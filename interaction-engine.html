@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beyond Deduplication: Interaction Resolution Engine</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 350px;
+    max-height: 400px;
+}
+@media (min-width: 768px) {
+    .chart-container {
+        height: 400px;
+    }
+}
+.card-shadow {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.flow-arrow {
+    font-size: 2rem;
+    color: #3b82f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+}
+@media (min-width: 768px) {
+    .flow-arrow-horizontal {
+        margin: 0 1rem;
+        transform: rotate(-90deg);
+    }
+}
+</style>
+</head>
+<body class="antialiased selection:bg-blue-200 selection:text-blue-900">
+
+<nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <span class="font-bold text-xl tracking-tight text-blue-400">&#9881; Engine<span class="text-white">Architecture</span></span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="#problem" class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">The Challenge</a>
+                    <a href="#architecture" class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Metadata Model</a>
+                    <a href="#evaluation" class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Nuanced Evaluation</a>
+                    <a href="#orchestration" class="hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors">Orchestration</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<header class="bg-gradient-to-br from-blue-900 via-slate-800 to-slate-900 text-white py-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="uppercase tracking-widest text-orange-400 font-bold text-sm mb-4 block">CRM Architecture Pattern</span>
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            Beyond Deduplication: <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">The Interaction Resolution Engine</span>
+        </h1>
+        <p class="mt-4 text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto font-light">
+            How to resolve incoming CRM interactions before they pollute core data, transitioning from simple duplicate rules to intelligent prospect resolution.
+        </p>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <section id="problem" class="mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">Why Standard Duplicate Management Is Not Enough</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                Traditional duplicate management answers a narrow question: <em>Does this record look like another one?</em> Enterprise CRM requires an intelligent decision layer before raw data writes to core objects.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-2xl card-shadow p-8 border-t-4 border-orange-500">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                
+                <div class="flex flex-col items-center w-full md:w-1/4 text-center">
+                    <div class="bg-slate-100 p-6 rounded-full w-24 h-24 flex items-center justify-center text-4xl mb-4 text-slate-700 border-2 border-slate-200">
+                        &#128229;
+                    </div>
+                    <h3 class="font-bold text-lg">Raw Interaction</h3>
+                    <p class="text-sm text-slate-500 mt-2">Web Forms, Inbound Calls, Event Lists, Partner Referrals</p>
+                </div>
+
+                <div class="flow-arrow flow-arrow-horizontal">&#10132;</div>
+
+                <div class="flex flex-col items-center w-full md:w-2/4 bg-blue-50 border border-blue-200 rounded-xl p-6 relative">
+                    <span class="absolute -top-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">The Decision Layer</span>
+                    <h3 class="font-bold text-xl text-blue-900 mb-2">Interaction Resolution Engine</h3>
+                    <div class="grid grid-cols-2 gap-2 w-full mt-4 text-sm text-blue-800">
+                        <div class="bg-white p-2 rounded text-center border border-blue-100 shadow-sm">&#128269; Match Logic</div>
+                        <div class="bg-white p-2 rounded text-center border border-blue-100 shadow-sm">&#9878; Context Check</div>
+                        <div class="bg-white p-2 rounded text-center border border-blue-100 shadow-sm">&#128202; Priority Rank</div>
+                        <div class="bg-white p-2 rounded text-center border border-blue-100 shadow-sm">&#128736; Field Mapping</div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow flow-arrow-horizontal">&#10132;</div>
+
+                <div class="flex flex-col items-center w-full md:w-1/4 text-center">
+                    <div class="bg-teal-50 p-6 rounded-full w-24 h-24 flex items-center justify-center text-4xl mb-4 text-teal-600 border-2 border-teal-200">
+                        &#128193;
+                    </div>
+                    <h3 class="font-bold text-lg">Core CRM Records</h3>
+                    <p class="text-sm text-slate-500 mt-2">Leads, Contacts, Opportunities smartly updated or created</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture" class="mb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">A Metadata-Driven Design</h2>
+                <p class="text-lg text-slate-600 mb-4 leading-relaxed">
+                    The most powerful part of the solution is that the logic is modeled as metadata rather than buried inside Apex condition blocks. Code provides the framework; metadata defines the business behavior.
+                </p>
+                <ul class="space-y-4 mt-8">
+                    <li class="flex items-start">
+                        <span class="text-green-500 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-slate-800">Highly Configurable</strong>
+                            <span class="text-slate-600 text-sm">Rules can evolve without rewriting every branch of logic.</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-slate-800">Sequence-Driven Execution</strong>
+                            <span class="text-slate-600 text-sm">Prioritize high-confidence exact matches over looser contextual ones.</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 text-xl mr-3">&#10003;</span>
+                        <div>
+                            <strong class="block text-slate-800">Explainable Logic</strong>
+                            <span class="text-slate-600 text-sm">Business analysts can read the rule hierarchy like a truth table.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="bg-slate-800 rounded-2xl p-6 card-shadow text-white">
+                <div class="bg-slate-700 rounded-lg p-4 mb-4 border-l-4 border-blue-400">
+                    <div class="text-xs text-slate-400 uppercase tracking-wide">Top Level</div>
+                    <div class="font-bold text-lg">Rule Definitions</div>
+                    <div class="text-sm text-slate-300 mt-1">Defines target object, sequence, and logical operator.</div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 relative">
+                    <div class="absolute w-0.5 h-8 bg-slate-600 left-1/4 -top-4"></div>
+                    <div class="absolute w-0.5 h-8 bg-slate-600 left-3/4 -top-4"></div>
+                    <div class="absolute w-1/2 h-0.5 bg-slate-600 left-1/4 -top-4"></div>
+
+                    <div class="bg-slate-700 rounded-lg p-4 border-t-2 border-teal-400">
+                        <div class="font-bold text-teal-300 mb-2">&#128269; Evaluation</div>
+                        <div class="bg-slate-600 p-2 rounded text-sm mb-2">Condition Groups</div>
+                        <div class="bg-slate-600 p-2 rounded text-sm">Condition Items</div>
+                    </div>
+                    
+                    <div class="bg-slate-700 rounded-lg p-4 border-t-2 border-orange-400">
+                        <div class="font-bold text-orange-300 mb-2">&#9881; Orchestration</div>
+                        <div class="bg-slate-600 p-2 rounded text-sm mb-2">Action Groups</div>
+                        <div class="bg-slate-600 p-2 rounded text-sm">Action Items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="evaluation" class="mb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="order-2 lg:order-1 bg-white rounded-2xl p-6 card-shadow">
+                <h3 class="text-xl font-bold text-center text-slate-800 mb-6">Interaction Processing Outcomes</h3>
+                <div class="chart-container">
+                    <canvas id="outcomesChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="order-1 lg:order-2 flex flex-col justify-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-6">Evaluating Truth with Structure</h2>
+                <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                    Condition Items are the atomic units of evaluation. You are no longer limited to "same email = same person." The engine supports nuanced paths based on context, meaning the CRM actively interprets business intent.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-center">
+                        <div class="text-2xl mr-4">&#128100;</div>
+                        <div>
+                            <strong class="text-blue-900 block">Same Person, Different Interest</strong>
+                            <span class="text-sm text-blue-700">Creates a new Opportunity instead of ignoring the lead.</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-100 flex items-center">
+                        <div class="text-2xl mr-4">&#9888;</div>
+                        <div>
+                            <strong class="text-orange-900 block">Same Person, Disqualified Record</strong>
+                            <span class="text-sm text-orange-700">Triggers a reactivation workflow with updated status.</span>
+                        </div>
+                    </div>
+                    <div class="bg-teal-50 p-4 rounded-lg border border-teal-100 flex items-center">
+                        <div class="text-2xl mr-4">&#128274;</div>
+                        <div>
+                            <strong class="text-teal-900 block">Same Person, Protected Data</strong>
+                            <span class="text-sm text-teal-700">Limits updates to preserve a salesperson's golden record.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="orchestration" class="mb-20">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">From Evaluation to Orchestration</h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                Finding a match is only half the problem. Action Groups define what manipulation happens to which object. The <strong>Logic Upsert</strong> introduces intelligent handling, resolving both identity and the correct evolutionary path of the record.
+            </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 card-shadow">
+            <div class="chart-container">
+                <canvas id="actionsChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-slate-500 mt-6 max-w-2xl mx-auto">
+                Action Items provide field-level precision, allowing targeted updates (e.g., updating the last interaction date) while preserving crucial historical context (e.g., original lead source).
+            </p>
+        </div>
+    </section>
+
+    <section class="bg-slate-900 rounded-3xl p-10 text-white card-shadow mb-12 relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mt-16 -mr-16 text-slate-800 opacity-50" style="font-size: 15rem;">
+            &#10032;
+        </div>
+        <div class="relative z-10">
+            <h2 class="text-3xl font-bold mb-10 text-center">Strategic Value of the Pattern</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <div class="bg-slate-800 rounded-xl p-6 border-t-4 border-blue-500">
+                    <div class="text-4xl mb-4 text-blue-400">&#9889;</div>
+                    <h3 class="font-bold text-xl mb-2">Administrative Agility</h3>
+                    <p class="text-sm text-slate-400">Business rules can evolve rapidly through metadata management without requiring extensive Apex code rewrites.</p>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-6 border-t-4 border-teal-500">
+                    <div class="text-4xl mb-4 text-teal-400">&#128142;</div>
+                    <h3 class="font-bold text-xl mb-2">Improved Data Quality</h3>
+                    <p class="text-sm text-slate-400">Uncontrolled Lead creation is eliminated. Every interaction passes through a structured decision layer.</p>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-6 border-t-4 border-orange-500">
+                    <div class="text-4xl mb-4 text-orange-400">&#128737;</div>
+                    <h3 class="font-bold text-xl mb-2">Safer Orchestration</h3>
+                    <p class="text-sm text-slate-400">Selective field mapping protects critical historical data and significantly reduces accidental data degradation.</p>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-6 border-t-4 border-rose-500">
+                    <div class="text-4xl mb-4 text-rose-400">&#128205;</div>
+                    <h3 class="font-bold text-xl mb-2">Nuanced Journeys</h3>
+                    <p class="text-sm text-slate-400">The system responds to context, status, and strategic business rules rather than falling back to a narrow binary check.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-slate-900 border-t border-slate-800 text-center py-8">
+    <p class="text-slate-400">
+        It turns the CRM from a passive receiver of data into an active interpreter of business intent.
+    </p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const outcomesCtx = document.getElementById('outcomesChart').getContext('2d');
+    new Chart(outcomesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                ['Create', 'New Lead'], 
+                ['Update Existing', 'Contact'], 
+                ['Revive', 'Opportunity'], 
+                ['Reject', 'Duplicate']
+            ],
+            datasets: [{
+                data: [15, 45, 30, 10],
+                backgroundColor: [
+                    '#10b981', 
+                    '#3b82f6', 
+                    '#f97316', 
+                    '#f43f5e'  
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: 13
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            } else {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const actionsCtx = document.getElementById('actionsChart').getContext('2d');
+    new Chart(actionsCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                ['Marketing', 'Intake'], 
+                ['Sales', 'Inquiries'], 
+                ['Partner', 'Referrals'], 
+                ['Event', 'Attendees']
+            ],
+            datasets: [
+                {
+                    label: 'Standard Match & Update',
+                    data: [65, 40, 55, 75],
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Complex Logic Upsert',
+                    data: [35, 60, 45, 25],
+                    backgroundColor: '#f97316',
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    grid: {
+                        color: '#f1f5f9'
+                    },
+                    ticks: {
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            } else {
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
