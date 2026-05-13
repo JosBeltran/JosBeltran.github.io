@@ -1,150 +1,402 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Name | CRM Architect & Strategist</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root {
-    --bg: #f6f7fb;
-    --surface: rgba(255,255,255,0.72);
-    --surface-strong: rgba(255,255,255,0.88);
-    --text: #0f172a;
-    --muted: #475569;
-    --line: rgba(148,163,184,0.22);
-    --accent: #60a5fa;
-    --accent-2: #f472b6;
-}
-html { scroll-behavior: smooth; }
-body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background:
-        radial-gradient(circle at top left, rgba(96,165,250,0.10), transparent 28%),
-        radial-gradient(circle at top right, rgba(244,114,182,0.08), transparent 24%),
-        var(--bg);
-    color: var(--text);
-}
-.glass-nav {
-    backdrop-filter: blur(18px);
-    background: rgba(246,247,251,0.75);
-    border-bottom: 1px solid rgba(255,255,255,0.65);
-}
-.hero-panel {
-    background: linear-gradient(180deg, rgba(15,23,42,0.12) 0%, rgba(15,23,42,0.34) 38%, rgba(15,23,42,0.60) 100%);
-}
-.card {
-    background: var(--surface-strong);
-    border: 1px solid var(--line);
-    box-shadow: 0 20px 60px rgba(15,23,42,0.08);
-}
-.card-hover {
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-}
-.card-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 28px 80px rgba(15,23,42,0.12);
-    border-color: rgba(96,165,250,0.32);
-}
-.painting-tint {
-    background: linear-gradient(135deg, rgba(37,99,235,0.18), rgba(244,114,182,0.14));
-    mix-blend-mode: screen;
-}
-.section-art-overlay {
-    background: linear-gradient(180deg, rgba(246,247,251,0.86) 0%, rgba(246,247,251,0.80) 100%);
-    backdrop-filter: blur(3px);
-}
-.text-balance { text-wrap: balance; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>J. Beltrán — Abstract Works</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #050505;
+      color: #f5f5f0;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      isolation: isolate;
+      background:
+        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.85)),
+        url("./images/IMG_6980.JPEG") center / cover fixed;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.72) 72%);
+      z-index: -1;
+    }
+
+    .hero-content {
+      max-width: 900px;
+    }
+
+    .eyebrow {
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      font-size: .78rem;
+      color: #d7d0bd;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-size: clamp(3.4rem, 10vw, 9rem);
+      line-height: .88;
+      letter-spacing: -0.08em;
+      font-weight: 750;
+      margin-bottom: 1.5rem;
+    }
+
+    .intro {
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.7;
+      color: #ddd8c7;
+      max-width: 760px;
+      margin: 0 auto 2rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      color: #111;
+      background: #f2efe2;
+      text-decoration: none;
+      padding: .9rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .button.secondary {
+      color: #f2efe2;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      background: #fff;
+    }
+
+    .section-title {
+      padding: 7rem 1.5rem 4rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .section-title h2 {
+      font-size: clamp(2rem, 5vw, 5rem);
+      line-height: .95;
+      letter-spacing: -0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .section-title p {
+      color: #bbb5a5;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      max-width: 680px;
+    }
+
+    .work {
+      min-height: 115vh;
+      position: relative;
+      display: grid;
+      align-items: end;
+      padding: 2rem;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .work::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: var(--image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      transform: scale(1.03);
+      filter: saturate(1.08) contrast(1.03);
+    }
+
+    .work::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,.88) 100%);
+    }
+
+    .work-card {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      padding: 1.4rem;
+      border-radius: 24px;
+      background: rgba(8, 8, 8, .58);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.45);
+    }
+
+    .work-number {
+      color: #cfc6ab;
+      font-size: .82rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: .7rem;
+    }
+
+    .work h3 {
+      font-size: clamp(1.8rem, 4vw, 3.8rem);
+      letter-spacing: -0.045em;
+      line-height: 1;
+      margin-bottom: .85rem;
+    }
+
+    .work p {
+      color: #ddd8c7;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .info-strip {
+      padding: 6rem 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .info-card {
+      padding: 1.5rem;
+      border-radius: 24px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .info-card strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: .6rem;
+    }
+
+    .info-card span {
+      color: #bdb6a3;
+      line-height: 1.6;
+    }
+
+    .contact {
+      min-height: 80vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      background:
+        linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.92)),
+        url("./images/IMG_6987.JPEG") center / cover fixed;
+    }
+
+    .contact-inner {
+      max-width: 780px;
+    }
+
+    .contact h2 {
+      font-size: clamp(2.4rem, 7vw, 6rem);
+      line-height: .92;
+      letter-spacing: -0.06em;
+      margin-bottom: 1.2rem;
+    }
+
+    .contact p {
+      color: #d7d0bd;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    footer {
+      padding: 2rem;
+      color: #807968;
+      text-align: center;
+      font-size: .9rem;
+      background: #050505;
+    }
+
+    @media (max-width: 780px) {
+      .hero,
+      .work::before,
+      .contact {
+        background-attachment: scroll;
+      }
+
+      .work {
+        min-height: 95vh;
+        padding: 1rem;
+      }
+
+      .work-card {
+        padding: 1rem;
+      }
+
+      .info-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="text-slate-900 antialiased selection:bg-blue-200 selection:text-slate-900">
-
-<nav class="glass-nav sticky top-0 z-50">
-    <div class="flex justify-between items-center px-6 md:px-8 py-5 max-w-7xl mx-auto">
-        <div class="text-2xl font-extrabold tracking-tight text-slate-900">PORTFOLIO.</div>
-        <div class="hidden md:flex items-center space-x-8 font-medium text-slate-600">
-            <a href="#about" class="hover:text-slate-900 transition-colors">About</a>
-            <a href="#articles" class="hover:text-slate-900 transition-colors">Articles</a>
-            <a href="mailto:your.email@example.com" class="bg-slate-900 text-white px-5 py-2.5 rounded-full hover:bg-slate-700 transition-all">Contact Me</a>
-        </div>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <div class="eyebrow">Abstract works on paper</div>
+      <h1>J. Beltrán</h1>
+      <p class="intro">
+        Una colección de piezas abstractas construidas con capas, círculos, movimiento y contraste. Obras íntimas, directas y contemporáneas para espacios que buscan energía visual.
+      </p>
+      <div class="cta-row">
+        <a class="button" href="#collection">Ver colección</a>
+        <a class="button secondary" href="https://wa.me/521XXXXXXXXXX?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Preguntar por WhatsApp</a>
+      </div>
     </div>
-</nav>
+  </header>
 
-<section id="about" class="relative min-h-[88vh] flex items-center overflow-hidden">
-    <img src="IMG_6925.JPEG" alt="Abstract painting background" class="absolute inset-0 w-full h-full object-cover">
-    <div class="absolute inset-0 painting-tint"></div>
-    <div class="absolute inset-0 hero-panel"></div>
+  <section class="section-title" id="collection">
+    <h2>Scroll collection</h2>
+    <p>
+      Cada imagen aparece como una escena completa. La página está pensada para que la obra domine la pantalla y el visitante avance pieza por pieza, casi como una visita privada.
+    </p>
+  </section>
 
-    <div class="relative max-w-7xl mx-auto px-6 md:px-8 w-full py-24">
-        <div class="max-w-4xl text-center md:text-left mx-auto md:mx-0">
-            <div class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wide text-white uppercase bg-white/12 border border-white/20 rounded-full backdrop-blur-sm">Available for Architecture Consulting</div>
-            <h1 class="text-balance text-5xl md:text-7xl font-extrabold mb-8 tracking-tight leading-[1.04] text-white">
-                I build <span class="text-blue-300">intelligent systems</span> for complex CRM data.
-            </h1>
-            <p class="text-xl text-slate-200 leading-relaxed mb-10 max-w-3xl">
-                Specializing in Salesforce architecture, metadata-driven engines, and interaction resolution strategies that bridge the gap between raw data and business growth.
-            </p>
-            <div class="flex flex-col sm:flex-row sm:justify-center md:justify-start gap-4">
-                <a href="#articles" class="bg-white text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all">Read My Articles</a>
-                <a href="https://linkedin.com/in/your-profile" class="bg-white/10 text-white border border-white/20 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/16 transition-all backdrop-blur-sm">View LinkedIn</a>
-            </div>
-        </div>
+  <section class="work" style="--image: url('./images/IMG_6980.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 01</div>
+      <h3>Orbit Field</h3>
+      <p>Verdes profundos, negros densos y líneas circulares que sugieren movimiento interno.</p>
     </div>
-</section>
+  </section>
 
-
-<section id="articles" class="py-24 px-6 md:px-8 max-w-7xl mx-auto">
-    <div class="flex justify-between items-end mb-12">
-        <div>
-            <h2 class="text-3xl md:text-4xl font-bold mb-2 tracking-tight">Technical Deep Dives</h2>
-            <p class="text-slate-500">Architectural patterns and strategic insights.</p>
-        </div>
+  <section class="work" style="--image: url('./images/IMG_6926.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 02</div>
+      <h3>Blue Structure</h3>
+      <p>Una pieza fría y arquitectónica, con capas azules y trazos que cruzan como rutas.</p>
     </div>
+  </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="card rounded-[2rem] p-10 card-hover flex flex-col">
-            <div class="flex gap-3 mb-6 flex-wrap">
-                <span class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">CRM Architecture</span>
-                <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Featured</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-4 leading-snug">Beyond Deduplication: Designing an Interaction Resolution Engine</h3>
-            <p class="text-slate-600 mb-6 leading-relaxed">
-                Traditional duplicate management is no longer enough for enterprise CRM. Learn how a metadata-driven decision layer interprets intent before data hits core records.
-            </p>
-            <a href="interaction-engine.html" class="inline-flex items-center text-slate-900 font-bold hover:text-blue-700 transition-colors mt-auto">
-                Read Full Case Study <span class="ml-2">&#10230;</span>
-            </a>
-        </div>
-
-        <div class="card rounded-[2rem] p-10 card-hover flex flex-col">
-            <div class="flex gap-3 mb-6 flex-wrap">
-                <span class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Metadata</span>
-                <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Scalability</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-4 leading-snug">Product Validation Engine</h3>
-            <p class="text-slate-600 mb-6 leading-relaxed">
-                 How I replaced rigid hard-coded validation rules with a high-performance, configurable engine that reduced deployment time for new products by 80%.
-            </p>
-            <a href="validation-engine.html" class="inline-flex items-center text-slate-900 font-bold hover:text-blue-700 transition-colors mt-auto">
-                Read Full Case Study <span class="ml-2">&#10230;</span>
-            </a>
-        </div>
+  <section class="work" style="--image: url('./images/IMG_6969.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 03</div>
+      <h3>Green Atmosphere</h3>
+      <p>Una composición envolvente en verde y violeta, con círculos translúcidos y tensión suave.</p>
     </div>
-</section>
+  </section>
 
-<footer class="py-12 border-t border-slate-200 text-center text-slate-400 text-sm">
-    <div class="max-w-7xl mx-auto px-8 text-center">
-        <p class="text-slate-500 font-medium mb-4">Connect with me</p>
-        <div class="flex justify-center gap-8 mb-12 flex-wrap">
-            <a href="#" class="text-slate-900 font-bold hover:text-blue-700 transition-colors">LinkedIn</a>
-            <a href="#" class="text-slate-900 font-bold hover:text-blue-700 transition-colors">GitHub</a>
-            <a href="#" class="text-slate-900 font-bold hover:text-blue-700 transition-colors">Resume</a>
-        </div>
-        <p class="text-xs text-slate-400 uppercase tracking-[0.25em] font-bold">© 2026 Systems Architect Portfolio</p>
+  <section class="work" style="--image: url('./images/IMG_7046.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 04</div>
+      <h3>Magenta Signal</h3>
+      <p>Magenta oscuro, transparencias y trazos luminosos sobre una superficie vibrante.</p>
     </div>
-</footer>
+  </section>
 
+  <section class="work" style="--image: url('./images/IMG_6925.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 05</div>
+      <h3>Deep Blue Orbit</h3>
+      <p>Azules y verdes en capas con un gesto circular central que organiza la composición.</p>
+    </div>
+  </section>
+
+  <section class="work" style="--image: url('./images/IMG_6908.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 06</div>
+      <h3>Cosmic Route</h3>
+      <p>Una pieza más dinámica, con azules, naranjas y círculos que recuerdan mapas o constelaciones.</p>
+    </div>
+  </section>
+
+  <section class="work" style="--image: url('./images/IMG_6930.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 07</div>
+      <h3>Violet Gravity</h3>
+      <p>Negros y violetas profundos con formas circulares que flotan como campos de energía.</p>
+    </div>
+  </section>
+
+  <section class="work" style="--image: url('./images/IMG_6976.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 08</div>
+      <h3>Green Core</h3>
+      <p>Una obra de centro fuerte, casi ritual, con verdes intensos, blanco y acentos naranja.</p>
+    </div>
+  </section>
+
+  <section class="work" style="--image: url('./images/IMG_6985.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 09</div>
+      <h3>Hidden Garden</h3>
+      <p>Capas oscuras y verdes con círculos claros que emergen como señales bajo la superficie.</p>
+    </div>
+  </section>
+
+  <section class="work" style="--image: url('./images/IMG_6987.JPEG')">
+    <div class="work-card">
+      <div class="work-number">Work 10</div>
+      <h3>Urban Bloom</h3>
+      <p>Una composición intensa con trazos violetas, verdes y naranjas sobre una base oscura.</p>
+    </div>
+  </section>
+
+  <section class="info-strip">
+    <div class="info-card">
+      <strong>Formato</strong>
+      <span>Obras abstractas en papel. Ideales para enmarcar en formato moderno, con margen blanco o marco flotante.</span>
+    </div>
+    <div class="info-card">
+      <strong>Serie</strong>
+      <span>Una exploración de capas, órbitas, señales y movimiento visual. Cada pieza puede funcionar sola o como set.</span>
+    </div>
+    <div class="info-card">
+      <strong>Disponibilidad</strong>
+      <span>Consulta medidas, precio y opciones de entrega directa por WhatsApp.</span>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="contact-inner">
+      <h2>Interested in a piece?</h2>
+      <p>
+        Escríbeme por WhatsApp para preguntar por una obra, reservarla o ver opciones de set para decorar un espacio.
+      </p>
+      <a class="button" href="https://wa.me/5218123518298?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Contactar por WhatsApp</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 J. Beltrán. Abstract works on paper.
+  </footer>
 </body>
 </html>
