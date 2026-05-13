@@ -162,25 +162,34 @@
     }
 
     .work {
-      min-height: 112vh;
-      position: relative;
-      display: grid;
-      align-items: end;
-      padding: 2rem;
-      overflow: hidden;
-      background: #000;
+    /* 100vh asegura que la sección ocupe exactamente una pantalla */
+  min-height: 100vh;
+  position: relative;
+  display: grid;
+  align-items: end;
+  padding: 2rem;
+  overflow: hidden;
+  background: #000; /* Fondo negro para las "barras" laterales en monitores anchos */
     }
 
     .work::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: var(--image);
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      transform: scale(1.035);
-      filter: saturate(1.08) contrast(1.04);
+content: "";
+  position: absolute;
+  /* Ajustamos el inset para dar un poco de aire (opcional) */
+  inset: 0;
+  background-image: var(--image);
+
+  /* CAMBIO CLAVE: 'contain' asegura que la imagen se vea completa */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  /* Mantenemos el fixed para el efecto de profundidad,
+     pero quitamos el scale para no comer bordes */
+  background-attachment: fixed;
+  transform: scale(1);
+
+  filter: saturate(1.08) contrast(1.04);
     }
 
     .work::after {
