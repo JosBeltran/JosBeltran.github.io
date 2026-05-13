@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>J. Beltrán — Abstract Works</title>
+  <title>J. Beltrán — Abstract Collections</title>
   <style>
     * {
       box-sizing: border-box;
@@ -22,6 +22,10 @@
       overflow-x: hidden;
     }
 
+    a {
+      color: inherit;
+    }
+
     .hero {
       min-height: 100vh;
       display: grid;
@@ -31,20 +35,20 @@
       position: relative;
       isolation: isolate;
       background:
-        linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.85)),
-        url("./images/IMG_6980.JPEG") center / cover fixed;
+        linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.9)),
+        url("./images/ORBITALS/IMG_6980.JPEG") center / cover fixed;
     }
 
     .hero::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.72) 72%);
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.74) 72%);
       z-index: -1;
     }
 
     .hero-content {
-      max-width: 900px;
+      max-width: 980px;
     }
 
     .eyebrow {
@@ -56,10 +60,10 @@
     }
 
     h1 {
-      font-size: clamp(3.4rem, 10vw, 9rem);
+      font-size: clamp(3.2rem, 10vw, 9rem);
       line-height: .88;
       letter-spacing: -0.08em;
-      font-weight: 750;
+      font-weight: 780;
       margin-bottom: 1.5rem;
     }
 
@@ -67,7 +71,7 @@
       font-size: clamp(1rem, 2vw, 1.35rem);
       line-height: 1.7;
       color: #ddd8c7;
-      max-width: 760px;
+      max-width: 790px;
       margin: 0 auto 2rem;
     }
 
@@ -84,7 +88,7 @@
       text-decoration: none;
       padding: .9rem 1.25rem;
       border-radius: 999px;
-      font-weight: 700;
+      font-weight: 750;
       transition: transform .2s ease, background .2s ease;
     }
 
@@ -100,16 +104,53 @@
       background: #fff;
     }
 
+    .collection-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+      padding: .85rem 1rem;
+      background: rgba(5, 5, 5, .74);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(14px);
+    }
+
+    .collection-nav a {
+      text-decoration: none;
+      color: #d7d0bd;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: .55rem .85rem;
+      border-radius: 999px;
+      font-size: .88rem;
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .collection-nav a:hover {
+      background: #f2efe2;
+      color: #101010;
+    }
+
     .section-title {
       padding: 7rem 1.5rem 4rem;
-      max-width: 980px;
+      max-width: 1050px;
       margin: 0 auto;
     }
 
+    .section-title .label {
+      color: #bcb49f;
+      text-transform: uppercase;
+      letter-spacing: .24em;
+      font-size: .76rem;
+      margin-bottom: 1rem;
+    }
+
     .section-title h2 {
-      font-size: clamp(2rem, 5vw, 5rem);
-      line-height: .95;
-      letter-spacing: -0.05em;
+      font-size: clamp(2.4rem, 6vw, 6rem);
+      line-height: .9;
+      letter-spacing: -0.06em;
       margin-bottom: 1rem;
     }
 
@@ -117,11 +158,11 @@
       color: #bbb5a5;
       font-size: 1.1rem;
       line-height: 1.7;
-      max-width: 680px;
+      max-width: 730px;
     }
 
     .work {
-      min-height: 115vh;
+      min-height: 112vh;
       position: relative;
       display: grid;
       align-items: end;
@@ -138,21 +179,21 @@
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      transform: scale(1.03);
-      filter: saturate(1.08) contrast(1.03);
+      transform: scale(1.035);
+      filter: saturate(1.08) contrast(1.04);
     }
 
     .work::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,.88) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.24) 45%, rgba(0,0,0,.88) 100%);
     }
 
     .work-card {
       position: relative;
       z-index: 1;
-      max-width: 680px;
+      max-width: 690px;
       padding: 1.4rem;
       border-radius: 24px;
       background: rgba(8, 8, 8, .58);
@@ -180,6 +221,34 @@
       color: #ddd8c7;
       line-height: 1.7;
       font-size: 1rem;
+    }
+
+    .collection-break {
+      min-height: 70vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: #090909;
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .collection-break-inner {
+      max-width: 850px;
+    }
+
+    .collection-break h2 {
+      font-size: clamp(2.6rem, 7vw, 7rem);
+      line-height: .9;
+      letter-spacing: -0.07em;
+      margin-bottom: 1.2rem;
+    }
+
+    .collection-break p {
+      color: #c9c1ad;
+      line-height: 1.7;
+      font-size: 1.1rem;
     }
 
     .info-strip {
@@ -217,7 +286,7 @@
       padding: 2rem;
       background:
         linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.92)),
-        url("./images/IMG_6987.JPEG") center / cover fixed;
+        url("./images/FLOW/IMG_7735.JPEG") center / cover fixed;
     }
 
     .contact-inner {
@@ -254,7 +323,7 @@
       }
 
       .work {
-        min-height: 95vh;
+        min-height: 94vh;
         padding: 1rem;
       }
 
@@ -269,119 +338,147 @@
   </style>
 </head>
 <body>
-  <header class="hero">
+  <header class="hero" id="top">
     <div class="hero-content">
       <div class="eyebrow">Abstract works on paper</div>
       <h1>J. Beltrán</h1>
       <p class="intro">
-        Una colección de piezas abstractas construidas con capas, círculos, movimiento y contraste. Obras íntimas, directas y contemporáneas para espacios que buscan energía visual.
+        Tres colecciones abstractas construidas con capas, círculos, movimiento, contraste y color. Una experiencia visual tipo parallax para recorrer las obras como una galería privada.
       </p>
       <div class="cta-row">
-        <a class="button" href="#collection">Ver colección</a>
+        <a class="button" href="#orbitals">Ver colecciones</a>
         <a class="button secondary" href="https://wa.me/521XXXXXXXXXX?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Preguntar por WhatsApp</a>
       </div>
     </div>
   </header>
 
-  <section class="section-title" id="collection">
-    <h2>Scroll collection</h2>
+  <nav class="collection-nav" aria-label="Colecciones">
+    <a href="#orbitals">Orbitals</a>
+    <a href="#flow">Flow</a>
+    <a href="#deco">Deco</a>
+    <a href="#contact">Contacto</a>
+  </nav>
+
+  <section class="section-title" id="orbitals">
+    <div class="label">Collection 01</div>
+    <h2>Orbitals</h2>
     <p>
-      Cada imagen aparece como una escena completa. La página está pensada para que la obra domine la pantalla y el visitante avance pieza por pieza, casi como una visita privada.
+      Una serie basada en campos circulares, capas oscuras y trazos que cruzan la composición como órbitas. Ideal para presentar como la colección principal de alto impacto visual.
     </p>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6980.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 01</div>
-      <h3>Orbit Field</h3>
-      <p>Verdes profundos, negros densos y líneas circulares que sugieren movimiento interno.</p>
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6980.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 01</div><h3>Orbit Field</h3><p>Verdes profundos, negros densos y líneas circulares que sugieren movimiento interno.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6926.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 02</div><h3>Blue Structure</h3><p>Una pieza fría y arquitectónica, con capas azules y trazos que cruzan como rutas.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6969.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 03</div><h3>Green Atmosphere</h3><p>Una composición envolvente en verde y violeta, con círculos translúcidos y tensión suave.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_7046.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 04</div><h3>Magenta Signal</h3><p>Magenta oscuro, transparencias y trazos luminosos sobre una superficie vibrante.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6925.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 05</div><h3>Deep Blue Orbit</h3><p>Azules y verdes en capas con un gesto circular central que organiza la composición.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6908.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 06</div><h3>Cosmic Route</h3><p>Una pieza más dinámica, con azules, naranjas y círculos que recuerdan mapas o constelaciones.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6930.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 07</div><h3>Violet Gravity</h3><p>Negros y violetas profundos con formas circulares que flotan como campos de energía.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6976.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 08</div><h3>Green Core</h3><p>Una obra de centro fuerte, casi ritual, con verdes intensos, blanco y acentos naranja.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6985.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 09</div><h3>Hidden Garden</h3><p>Capas oscuras y verdes con círculos claros que emergen como señales bajo la superficie.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/ORBITALS/IMG_6987.JPEG')">
+    <div class="work-card"><div class="work-number">Orbitals 10</div><h3>Urban Bloom</h3><p>Una composición intensa con trazos violetas, verdes y naranjas sobre una base oscura.</p></div>
+  </section>
+
+  <section class="collection-break" id="flow">
+    <div class="collection-break-inner">
+      <div class="label">Collection 02</div>
+      <h2>Flow</h2>
+      <p>
+        Piezas con sensación de desplazamiento, textura expandida y energía más gestual. Esta sección funciona como un cambio de ritmo dentro del recorrido.
+      </p>
     </div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6926.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 02</div>
-      <h3>Blue Structure</h3>
-      <p>Una pieza fría y arquitectónica, con capas azules y trazos que cruzan como rutas.</p>
+  <section class="work" style="--image: url('./images/FLOW/IMG_7726.PNG')">
+    <div class="work-card"><div class="work-number">Flow 01</div><h3>First Current</h3><p>Una obra de flujo amplio, marcada por capas y movimiento visual extendido.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/FLOW/IMG_7727.PNG')">
+    <div class="work-card"><div class="work-number">Flow 02</div><h3>Open Movement</h3><p>Textura, expansión y profundidad para una lectura más atmosférica.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/FLOW/IMG_7728.PNG')">
+    <div class="work-card"><div class="work-number">Flow 03</div><h3>Surface Drift</h3><p>Capas dinámicas que crean una sensación de desplazamiento continuo.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/FLOW/IMG_7734.JPEG')">
+    <div class="work-card"><div class="work-number">Flow 04</div><h3>Soft Pulse</h3><p>Una pieza más íntima, con ritmo controlado y contrastes sutiles.</p></div>
+  </section>
+
+  <section class="work" style="--image: url('./images/FLOW/IMG_7735.JPEG')">
+    <div class="work-card"><div class="work-number">Flow 05</div><h3>Last Wave</h3><p>El cierre de la serie Flow, con presencia visual directa y energía de transición.</p></div>
+  </section>
+
+  <section class="collection-break" id="deco">
+    <div class="collection-break-inner">
+      <div class="label">Collection 03</div>
+      <h2>Deco</h2>
+      <p>
+        Una colección más decorativa y adaptable a interiores. Pensada para compradores que buscan una pieza lista para transformar un muro o armar un set.
+      </p>
     </div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6969.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 03</div>
-      <h3>Green Atmosphere</h3>
-      <p>Una composición envolvente en verde y violeta, con círculos translúcidos y tensión suave.</p>
-    </div>
+  <section class="work" style="--image: url('./images/DECO/IMG_7708.JPEG')">
+    <div class="work-card"><div class="work-number">Deco 01</div><h3>Room Accent</h3><p>Una obra pensada para generar presencia en espacios modernos sin perder textura.</p></div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_7046.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 04</div>
-      <h3>Magenta Signal</h3>
-      <p>Magenta oscuro, transparencias y trazos luminosos sobre una superficie vibrante.</p>
-    </div>
+  <section class="work" style="--image: url('./images/DECO/IMG_7710.JPEG')">
+    <div class="work-card"><div class="work-number">Deco 02</div><h3>Wall Rhythm</h3><p>Movimiento visual y balance para integrarse en sala, estudio o recibidor.</p></div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6925.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 05</div>
-      <h3>Deep Blue Orbit</h3>
-      <p>Azules y verdes en capas con un gesto circular central que organiza la composición.</p>
-    </div>
+  <section class="work" style="--image: url('./images/DECO/IMG_7715.JPEG')">
+    <div class="work-card"><div class="work-number">Deco 03</div><h3>Interior Signal</h3><p>Una pieza con lenguaje abstracto claro y lectura decorativa inmediata.</p></div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6908.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 06</div>
-      <h3>Cosmic Route</h3>
-      <p>Una pieza más dinámica, con azules, naranjas y círculos que recuerdan mapas o constelaciones.</p>
-    </div>
+  <section class="work" style="--image: url('./images/DECO/IMG_7716.JPEG')">
+    <div class="work-card"><div class="work-number">Deco 04</div><h3>Modern Layer</h3><p>Capas, contraste y composición para un estilo contemporáneo y sobrio.</p></div>
   </section>
 
-  <section class="work" style="--image: url('./images/IMG_6930.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 07</div>
-      <h3>Violet Gravity</h3>
-      <p>Negros y violetas profundos con formas circulares que flotan como campos de energía.</p>
-    </div>
-  </section>
-
-  <section class="work" style="--image: url('./images/IMG_6976.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 08</div>
-      <h3>Green Core</h3>
-      <p>Una obra de centro fuerte, casi ritual, con verdes intensos, blanco y acentos naranja.</p>
-    </div>
-  </section>
-
-  <section class="work" style="--image: url('./images/IMG_6985.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 09</div>
-      <h3>Hidden Garden</h3>
-      <p>Capas oscuras y verdes con círculos claros que emergen como señales bajo la superficie.</p>
-    </div>
-  </section>
-
-  <section class="work" style="--image: url('./images/IMG_6987.JPEG')">
-    <div class="work-card">
-      <div class="work-number">Work 10</div>
-      <h3>Urban Bloom</h3>
-      <p>Una composición intensa con trazos violetas, verdes y naranjas sobre una base oscura.</p>
-    </div>
+  <section class="work" style="--image: url('./images/DECO/IMG_7721.JPEG')">
+    <div class="work-card"><div class="work-number">Deco 05</div><h3>Collected Space</h3><p>Una obra ideal para cerrar la colección como set o como pieza individual.</p></div>
   </section>
 
   <section class="info-strip">
     <div class="info-card">
-      <strong>Formato</strong>
-      <span>Obras abstractas en papel. Ideales para enmarcar en formato moderno, con margen blanco o marco flotante.</span>
+      <strong>3 colecciones</strong>
+      <span>Orbitals, Flow y Deco separan tu obra por narrativa visual y ayudan a que el comprador entienda mejor tu propuesta.</span>
     </div>
     <div class="info-card">
-      <strong>Serie</strong>
-      <span>Una exploración de capas, órbitas, señales y movimiento visual. Cada pieza puede funcionar sola o como set.</span>
+      <strong>Formato de galería</strong>
+      <span>Cada obra ocupa una pantalla completa para elevar la percepción de valor y evitar que se vea como una publicación casual.</span>
     </div>
     <div class="info-card">
-      <strong>Disponibilidad</strong>
-      <span>Consulta medidas, precio y opciones de entrega directa por WhatsApp.</span>
+      <strong>Venta directa</strong>
+      <span>El botón de WhatsApp permite preguntar por medidas, precio, disponibilidad, set o entrega.</span>
     </div>
   </section>
 
@@ -391,12 +488,12 @@
       <p>
         Escríbeme por WhatsApp para preguntar por una obra, reservarla o ver opciones de set para decorar un espacio.
       </p>
-      <a class="button" href="https://wa.me/5218123518298?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Contactar por WhatsApp</a>
+      <a class="button" href="https://wa.me/521XXXXXXXXXX?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Contactar por WhatsApp</a>
     </div>
   </section>
 
   <footer>
-    © 2026 J. Beltrán. Abstract works on paper.
+    © 2026 J. Beltrán. Abstract collections on paper. · <a href="#top">Volver arriba</a>
   </footer>
 </body>
 </html>
