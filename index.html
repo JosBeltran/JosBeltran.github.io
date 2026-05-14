@@ -379,6 +379,27 @@ content: "";
       }
     }
   </style>
+    <script>
+  window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const targetId = params.get("scrollTo");
+
+    if (!targetId) return;
+
+    const target = document.getElementById(targetId);
+
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+        window.history.replaceState({}, "", "index.html");
+      }, 350);
+    }
+  });
+</script>
 </head>
 <body>
   <header class="hero" id="top">
