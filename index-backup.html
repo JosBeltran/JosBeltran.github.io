@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>J. Beltrán — Abstract Collections</title>
+  <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:title" content="Orbital Art Collection – Josué Beltrán">
+<meta property="og:description" content="Explora una colección visual inmersiva de arte abstracto en formato interactivo.">
+<meta property="og:image" content="https://josbeltran.github.io/assets/preview.png">
+<meta property="og:url" content="https://josbeltran.github.io/">
+<meta property="og:type" content="website">
+
+<!-- Twitter (opcional pero recomendable) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orbital Art Collection – Josué Beltrán">
+<meta name="twitter:description" content="Arte abstracto en una experiencia tipo parallax interactiva.">
+<meta name="twitter:image" content="https://josbeltran.github.io/assets/preview.png">
+
+       <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #050505;
+      color: #f5f5f0;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      isolation: isolate;
+      background:
+        linear-gradient(rgba(0,0,0,.38), rgba(0,0,0,.9)),
+        url("./images/ORBITALS/IMG_6980.JPEG") center / cover fixed;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.74) 72%);
+      z-index: -1;
+    }
+
+    .hero-content {
+      max-width: 980px;
+    }
+
+    .eyebrow {
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      font-size: .78rem;
+      color: #d7d0bd;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 {
+      font-size: clamp(3.2rem, 10vw, 9rem);
+      line-height: .88;
+      letter-spacing: -0.08em;
+      font-weight: 780;
+      margin-bottom: 1.5rem;
+    }
+
+    .intro {
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      line-height: 1.7;
+      color: #ddd8c7;
+      max-width: 790px;
+      margin: 0 auto 2rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      color: #111;
+      background: #f2efe2;
+      text-decoration: none;
+      padding: .9rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 750;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .button.secondary {
+      color: #f2efe2;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      background: #fff;
+    }
+
+    .collection-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+      padding: .85rem 1rem;
+      background: rgba(5, 5, 5, .74);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(14px);
+    }
+
+    .collection-nav a {
+      text-decoration: none;
+      color: #d7d0bd;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: .55rem .85rem;
+      border-radius: 999px;
+      font-size: .88rem;
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .collection-nav a:hover {
+      background: #f2efe2;
+      color: #101010;
+    }
+
+    .section-title {
+      padding: 7rem 1.5rem 4rem;
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .section-title .label {
+      color: #bcb49f;
+      text-transform: uppercase;
+      letter-spacing: .24em;
+      font-size: .76rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title h2 {
+      font-size: clamp(2.4rem, 6vw, 6rem);
+      line-height: .9;
+      letter-spacing: -0.06em;
+      margin-bottom: 1rem;
+    }
+
+    .section-title p {
+      color: #bbb5a5;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      max-width: 730px;
+    }
+
+    .work {
+    /* 100vh asegura que la sección ocupe exactamente una pantalla */
+  min-height: 100vh;
+  position: relative;
+  display: grid;
+  align-items: end;
+  padding: 2rem;
+  overflow: hidden;
+  background: #000; /* Fondo negro para las "barras" laterales en monitores anchos */
+    }
+
+    .work::before {
+content: "";
+  position: absolute;
+  /* Ajustamos el inset para dar un poco de aire (opcional) */
+  inset: 0;
+  background-image: var(--image);
+
+  /* CAMBIO CLAVE: 'contain' asegura que la imagen se vea completa */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  /* Mantenemos el fixed para el efecto de profundidad,
+     pero quitamos el scale para no comer bordes */
+  background-attachment: fixed;
+  transform: scale(1);
+
+  filter: saturate(1.08) contrast(1.04);
+    }
+
+    .work::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.24) 45%, rgba(0,0,0,.88) 100%);
+    }
+
+    .work-card {
+      position: relative;
+      z-index: 1;
+      max-width: 690px;
+      padding: 1.4rem;
+      border-radius: 24px;
+      background: rgba(8, 8, 8, .58);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 30px 90px rgba(0,0,0,.45);
+    }
+
+    .work-number {
+      color: #cfc6ab;
+      font-size: .82rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: .7rem;
+    }
+
+    .work h3 {
+      font-size: clamp(1.8rem, 4vw, 3.8rem);
+      letter-spacing: -0.045em;
+      line-height: 1;
+      margin-bottom: .85rem;
+    }
+
+    .work p {
+      color: #ddd8c7;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .collection-break {
+      min-height: 70vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: #090909;
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .collection-break-inner {
+      max-width: 850px;
+    }
+
+    .collection-break h2 {
+      font-size: clamp(2.6rem, 7vw, 7rem);
+      line-height: .9;
+      letter-spacing: -0.07em;
+      margin-bottom: 1.2rem;
+    }
+
+    .collection-break p {
+      color: #c9c1ad;
+      line-height: 1.7;
+      font-size: 1.1rem;
+    }
+
+    .info-strip {
+      padding: 6rem 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .info-card {
+      padding: 1.5rem;
+      border-radius: 24px;
+      background: #111;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .info-card strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: .6rem;
+    }
+
+    .info-card span {
+      color: #bdb6a3;
+      line-height: 1.6;
+    }
+
+    .contact {
+      min-height: 80vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 2rem;
+      background:
+        linear-gradient(rgba(0,0,0,.76), rgba(0,0,0,.92)),
+        url("./images/FLOW/IMG_7735.JPEG") center / cover fixed;
+    }
+.work-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+}
+
+.work-card * {
+  text-decoration: none;
+}
+
+.work-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: 700;
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.work-card:hover .work-link {
+  opacity: 1;
+  transform: translateX(4px);
+}
+    .contact-inner {
+      max-width: 780px;
+    }
+
+    .contact h2 {
+      font-size: clamp(2.4rem, 7vw, 6rem);
+      line-height: .92;
+      letter-spacing: -0.06em;
+      margin-bottom: 1.2rem;
+    }
+
+    .contact p {
+      color: #d7d0bd;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    footer {
+      padding: 2rem;
+      color: #807968;
+      text-align: center;
+      font-size: .9rem;
+      background: #050505;
+    }
+
+    @media (max-width: 780px) {
+      .hero,
+      .work::before,
+      .contact {
+        background-attachment: scroll;
+      }
+
+      .work {
+        min-height: 94vh;
+        padding: 1rem;
+      }
+
+      .work-card {
+        padding: 1rem;
+      }
+
+      .info-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+      /* =========================================================
+   JBeltran — Minimal Gallery Override
+   Editorial / clean / modern gallery direction
+   ========================================================= */
+
+:root {
+  --page-bg: #f7f5ef;
+  --page-fg: #111111;
+  --muted: #6f6a5f;
+  --soft: #e8e3d8;
+  --line: rgba(17, 17, 17, 0.13);
+  --inverse-bg: #080808;
+  --inverse-fg: #f7f5ef;
+  --max: 1180px;
+}
+
+/* Base */
+html {
+  scroll-behavior: smooth;
+}
+
+body,
+.artwork-body {
+  background: var(--page-bg);
+  color: var(--page-fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+}
+
+/* =========================================================
+   HOME / INDEX
+   ========================================================= */
+
+.hero {
+  min-height: 92vh;
+  background: var(--page-bg) !important;
+  color: var(--page-fg);
+  padding: clamp(32px, 6vw, 90px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.hero::after {
+  display: none;
+}
+
+.hero-content {
+  width: min(100%, var(--max));
+  margin: 0 auto;
+}
+
+.eyebrow,
+.section-title .label,
+.collection-break .label,
+.artwork-code,
+.section-kicker,
+.full-artwork-heading span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+h1,
+.hero h1 {
+  color: var(--page-fg);
+  font-size: clamp(64px, 15vw, 210px);
+  line-height: 0.82;
+  letter-spacing: -0.095em;
+  font-weight: 760;
+  max-width: 1040px;
+  margin: 0 0 28px;
+}
+
+.intro {
+  margin: 0;
+  max-width: 580px;
+}
+
+.cta-row {
+  justify-content: flex-start;
+  margin-top: 34px;
+}
+
+.button,
+.btn,
+.platform-button,
+.certificate-button {
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: none !important;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.button,
+.btn-primary,
+.platform-button-primary {
+  background: var(--page-fg) !important;
+  color: var(--page-bg) !important;
+  border: 1px solid var(--page-fg) !important;
+}
+
+.button.secondary,
+.btn-secondary,
+.platform-button-outline {
+  background: transparent !important;
+  color: var(--page-fg) !important;
+  border: 1px solid var(--line) !important;
+}
+
+.button:hover,
+.btn:hover,
+.platform-button:hover {
+  transform: translateY(-1px);
+  background: transparent !important;
+  color: var(--page-fg) !important;
+  border-color: var(--page-fg) !important;
+}
+
+/* Nav */
+.collection-nav,
+.artwork-header {
+  background: rgba(247, 245, 239, 0.86) !important;
+  border-bottom: 1px solid var(--line) !important;
+  backdrop-filter: blur(18px);
+}
+
+.collection-nav a,
+.back-home {
+  color: var(--page-fg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 8px 0 !important;
+  margin: 0 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: transparent !important;
+}
+
+.collection-nav a:hover,
+.back-home:hover {
+  color: var(--muted) !important;
+  background: transparent !important;
+}
+
+/* Section titles */
+.section-title,
+.collection-break {
+  background: var(--page-bg) !important;
+  border: 0 !important;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(90px, 12vw, 180px) clamp(24px, 6vw, 72px) clamp(56px, 8vw, 110px);
+  text-align: left;
+  display: block;
+  min-height: auto;
+}
+
+.collection-break-inner {
+  max-width: 760px;
+}
+
+.section-title h2,
+.collection-break h2,
+.contact h2,
+.artwork-info h1,
+.section-heading h2,
+.full-artwork-heading h2 {
+  color: var(--page-fg);
+  font-size: clamp(52px, 9vw, 132px);
+  line-height: 0.86;
+  letter-spacing: -0.085em;
+  font-weight: 760;
+  margin: 0 0 22px;
+}
+
+.section-title p,
+.collection-break p,
+.contact p {
+  color: var(--muted);
+  max-width: 620px;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.55;
+}
+
+/* Artwork sections on index */
+.work {
+  min-height: 100vh;
+  background: var(--page-bg) !important;
+  padding: clamp(22px, 4vw, 54px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  overflow: hidden;
+}
+
+.work::before {
+  inset: clamp(24px, 5vw, 72px) !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-attachment: scroll !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.work::after {
+  display: none !important;
+}
+
+.work-card {
+  position: relative;
+  z-index: 2;
+  max-width: 430px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  color: var(--page-fg) !important;
+  text-decoration: none !important;
+}
+
+.work-card * {
+  text-decoration: none !important;
+}
+
+.work-number {
+  color: var(--muted) !important;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.work h3 {
+  color: var(--page-fg);
+  font-size: clamp(32px, 5vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+  font-weight: 760;
+  margin: 0 0 12px;
+}
+
+.work p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+.work-link {
+  color: var(--page-fg);
+  margin-top: 20px;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 850;
+  opacity: 1;
+}
+
+.work-card:hover .work-link {
+  transform: translateX(8px);
+}
+
+/* Info / contact */
+.info-strip {
+  max-width: var(--max);
+  padding: clamp(80px, 10vw, 150px) clamp(24px, 6vw, 72px);
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.info-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-right: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  padding: 0 28px 0 0 !important;
+}
+
+.info-card:last-child {
+  border-right: 0 !important;
+}
+
+.info-card strong {
+  color: var(--page-fg);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.info-card span {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.contact {
+  background: var(--inverse-bg) !important;
+  color: var(--inverse-fg);
+  min-height: 72vh;
+}
+
+.contact h2 {
+  color: var(--inverse-fg);
+}
+
+.contact p {
+  color: rgba(247, 245, 239, 0.68);
+}
+
+.contact .button {
+  background: var(--inverse-fg) !important;
+  color: var(--inverse-bg) !important;
+  border-color: var(--inverse-fg) !important;
+}
+
+footer {
+  background: var(--inverse-bg) !important;
+  color: rgba(247, 245, 239, 0.48) !important;
+  border-top: 1px solid rgba(247, 245, 239, 0.14);
+}
+/* =========================================================
+   JBeltran — Minimal Gallery Override
+   Editorial / clean / modern gallery direction
+   ========================================================= */
+
+:root {
+  --page-bg: #f7f5ef;
+  --page-fg: #111111;
+  --muted: #6f6a5f;
+  --soft: #e8e3d8;
+  --line: rgba(17, 17, 17, 0.13);
+  --inverse-bg: #080808;
+  --inverse-fg: #f7f5ef;
+  --max: 1180px;
+}
+
+/* Base */
+html {
+  scroll-behavior: smooth;
+}
+
+body,
+.artwork-body {
+  background: var(--page-bg);
+  color: var(--page-fg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+}
+
+/* =========================================================
+   HOME / INDEX
+   ========================================================= */
+
+.hero {
+  min-height: 92vh;
+  background: var(--page-bg) !important;
+  color: var(--page-fg);
+  padding: clamp(32px, 6vw, 90px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.hero::after {
+  display: none;
+}
+
+.hero-content {
+  width: min(100%, var(--max));
+  margin: 0 auto;
+}
+
+.eyebrow,
+.section-title .label,
+.collection-break .label,
+.artwork-code,
+.section-kicker,
+.full-artwork-heading span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+h1,
+.hero h1 {
+  color: var(--page-fg);
+  font-size: clamp(64px, 15vw, 210px);
+  line-height: 0.82;
+  letter-spacing: -0.095em;
+  font-weight: 760;
+  max-width: 1040px;
+  margin: 0 0 28px;
+}
+
+.intro {
+  margin: 0;
+  max-width: 580px;
+  color: var(--muted);
+  font-size: clamp(17px, 1.65vw, 23px);
+  line-height: 1.45;
+}
+
+.cta-row {
+  justify-content: flex-start;
+  margin-top: 34px;
+}
+
+.button,
+.btn,
+.platform-button,
+.certificate-button {
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: none !important;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.button,
+.btn-primary,
+.platform-button-primary {
+  background: var(--page-fg) !important;
+  color: var(--page-bg) !important;
+  border: 1px solid var(--page-fg) !important;
+}
+
+.button.secondary,
+.btn-secondary,
+.platform-button-outline {
+  background: transparent !important;
+  color: var(--page-fg) !important;
+  border: 1px solid var(--line) !important;
+}
+
+.button:hover,
+.btn:hover,
+.platform-button:hover {
+  transform: translateY(-1px);
+  background: transparent !important;
+  color: var(--page-fg) !important;
+  border-color: var(--page-fg) !important;
+}
+
+/* Nav */
+.collection-nav,
+.artwork-header {
+  background: rgba(247, 245, 239, 0.86) !important;
+  border-bottom: 1px solid var(--line) !important;
+  backdrop-filter: blur(18px);
+}
+
+.collection-nav a,
+.back-home {
+  color: var(--page-fg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 8px 0 !important;
+  margin: 0 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: transparent !important;
+}
+
+.collection-nav a:hover,
+.back-home:hover {
+  color: var(--muted) !important;
+  background: transparent !important;
+}
+
+/* Section titles */
+.section-title,
+.collection-break {
+  background: var(--page-bg) !important;
+  border: 0 !important;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(90px, 12vw, 180px) clamp(24px, 6vw, 72px) clamp(56px, 8vw, 110px);
+  text-align: left;
+  display: block;
+  min-height: auto;
+}
+
+.collection-break-inner {
+  max-width: 760px;
+}
+
+.section-title h2,
+.collection-break h2,
+.contact h2,
+.artwork-info h1,
+.section-heading h2,
+.full-artwork-heading h2 {
+  color: var(--page-fg);
+  font-size: clamp(52px, 9vw, 132px);
+  line-height: 0.86;
+  letter-spacing: -0.085em;
+  font-weight: 760;
+  margin: 0 0 22px;
+}
+
+.section-title p,
+.collection-break p,
+.contact p {
+  color: var(--muted);
+  max-width: 620px;
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.55;
+}
+
+/* Artwork sections on index */
+.work {
+  min-height: 100vh;
+  background: var(--page-bg) !important;
+  padding: clamp(22px, 4vw, 54px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  overflow: hidden;
+}
+
+.work::before {
+  inset: clamp(24px, 5vw, 72px) !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-attachment: scroll !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.work::after {
+  display: none !important;
+}
+
+.work-card {
+  position: relative;
+  z-index: 2;
+  max-width: 430px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  color: var(--page-fg) !important;
+  text-decoration: none !important;
+}
+
+.work-card * {
+  text-decoration: none !important;
+}
+
+.work-number {
+  color: var(--muted) !important;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.work h3 {
+  color: var(--page-fg);
+  font-size: clamp(32px, 5vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+  font-weight: 760;
+  margin: 0 0 12px;
+}
+
+.work p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+.work-link {
+  color: var(--page-fg);
+  margin-top: 20px;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-weight: 850;
+  opacity: 1;
+}
+
+.work-card:hover .work-link {
+  transform: translateX(8px);
+}
+
+/* Info / contact */
+.info-strip {
+  max-width: var(--max);
+  padding: clamp(80px, 10vw, 150px) clamp(24px, 6vw, 72px);
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.info-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-right: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  padding: 0 28px 0 0 !important;
+}
+
+.info-card:last-child {
+  border-right: 0 !important;
+}
+
+.info-card strong {
+  color: var(--page-fg);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.info-card span {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.contact {
+  background: var(--inverse-bg) !important;
+  color: var(--inverse-fg);
+  min-height: 72vh;
+}
+
+.contact h2 {
+  color: var(--inverse-fg);
+}
+
+.contact p {
+  color: rgba(247, 245, 239, 0.68);
+}
+
+.contact .button {
+  background: var(--inverse-fg) !important;
+  color: var(--inverse-bg) !important;
+  border-color: var(--inverse-fg) !important;
+}
+
+footer {
+  background: var(--inverse-bg) !important;
+  color: rgba(247, 245, 239, 0.48) !important;
+  border-top: 1px solid rgba(247, 245, 239, 0.14);
+}
+
+/* =========================================================
+   ARTWORK DETAIL PAGES
+   ========================================================= */
+
+.artwork-page {
+  background: var(--page-bg);
+  color: var(--page-fg);
+}
+
+.artwork-header {
+  width: calc(100% - 48px);
+}
+
+.artwork-hero {
+  min-height: 100vh;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: clamp(100px, 12vw, 160px) clamp(24px, 6vw, 72px) clamp(64px, 8vw, 110px);
+  display: grid;
+  grid-template-columns: minmax(280px, 0.92fr) minmax(320px, 1.08fr);
+  gap: clamp(40px, 8vw, 110px);
+  align-items: center;
+}
+
+.artwork-hero-atmosphere::before,
+.artwork-hero-atmosphere::after {
+  display: none !important;
+}
+
+.artwork-image img {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: transparent;
+  max-height: 78vh;
+}
+
+.artwork-info {
+  max-width: 620px;
+}
+
+.artwork-info h1 {
+  margin-bottom: 28px;
+}
+
+.artwork-description {
+  color: var(--muted);
+  font-size: clamp(18px, 1.7vw, 24px);
+  line-height: 1.48;
+  max-width: 580px;
+}
+
+.artwork-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  gap: 0;
+  margin: 42px 0;
+}
+
+.detail-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-right: 1px solid var(--line) !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  padding: 18px !important;
+  color: var(--page-fg);
+}
+
+.detail-card strong {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+/* Full artwork */
+.full-artwork-section {
+  background: var(--page-bg) !important;
+  padding: clamp(80px, 10vw, 150px) clamp(24px, 7vw, 96px);
+  border-top: 1px solid var(--line);
+}
+
+.full-artwork-heading {
+  max-width: var(--max);
+  margin: 0 auto 42px;
+}
+
+.full-artwork-heading p {
+  color: var(--muted);
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.55;
+}
+
+.full-artwork-image {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.full-artwork-image img {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* Platforms */
+.platform-section {
+  background: var(--inverse-bg);
+  color: var(--inverse-fg);
+  padding: clamp(80px, 10vw, 150px) clamp(24px, 7vw, 96px);
+}
+
+.platform-section .section-heading {
+  max-width: var(--max);
+  margin: 0 auto 44px;
+}
+
+.platform-section .section-heading h2 {
+  color: var(--inverse-fg);
+}
+
+.platform-section .section-heading p {
+  color: rgba(247, 245, 239, 0.62);
+}
+
+.platform-grid {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(247, 245, 239, 0.18);
+  border: 1px solid rgba(247, 245, 239, 0.18);
+}
+
+.platform-card {
+  min-height: 340px;
+  background: var(--inverse-bg) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding: 34px !important;
+  color: var(--inverse-fg);
+}
+
+.platform-card:hover {
+  transform: none !important;
+  background: #111 !important;
+}
+
+.platform-logo-text span,
+.mercado-logo {
+  color: var(--inverse-fg);
+}
+
+.platform-card p {
+  color: rgba(247, 245, 239, 0.62);
+  font-size: 14px;
+}
+
+.platform-badge,
+.platform-badge-yellow,
+.platform-badge-blue {
+  background: transparent !important;
+  color: rgba(247, 245, 239, 0.52) !important;
+  border: 1px solid rgba(247, 245, 239, 0.18);
+  border-radius: 0 !important;
+}
+
+.platform-button {
+  border-radius: 0 !important;
+}
+
+.platform-button-primary,
+.platform-button-outline,
+.platform-button-blue {
+  background: transparent !important;
+  color: var(--inverse-fg) !important;
+  border: 1px solid rgba(247, 245, 239, 0.32) !important;
+}
+
+.platform-button-primary:hover,
+.platform-button-outline:hover,
+.platform-button-blue:hover {
+  background: var(--inverse-fg) !important;
+  color: var(--inverse-bg) !important;
+}
+
+/* Focus effect when returning from detail */
+.return-focus {
+  animation: minimalReturnFocus 1.4s ease;
+}
+
+@keyframes minimalReturnFocus {
+  0% {
+    filter: brightness(1.08);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .hero {
+    min-height: 82vh;
+    align-items: flex-end;
+  }
+
+  h1,
+  .hero h1 {
+    font-size: clamp(58px, 22vw, 118px);
+  }
+
+  .collection-nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .work {
+    min-height: 88vh;
+    padding: 20px;
+  }
+
+  .work::before {
+    inset: 80px 20px 160px !important;
+  }
+
+  .work-card {
+    max-width: 100%;
+  }
+
+  .work p {
+    max-width: 100%;
+  }
+
+  .section-title,
+  .collection-break {
+    padding: 90px 20px 56px;
+  }
+
+  .info-strip,
+  .platform-grid,
+  .artwork-details {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    padding: 24px 0 !important;
+  }
+
+  .artwork-header {
+    width: calc(100% - 32px);
+  }
+
+  .artwork-hero {
+    grid-template-columns: 1fr;
+    padding: 96px 20px 64px;
+  }
+
+  .artwork-info h1 {
+    font-size: clamp(56px, 18vw, 96px);
+  }
+
+  .platform-grid {
+    gap: 1px;
+  }
+}
+  </style>
+
+    <script>
+  window.addEventListener("load", () => {
+    const params = new URLSearchParams(window.location.search);
+    const targetId = params.get("scrollTo");
+
+    if (!targetId) return;
+
+    const target = document.getElementById(targetId);
+
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+        window.history.replaceState({}, "", "index.html");
+      }, 350);
+    }
+  });
+</script>
+</head>
+<body>
+  <header class="hero" id="top">
+    <div class="hero-content">
+      <div class="eyebrow">Abstract works on paper</div>
+      <h1>J. Beltrán</h1>
+      <p class="intro">
+        Tres colecciones abstractas construidas con capas, círculos, movimiento, contraste y color.
+      </p>
+      <div class="cta-row">
+        <a class="button" href="#orbitals">Ver colecciones</a>
+        <a class="button secondary" href="https://wa.me/5218123518298?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="collection-nav" aria-label="Colecciones">
+    <a href="#orbitals">Orbitals</a>
+    <a href="#flow">Flow</a>
+    <a href="#deco">Deco</a>
+    <a href="#contact">Contacto</a>
+  </nav>
+
+  <section class="section-title" id="orbitals">
+    <div class="label">Collection 01</div>
+    <h2>Orbitals</h2>
+    <p>
+      Una serie basada en campos circulares, capas oscuras y trazos que cruzan la composición como órbitas.
+    </p>
+  </section>
+
+
+
+  <section id="orbitals-01" class="work" style="--image: url('./images/ORBITALS/IMG_6980.JPEG')">
+    <a href="./works/orbitals-01-orbit-field.html" class="work-card">
+      <div class="work-number">Orbitals 01</div>
+      <h3>Orbit Field</h3>
+      <p>Verdes profundos, negros densos y líneas circulares que sugieren movimiento interno.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-02" class="work" style="--image: url('./images/ORBITALS/IMG_6926.JPEG')">
+    <a href="./works/orbitals-02-blue-structure.html" class="work-card">
+      <div class="work-number">Orbitals 02</div>
+      <h3>Blue Structure</h3>
+      <p>Una pieza fría y arquitectónica, con capas azules y trazos que cruzan como rutas.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-03" class="work" style="--image: url('./images/ORBITALS/IMG_6969.JPEG')">
+    <a href="./works/orbitals-03-green-atmosphere.html" class="work-card">
+      <div class="work-number">Orbitals 03</div>
+      <h3>Green Atmosphere</h3>
+      <p>Una composición envolvente en verde y violeta, con círculos translúcidos y tensión suave.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-04" class="work" style="--image: url('./images/ORBITALS/IMG_7046.JPEG')">
+    <a href="./works/orbitals-04-magenta-signal.html" class="work-card">
+      <div class="work-number">Orbitals 04</div>
+      <h3>Magenta Signal</h3>
+      <p>Magenta oscuro, transparencias y trazos luminosos sobre una superficie vibrante.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-05" class="work" style="--image: url('./images/ORBITALS/IMG_6925.JPEG')">
+    <a href="./works/orbitals-05-deep-blue-orbit.html" class="work-card">
+      <div class="work-number">Orbitals 05</div>
+      <h3>Deep Blue Orbit</h3>
+      <p>Azules y verdes en capas con un gesto circular central que organiza la composición.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-06" class="work" style="--image: url('./images/ORBITALS/IMG_6908.JPEG')">
+    <a href="./works/orbitals-06-cosmic-route.html" class="work-card">
+      <div class="work-number">Orbitals 06</div>
+      <h3>Cosmic Route</h3>
+      <p>Una pieza más dinámica, con azules, naranjas y círculos que recuerdan mapas o constelaciones.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-07" class="work" style="--image: url('./images/ORBITALS/IMG_6930.JPEG')">
+    <a href="./works/orbitals-07-violet-gravity.html" class="work-card">
+      <div class="work-number">Orbitals 07</div>
+      <h3>Violet Gravity</h3>
+      <p>Negros y violetas profundos con formas circulares que flotan como campos de energía.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-08" class="work" style="--image: url('./images/ORBITALS/IMG_6976.JPEG')">
+    <a href="./works/orbitals-08-green-core.html" class="work-card">
+      <div class="work-number">Orbitals 08</div>
+      <h3>Green Core</h3>
+      <p>Una obra de centro fuerte, casi ritual, con verdes intensos, blanco y acentos naranja.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-09" class="work" style="--image: url('./images/ORBITALS/IMG_6985.JPEG')">
+    <a href="./works/orbitals-09-hidden-garden.html" class="work-card">
+      <div class="work-number">Orbitals 09</div>
+      <h3>Hidden Garden</h3>
+      <p>Capas oscuras y verdes con círculos claros que emergen como señales bajo la superficie.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="orbitals-10" class="work" style="--image: url('./images/ORBITALS/IMG_6987.JPEG')">
+    <a href="./works/orbitals-10-urban-bloom.html" class="work-card">
+      <div class="work-number">Orbitals 10</div>
+      <h3>Urban Bloom</h3>
+      <p>Una composición intensa con trazos violetas, verdes y naranjas sobre una base oscura.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+
+
+  <section class="collection-break" id="flow">
+    <div class="collection-break-inner">
+      <div class="label">Collection 02</div>
+      <h2>Flow</h2>
+      <p>
+        Piezas con sensación de desplazamiento, textura expandida y energía más gestual.
+      </p>
+    </div>
+  </section>
+
+
+
+  <section id="flow-01" class="work" style="--image: url('./images/FLOW/IMG_7726.PNG')">
+    <a href="./works/flow-01-first-current.html" class="work-card">
+      <div class="work-number">Flow 01</div>
+      <h3>First Current</h3>
+      <p>Una obra de flujo amplio, marcada por capas y movimiento visual extendido.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="flow-02" class="work" style="--image: url('./images/FLOW/IMG_7727.PNG')">
+    <a href="./works/flow-02-open-movement.html" class="work-card">
+      <div class="work-number">Flow 02</div>
+      <h3>Open Movement</h3>
+      <p>Textura, expansión y profundidad para una lectura más atmosférica.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="flow-03" class="work" style="--image: url('./images/FLOW/IMG_7728.PNG')">
+    <a href="./works/flow-03-surface-drift.html" class="work-card">
+      <div class="work-number">Flow 03</div>
+      <h3>Surface Drift</h3>
+      <p>Capas dinámicas que crean una sensación de desplazamiento continuo.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="flow-04" class="work" style="--image: url('./images/FLOW/IMG_7734.JPEG')">
+    <a href="./works/flow-04-soft-pulse.html" class="work-card">
+      <div class="work-number">Flow 04</div>
+      <h3>Soft Pulse</h3>
+      <p>Una pieza más íntima, con ritmo controlado y contrastes sutiles.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="flow-05" class="work" style="--image: url('./images/FLOW/IMG_7735.JPEG')">
+    <a href="./works/flow-05-last-wave.html" class="work-card">
+      <div class="work-number">Flow 05</div>
+      <h3>Last Wave</h3>
+      <p>El cierre de la serie Flow, con presencia visual directa y energía de transición.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+
+
+  <section class="collection-break" id="deco">
+    <div class="collection-break-inner">
+      <div class="label">Collection 03</div>
+      <h2>Deco</h2>
+      <p>
+        Una colección más decorativa y adaptable a interiores. Pensada para compradores que buscan una pieza lista para transformar un muro o armar un set.
+      </p>
+    </div>
+  </section>
+
+
+
+  <section id="deco-01" class="work" style="--image: url('./images/DECO/IMG_7708.JPEG')">
+    <a href="./works/deco-01-room-accent.html" class="work-card">
+      <div class="work-number">Deco 01</div>
+      <h3>Room Accent</h3>
+      <p>Una obra pensada para generar presencia en espacios modernos sin perder textura.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-02" class="work" style="--image: url('./images/DECO/IMG_7710.JPEG')">
+    <a href="./works/deco-02-wall-rhythm.html" class="work-card">
+      <div class="work-number">Deco 02</div>
+      <h3>Wall Rhythm</h3>
+      <p>Movimiento visual y balance para integrarse en sala, estudio o recibidor.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-03" class="work" style="--image: url('./images/DECO/IMG_7715.JPEG')">
+    <a href="./works/deco-03-interior-signal.html" class="work-card">
+      <div class="work-number">Deco 03</div>
+      <h3>Interior Signal</h3>
+      <p>Una pieza con lenguaje abstracto claro y lectura decorativa inmediata.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-04" class="work" style="--image: url('./images/DECO/IMG_7716.JPEG')">
+    <a href="./works/deco-04-modern-layer.html" class="work-card">
+      <div class="work-number">Deco 04</div>
+      <h3>Modern Layer</h3>
+      <p>Capas, contraste y composición para un estilo contemporáneo y sobrio.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-05" class="work" style="--image: url('./images/DECO/IMG_7721.JPEG')">
+    <a href="./works/deco-05-collected-space.html" class="work-card">
+      <div class="work-number">Deco 05</div>
+      <h3>Collected Space</h3>
+      <p>Una obra ideal para cerrar la colección como set o como pieza individual.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-06" class="work" style="--image: url('./images/DECO/IMG_8094.JPEG')">
+    <a href="./works/deco-06-structured-chaos.html" class="work-card">
+      <div class="work-number">Deco 06</div>
+      <h3>Structured Chaos</h3>
+      <p>Una composición donde la geometría y el trazo libre conviven en tensión constante.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-07" class="work" style="--image: url('./images/DECO/IMG_8095.JPEG')">
+    <a href="./works/deco-07-Industrial-Pulse" class="work-card">
+      <div class="work-number">Deco 07</div>
+      <h3>Industrial Pulse</h3>
+      <p>Texturas densas y líneas eléctricas evocan movimiento dentro de una estructura rígida.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-08" class="work" style="--image: url('./images/DECO/IMG_8096.JPEG')">
+    <a href="./works/deco-08-soft-boundaries.html" class="work-card">
+      <div class="work-number">Deco 08</div>
+      <h3>Soft Boundaries</h3>
+      <p>Capas suaves delimitadas por trazos que sugieren orden dentro de lo orgánico.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-09" class="work" style="--image: url('./images/DECO/IMG_8097.JPEG')">
+    <a href="./works/deco-09-flow-state.html" class="work-card">
+      <div class="work-number">Deco 09</div>
+      <h3>Flow State</h3>
+      <p>Una pieza que fluye sin interrupciones, guiando la mirada a través de energía continua.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+  <section id="deco-10" class="work" style="--image: url('./images/DECO/IMG_8098.JPEG')">
+    <a href="./works/deco-10-echo-patterns.html" class="work-card">
+      <div class="work-number">Deco 10</div>
+      <h3>Echo Patterns</h3>
+      <p>Repeticiones orgánicas que construyen ritmo visual y profundidad en cada capa.</p>
+      <span class="work-link">Ver disponibilidad →</span>
+    </a>
+  </section>
+
+
+
+  <section class="info-strip">
+    <div class="info-card">
+      <strong>Enmarcado Standard</strong>
+      <span>Marco Negro Mate con Páspartú.</span>
+    </div>
+    <div class="info-card">
+      <strong>Dimensiones</strong>
+      <span>13 x 19 Pulgadas.</span>
+    </div>
+    <div class="info-card">
+      <strong>Colaboración y Consignación</strong>
+      <span>Busco expandir la presencia de la colección en entornos físicos. Si gestionas una cafetería, negocio o propiedad de alta gama, podemos acordar una entrega en consignación para que mis obras formen parte de tu decoración y estén disponibles para venta inmediata a tus clientes.</span>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="contact-inner">
+      <h2>Interested in a piece?</h2>
+      <p>
+        Escríbeme por WhatsApp para preguntar por una obra, reservarla o ver opciones de set para decorar un espacio.
+      </p>
+      <a class="button" href="https://wa.me/5218123518298?text=Hola%2C%20me%20interesa%20una%20obra%20de%20J.%20Beltr%C3%A1n" target="_blank" rel="noreferrer">Contactar por WhatsApp</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 J. Beltrán. Abstract collections on paper. · <a href="#top">Volver arriba</a>
+  </footer>
+</body>
+</html>
