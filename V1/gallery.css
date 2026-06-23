@@ -1,0 +1,336 @@
+/* ==========================================================================
+   1. PALETA DE COLORES "GALERÍA" & VARIABLES EDITORIALES
+   ========================================================================== */
+:root {
+  /* Fondo estilo muro de galería contemporánea (Hueso / Warm Off-White) */
+  --bg-color: #F7F5F0; 
+  
+  /* Negro carbón suave (elegante, orgánico y menos agresivo que el negro puro) */
+  --text-main: #1C1B1A; 
+  
+  /* Gris piedra para fichas técnicas y textos secundarios */
+  --text-muted: #6E6A64; 
+  
+  /* Líneas divisorias sutiles (Tono arcilla muy claro) */
+  --border-flat: #E8E5DC; 
+  
+  /* Verde Oliva de Colección (Para realzar botones y estados comerciales) */
+  --accent-color: #4A5343; 
+
+  /* Tipografía limpia y sofisticada */
+  --font-editorial: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --max-width-content: 1400px;
+}
+
+/* Reset Estricto */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-editorial);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  padding: 0 6vw; /* Márgenes generosos que enmarcan la web */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   2. HEADER & NAVEGACIÓN (Limpia y sutil en los extremos)
+   ========================================================================== */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem 0;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+.brand {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.site-nav a {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: 2rem;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease;
+}
+
+.site-nav a:hover {
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   3. SECCIONES DE INTRODUCCIÓN (Hero & Cover)
+   ========================================================================== */
+.home-cover, .hero {
+  padding: 15vh 0 10vh 0;
+  max-width: 800px;
+}
+
+.kicker, .home-kicker {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  margin-bottom: 2rem;
+  line-height: 1.1;
+}
+
+.home-subtitle, .hero-copy {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.home-cover-figure {
+  margin: 8vh 0;
+  max-width: var(--max-width-content);
+}
+
+.home-cover-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.home-cover-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding-bottom: 10vh;
+}
+
+/* ==========================================================================
+   4. COLECCIONES & FLUJO ASIMÉTRICO (Máximo protagonismo a la obra)
+   ========================================================================== */
+.collection {
+  padding: 20vh 0;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  border-top: 1px solid var(--border-flat);
+}
+
+.collection-heading {
+  margin-bottom: 15vh;
+  max-width: 500px;
+}
+
+.collection-heading h2 {
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+/* Contenedor vertical con separación masiva entre piezas */
+.artwork-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 25vh; /* Aísla cada obra para que el usuario contemple una sola a la vez */
+}
+
+/* Tarjeta base */
+.artwork-card {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start; /* Alineación izquierda por defecto */
+}
+
+/* Ritmo de Galería: Cada segunda obra se desplaza automáticamente a la derecha */
+.artwork-card:nth-child(even) {
+  justify-content: flex-end;
+}
+
+/* Enlace contenedor: define la escala ideal de visualización */
+.artwork-link {
+  display: block;
+  width: 100%;
+  max-width: 620px; 
+}
+
+/* El "Paspartú" / Marco blanco limpio que realza el contraste de la obra física */
+.artwork-frame, .artwork-image-wrap {
+  background-color: #FFFFFF; 
+  margin-bottom: 2rem;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.015); /* Sombra casi invisible para dar relieve tridimensional */
+}
+
+.artwork-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: contrast(98%);
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Interacción refinada al pasar el cursor */
+.artwork-link:hover img {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03);
+}
+
+/* Cédula de información de la obra (Diseño de catálogo impreso) */
+.artwork-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 0.8rem;
+  border-top: 1px solid var(--border-flat);
+  padding-top: 1.2rem;
+  max-width: 100%;
+}
+
+.artwork-meta h3 {
+  font-size: 1.1rem;
+  font-weight: 400;
+  grid-column: span 2; 
+  margin-bottom: 0.1rem;
+  color: var(--text-main);
+}
+
+.artwork-year, .artwork-medium, .artwork-size {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Distintivo de "Vendido" sofisticado (Genera urgencia comercial) */
+.sold-pill {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  padding: 4px 10px;
+  width: fit-content;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.artwork-watermark {
+  grid-column: span 2;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border-flat);
+  margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   5. NOTAS DE ESTUDIO, CONTACTO Y FOOTER
+   ========================================================================== */
+.studio-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 5rem;
+  padding: 15vh 0;
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+  border-top: 1px solid var(--border-flat);
+}
+
+.studio-notes h2 {
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.contact {
+  padding: 20vh 0;
+  text-align: center;
+  border-top: 1px solid var(--border-flat);
+}
+
+.contact h2 {
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+
+.contact p {
+  color: var(--text-muted);
+  max-width: 500px;
+  margin: 0 auto 3rem auto;
+  font-size: 1.1rem;
+}
+
+/* Botón de Acción Sólido Premium */
+.button {
+  display: inline-block;
+  padding: 1.2rem 3.5rem;
+  background: var(--text-main);
+  color: var(--bg-color);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 500;
+  border: 1px solid var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #FFFFFF;
+}
+
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 4rem 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-flat);
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+/* Indicador visual de foco (Scroll dirigido por JS) */
+.return-focus {
+  outline: 1px solid var(--accent-color);
+  outline-offset: 15px;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE DESIGN (Adaptación impecable a móviles)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body { padding: 0 5vw; }
+  h1 { font-size: 2.4rem; }
+  .collection-heading { margin-bottom: 8vh; }
+  .artwork-grid { gap: 12vh; }
+  .artwork-card, .artwork-card:nth-child(even) { justify-content: center; }
+  .artwork-link { max-width: 100%; }
+  .artwork-meta { grid-template-columns: 1fr; gap: 0.4rem; }
+  .artwork-meta h3, .artwork-watermark { grid-column: span 1; }
+  .studio-notes { gap: 3rem; padding: 10vh 0; }
+}

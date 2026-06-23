@@ -1,0 +1,277 @@
+{
+  "artist": "Josue Beltran Uresti",
+  "logo": "assets/logo.png",
+  "homePhrase": "2026"  ,
+  "works": [
+    {
+      "code": "JBU-001",
+      "title": "Quantum Drift",
+      "marketplaceTitle": "Quantum Drift | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-001.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-002",
+      "title": "Observer Effect",
+      "marketplaceTitle": "Observer Effect | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-002.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-003",
+      "title": "Probability Wave",
+      "marketplaceTitle": "Probability Wave | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-003.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-004",
+      "title": "Superposition State",
+      "marketplaceTitle": "Superposition State | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-004.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-005",
+      "title": "Entangled Memory",
+      "marketplaceTitle": "Entangled Memory | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-005.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-006",
+      "title": "Neon Entanglement",
+      "marketplaceTitle": "Neon Entanglement | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-006.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-007",
+      "title": "Collapse State",
+      "marketplaceTitle": "Collapse State | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-007.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-008",
+      "title": "Multiverse Signal",
+      "marketplaceTitle": "Multiverse Signal | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-008.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-009",
+      "title": "Chromatic Resonance",
+      "marketplaceTitle": "Chromatic Resonance | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-009.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-010",
+      "title": "Parallel Echo",
+      "marketplaceTitle": "Parallel Echo | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-010.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-011",
+      "title": "Infinite Observer",
+      "marketplaceTitle": "Infinite Observer | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-011.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-012",
+      "title": "Memory Fragment",
+      "marketplaceTitle": "Memory Fragment | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-012.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-013",
+      "title": "Quantum Bloom",
+      "marketplaceTitle": "Quantum Bloom | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-013.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-014",
+      "title": "Consciousness Drift",
+      "marketplaceTitle": "Consciousness Drift | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-014.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-015",
+      "title": "Spectral Signal",
+      "marketplaceTitle": "Spectral Signal | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-015.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-016",
+      "title": "Uncertain Future",
+      "marketplaceTitle": "Uncertain Future | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-016.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-017",
+      "title": "Dimensional Echo",
+      "marketplaceTitle": "Dimensional Echo | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-017.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-018",
+      "title": "Entropic Dream",
+      "marketplaceTitle": "Entropic Dream | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-018.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-019",
+      "title": "Resonance Field",
+      "marketplaceTitle": "Resonance Field | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-019.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-020",
+      "title": "Neural Universe",
+      "marketplaceTitle": "Neural Universe | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-020.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-021",
+      "title": "Temporal Fragment",
+      "marketplaceTitle": "Temporal Fragment | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-021.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-022",
+      "title": "Particle Memory",
+      "marketplaceTitle": "Particle Memory | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-022.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-023",
+      "title": "Frequency Shift",
+      "marketplaceTitle": "Frequency Shift | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-023.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-024",
+      "title": "Electric Consciousness",
+      "marketplaceTitle": "Electric Consciousness | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-024.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-025",
+      "title": "Observer's Paradox",
+      "marketplaceTitle": "Observer's Paradox | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-025.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-026",
+      "title": "Cosmic Interference",
+      "marketplaceTitle": "Cosmic Interference | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-026.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },
+    {
+      "code": "JBU-027",
+      "title": "Infinite Probability",
+      "marketplaceTitle": "Infinite Probability | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-027.JPEG",
+      "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    }
+  ]
+}
