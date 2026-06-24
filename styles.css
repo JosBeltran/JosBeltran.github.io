@@ -94,7 +94,9 @@ body {
 .code-btn {
     aspect-ratio: 1 / 1; /* Cuadrados perfectos automáticos */
     border: 1px solid var(--btn-border);
-    background-color: var(--btn-bg);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--text);
     display: flex;
     align-items: center;
@@ -242,4 +244,90 @@ body {
     .artwork-details h1 {
         font-size: 28px;
     }
+}
+
+.like-btn,
+.whatsapp-btn {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.like-btn {
+    border: 1px solid #0d2f6f;
+    background: white;
+    color: #0d2f6f;
+}
+
+.whatsapp-btn {
+    border: 1px solid #0d2f6f;
+    background: #0d2f6f;
+    color: white;
+}.home-bg {
+     position: fixed;
+     inset: 0;
+     z-index: -3;
+     overflow: hidden;
+     background: #f3f0ea;
+ }
+
+.bg-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2.4s ease-in-out;
+}
+
+.bg-slide.visible {
+    opacity: 1;
+}
+
+/* Capa grande: llena toda la pantalla, muy difuminada */
+.bg-cover {
+    object-fit: cover;
+    object-position: center;
+    filter: blur(18px) brightness(1.03) saturate(1.08);
+    transform: scale(1.08);
+    opacity: 0;
+}
+
+.bg-cover.visible {
+    opacity: 0.55;
+}
+
+/* Capa central: obra completa, suave y translúcida */
+.bg-focus {
+    object-fit: contain;
+    object-position: center;
+    filter: blur(2px) brightness(1.04) saturate(1.05);
+    transform: scale(0.92);
+    opacity: 0;
+}
+
+.bg-focus.visible {
+    opacity: 0.28;
+}
+
+.home-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+            radial-gradient(circle at center,
+            rgba(243, 240, 234, 0.18),
+            rgba(243, 240, 234, 0.62)
+            ),
+            linear-gradient(to bottom,
+            rgba(255,255,255,0.18),
+            rgba(243,240,234,0.78)
+            );
 }

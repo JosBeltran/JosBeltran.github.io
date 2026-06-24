@@ -17,7 +17,7 @@
     </div>
 
     <aside class="artwork-details">
-      <img src="../assets/logo.png" class="detail-logo" alt="JBU" />
+      <img src="../assets/logo.png" class="detail-logo" alt="JBU Logo" />
 
       <p class="artwork-code">JBU-019</p>
       <h1>Resonance Field</h1>
@@ -34,9 +34,31 @@
         <img src="../assets/qr/JBU-019.png" alt="QR JBU-019" />
         <p>Escanea para abrir esta obra</p>
       </div>
+
+      <a class="whatsapp-btn"
+         target="_blank"
+         href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-019%20-%20Resonance%20Field">
+        Preguntar por WhatsApp
+      </a>
     </aside>
   </section>
 </main>
+
+<script>
+  const likeBtn = document.querySelector(".like-btn");
+  const code = likeBtn.dataset.code;
+  const key = "likes-" + code;
+  const span = likeBtn.querySelector("span");
+
+  let likes = Number(localStorage.getItem(key) || 0);
+  span.textContent = likes;
+
+  likeBtn.addEventListener("click", () => {
+    likes++;
+    localStorage.setItem(key, likes);
+    span.textContent = likes;
+  });
+</script>
 
 </body>
 </html>

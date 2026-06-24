@@ -2,7 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const QRCode = require("qrcode");
 
-const SITE_URL = "https://josbeltran.github.io/"; // cambia esto
+const SITE_URL = "https://josuebeltranuresti.com/"; // cambia esto
+const WHATSAPP_NUMBER = "528123518298"; // cambia esto
+
 const data = JSON.parse(fs.readFileSync("artworks.json", "utf8"));
 
 const outputDir = path.join(__dirname, "obras");
@@ -20,6 +22,10 @@ fs.mkdirSync(qrDir, { recursive: true });
             width: 500,
             margin: 2
         });
+
+        const whatsappText = encodeURIComponent(
+            `Hola, me interesa la obra ${work.code} - ${work.title}`
+        );
 
         const html = `<!DOCTYPE html>
 <html lang="es">
@@ -40,7 +46,7 @@ fs.mkdirSync(qrDir, { recursive: true });
     </div>
 
     <aside class="artwork-details">
-      <img src="../${data.logo}" class="detail-logo" alt="JBU" />
+      <img src="../${data.logo}" class="detail-logo" alt="JBU Logo" />
 
       <p class="artwork-code">${work.code}</p>
       <h1>${work.title}</h1>
@@ -57,14 +63,40 @@ fs.mkdirSync(qrDir, { recursive: true });
         <img src="../assets/qr/${work.code}.png" alt="QR ${work.code}" />
         <p>Escanea para abrir esta obra</p>
       </div>
+
+      <a class="whatsapp-btn"
+         target="_blank"
+         href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">
+        Preguntar por WhatsApp
+      </a>
     </aside>
   </section>
 </main>
 
+<script>
+  const likeBtn = document.querySelector(".like-btn");
+  const code = likeBtn.dataset.code;
+  const key = "likes-" + code;
+  const span = likeBtn.querySelector("span");
+
+  let likes = Number(localStorage.getItem(key) || 0);
+  span.textContent = likes;
+
+  likeBtn.addEventListener("click", () => {
+    likes++;
+    localStorage.setItem(key, likes);
+    span.textContent = likes;
+  });
+</script>
+
 </body>
 </html>`;
 
-        fs.writeFileSync(path.join(outputDir, `${work.code}.html`), html, "utf8");
+        fs.writeFileSync(
+            path.join(outputDir, `${work.code}.html`),
+            html,
+            "utf8"
+        );
     }
 
     console.log("Subpáginas y QR generados correctamente.");

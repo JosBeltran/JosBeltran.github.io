@@ -80,7 +80,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-008.JPEG",
+      "image": "assets/artworks/JBU-008.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -210,7 +210,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-021.JPEG",
+      "image": "assets/artworks/JBU-021.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -220,7 +220,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-022.JPEG",
+      "image": "assets/artworks/JBU-022.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -230,7 +230,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-023.JPEG",
+      "image": "assets/artworks/JBU-023.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -250,7 +250,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-025.JPEG",
+      "image": "assets/artworks/JBU-025.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -260,7 +260,7 @@
       "year": "2026",
       "technique": "Técnica mixta sobre papel",
       "size": "Por definir",
-      "image": "assets/artworks/JBU-026.JPEG",
+      "image": "assets/artworks/JBU-026.JPG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
     },
     {
@@ -272,6 +272,23 @@
       "size": "Por definir",
       "image": "assets/artworks/JBU-027.JPEG",
       "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+    },{
+      "code": "JBU-028",
+      "title": "Quantum Orbit",
+      "year": "2026",
+      "technique": "Acrylic on Paper",
+      "size": "13 x 19 in",
+      "description": "A translucent being suspended within concentric orbital fields. Layers of blue, violet, and black suggest invisible forces, memory traces, and energetic pathways surrounding the figure.",
+      "image": "assets/artworks/JBU-028.JPG"
+    },
+    {
+      "code": "JBU-029",
+      "title": "Crimson Signal",
+      "year": "2026",
+      "technique": "Acrylic on Paper",
+      "size": "13 x 19 in",
+      "description": "A variation of The Translucent Being emerging through crimson geometric bursts and fragmented structures. The composition explores contrast between organic presence and constructed reality.",
+      "image": "assets/artworks/JBU-029.JPG"
     }
   ]
 }
