@@ -1,31 +1,77 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="g100">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JBU Portfolio</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JBU Portfolio</title>
+    <!-- Carbon Design System Styles v11 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="home-bg">
-    <img id="homeBgA" class="bg-slide bg-cover visible" src="" alt="" />
-    <img id="homeBgB" class="bg-slide bg-cover" src="" alt="" />
 
-    <img id="homeFocusA" class="bg-slide bg-focus visible" src="" alt="" />
-    <img id="homeFocusB" class="bg-slide bg-focus" src="" alt="" />
-</div>
+<!-- Barra de Navegación Superior (Carbon UI Shell) -->
+<header class="cds--header" role="banner" aria-label="JBU Portfolio">
+    <a class="cds--header__name" href="#">
+        <span class="cds--header__name--prefix">JBU</span>&nbsp;Portfolio
+    </a>
+    <nav class="cds--header__nav" aria-label="Plataforma">
+        <ul class="cds--header__menu-bar" role="menubar">
+            <li>
+                <a class="cds--header__menu-item" href="#galeria" role="menuitem" tabindex="0">Galería</a>
+            </li>
+            <li>
+                <a class="cds--header__menu-item" href="#info" role="menuitem" tabindex="-1">Información</a>
+            </li>
+        </ul>
+    </nav>
+</header>
 
-<div class="home-overlay"></div>
-<main class="home">
-    <!-- Grupo del encabezado: Logo + Nombre -->
-    <header class="home-header">
-        <img class="logo" id="logo" src="assets/logo.png" alt="JBU Logo" />
-        <h1 class="artist-name">Josue Beltran Uresti</h1>
-    </header>
+<!-- Contenedor Principal (Grid de Carbon) -->
+<main class="cds--grid main-content-wrapper">
+    <!-- Agregamos la clase "split-container" para forzar el comportamiento side-by-side -->
+    <div class="cds--row split-container">
 
-    <p class="phrase" id="homePhrase">Cada obra es una posibilidad: una imagen que espera ser observada para existir.</p>
-    <section class="code-grid" id="codeGrid" aria-label="Catálogo de obras"></section>
+        <!-- PANEL IZQUIERDO (Identidad) -->
+        <aside class="sidebar-panel">
+            <div class="sidebar-sticky-content">
+                <div class="logo-container">
+                    <img class="logo-clean" id="logo" src="assets/logo.png" alt="JBU Logo">
+                </div>
+                <h1 class="cds--type-productive-heading-05 artist-name">Josue Beltran Uresti</h1>
+                <p class="cds--type-body-short-01 brand-phrase" id="homePhrase">
+                    Cada obra es una posibilidad: una imagen que espera ser observada para existir.
+                </p>
+            </div>
+        </aside>
+
+        <!-- PANEL DERECHO (Carrusel y Catálogo) -->
+        <section id="galeria" class="content-panel">
+
+            <!-- Hero Panel (Carrusel) -->
+            <div class="cds--tile hero-panel">
+                <div class="hero-carousel-wrapper">
+                    <img id="homeBgA" class="bg-slide visible" src="" alt="" />
+                    <img id="homeBgB" class="bg-slide" src="" alt="" />
+                </div>
+                <div class="hero-info-bar">
+                    <span class="cds--type-label-01 info-label">Exhibición</span>
+                    <p id="artworkTitle" class="cds--type-expressive-heading-03">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Índice de Obras -->
+            <div class="catalog-wrapper">
+                <h2 class="cds--type-label-01" style="color: var(--cds-text-primary); opacity: 0.4; margin-bottom: 0.5rem;">Colecciones</h2>
+                <!-- Este contenedor ahora recibirá los grupos estructurados de series creados desde app.js -->
+                <div id="codeGrid"></div>
+            </div>
+
+        </section>
+
+    </div>
 </main>
-  <script src="app.js"></script>
+
+<script src="app.js"></script>
 </body>
 </html>
