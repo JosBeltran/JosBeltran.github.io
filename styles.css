@@ -1,333 +1,318 @@
 /* ==========================================================================
-   1. VARIABLES Y CONFIGURACIÓN GENERAL
+   1. VARIABLES DE SISTEMA Y REESCRITURA DE TEMA (Forzado G100)
    ========================================================================== */
 :root {
-    --bg: #f8f7f4;          /* Un fondo hueso/crema sutil y elegante */
-    --text: #1a1a1a;        /* Negro suave para mejor lectura */
-    --muted: #767670;       /* Gris cálido para metadatos y estados secundarios */
-    --accent: #0f3ba2;      /* Azul profundo institucional (tomado de tu logo) */
-    --btn-bg: #ffffff;      /* Fondo blanco limpio para los botones */
-    --btn-border: #e2e1dc;  /* Borde suave */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-serif: 'Georgia', serif;
+    --cds-background: #161616 !important;
+    --cds-layer-01: #262626 !important;
+    --cds-layer-02: #393939 !important;
+    --cds-layer-hover: #353535 !important;
+    --cds-text-primary: #f4f4f4 !important;
+    --cds-text-secondary: #c6c6c6 !important;
+    --cds-border-subtle: #4d4d4d !important;
+    --accent-interactive: #0f62fe !important;
 }
 
-* {
+html, body {
+    background-color: #161616 !important;
+    color: #f4f4f4 !important;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Forzar barra superior de Carbon a mantenerse oscura */
+.cds--header {
+    background-color: #161616 !important;
+    border-bottom: 1px solid #393939 !important;
+}
+.cds--header__name, .cds--header__menu-item {
+    color: #f4f4f4 !important;
+}
+.cds--header__menu-item:hover {
+    background-color: #262626 !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   2. DISTRIBUCIÓN DEL LAYOUT ASIMÉTRICO (Control Total)
+   ========================================================================== */
+.main-content-wrapper {
+    padding-top: 6rem; /* Más espacio por la barra fija */
+    padding-bottom: 4rem;
+    background-color: #161616 !important;
+}
+
+/* --- Panel Izquierdo (1/4 - Control de Logo y Textos) --- */
+.sidebar-panel {
+    margin-bottom: 2.5rem;
     box-sizing: border-box;
 }
 
-body {
-    margin: 0;
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
+.logo-container {
+    margin-bottom: 1.5rem;
+    display: block;
+    width: 100%;
 }
 
-/* ==========================================================================
-   2. ESTRUCTURA HOME
-   ========================================================================== */
-.home {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 24px;
+/* Restricción absoluta para evitar que el logo se deforme o crezca descontrolado */
+.logo-clean {
+    width: 100% !important;
+    max-width: 120px !important; /* Ajusta este valor al tamaño ideal que quieras para tu firma/logo */
+    height: auto !important;
+    display: block;
+    opacity: 0.9;
 }
 
-/* Contenedor para el logo y tu nombre */
-.home-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 40px; /* Separación con la frase */
-}
-
-/* Logo más grande y con más presencia */
-.logo {
-    width: min(160px, 40vw); /* Crece hasta 160px en escritorio (antes era 70px) */
-    height: auto;
-    margin-bottom: 16px;
-    opacity: 0.95;
-}
-
-/* Tu nombre como elemento secundario y sofisticado */
 .artist-name {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 14px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.2em; /* Espaciado amplio para look de galería de arte */
-    color: var(--muted);  /* Gris cálido (no negro) para que sea secundario */
-    text-align: center;
+    color: #f4f4f4 !important;
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin: 1rem 0 0.5rem 0;
 }
 
-.phrase {
-    max-width: 680px;
-    text-align: center;
-    font-family: var(--font-serif);
-    font-size: clamp(24px, 3.5vw, 38px); /* Reducida un poco para que el logo destaque más */
-    font-weight: 400;
-    line-height: 1.2;
-    color: var(--text);
-    margin: 0 0 52px;
-    letter-spacing: -0.01em;
+.brand-phrase {
+    color: #c6c6c6 !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* --- Comportamiento de Columnas Flexbox en Escritorio --- */
+@media (min-width: 66rem) {
+    .split-container {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 3rem;
+    }
+
+    .sidebar-panel {
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        border-right: 1px solid #4d4d4d;
+        padding-right: 2rem;
+    }
+
+    .content-panel {
+        flex: 0 0 75% !important;
+        max-width: 75% !important;
+        box-sizing: border-box;
+    }
+
+    .sidebar-sticky-content {
+        position: sticky;
+        top: 6rem;
+    }
+}
+
+/* Vista Móvil */
+@media (max-width: 65.99rem) {
+    .split-container {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .sidebar-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-bottom: 1px solid #4d4d4d;
+        padding-bottom: 2rem;
+    }
+    .content-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 /* ==========================================================================
-   3. RETÍCULA DE CATÁLOGO (GRID)
+   3. COMPONENTE: HERO PANEL (Carrusel Contenido)
    ========================================================================== */
+.hero-panel {
+    padding: 0 !important;
+    border: 1px solid var(--cds-border-subtle);
+    background-color: var(--cds-layer-01);
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+}
+
+.hero-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 520px; /* Un poco más de aire vertical */
+    background-color: #000000; /* Fondo negro puro para enmarcar obras verticales/cuadradas */
+}
+
+.hero-carousel-wrapper .bg-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* CAMBIO CLAVE: "contain" asegura que la obra de arte se vea COMPLETA sin recortes */
+    object-fit: contain;
+    padding: 24px; /* Pequeño margen estilo galería de arte */
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-carousel-wrapper .bg-slide.visible {
+    opacity: 1;
+    z-index: 2;
+}
+
+/* ==========================================================================
+   4. COMPONENTE: ÍNDICE DE OBRAS POR SERIES
+   ========================================================================== */
+.catalog-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; /* Separación elegante entre colecciones */
+}
+
+/* Títulos de las Series */
+.series-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: var(--cds-text-secondary) !important;
+    font-size: 0.75rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 0.75rem 0 !important;
+    border-left: 2px solid var(--accent-interactive);
+    padding-left: 8px;
+}
+
+/* La rejilla monolítica ahora se adapta de forma fluida a cada sub-bloque */
 .code-grid {
     display: grid;
-    /* El grid ahora es completamente fluido y se adapta al espacio disponible */
-    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 1px;
+    background-color: var(--cds-border-subtle);
+    border: 1px solid var(--cds-border-subtle);
     width: 100%;
-    max-width: 800px; /* Ancho máximo contenedor */
-    margin: 0 auto;
 }
 
 /* ==========================================================================
-   4. BOTONES DE OBRAS (CÓDIGOS)
+   5. VISTA DE DETALLE DE OBRA (Páginas Obras/JBU-xxx)
    ========================================================================== */
-.code-btn {
-    aspect-ratio: 1 / 1; /* Cuadrados perfectos automáticos */
-    border: 1px solid var(--btn-border);
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Efecto Hover: Elegante y minimalista */
-.code-btn:hover {
-    transform: translateY(-4px);
-    background-color: var(--accent);
-    border-color: var(--accent);
-    color: #ffffff;
-    box-shadow: 0 12px 24px rgba(15, 59, 162, 0.18);
-}
-
-/* ==========================================================================
-   5. RESPONSIVE / ADAPTABILIDAD MOBILE
-   ========================================================================== */
-@media (max-width: 600px) {
-    .home {
-        padding: 40px 16px;
-    }
-
-    .phrase {
-        margin-bottom: 40px;
-    }
-
-    .code-grid {
-        /* En pantallas muy pequeñas, forzamos 4 columnas para mantener orden */
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-    }
-}
-
-
 .artwork-page {
     min-height: 100vh;
-    padding: 32px;
-    background: #f7f6f2;
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+    background-color: var(--cds-background);
 }
 
 .back-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     margin-bottom: 24px;
     text-decoration: none;
-    color: #111;
+    color: var(--cds-text-secondary);
     font-size: 14px;
-    letter-spacing: .04em;
+    transition: color 0.15s ease;
+}
+
+.back-link:hover {
+    color: var(--cds-text-primary);
 }
 
 .artwork-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) 420px;
+    grid-template-columns: minmax(0, 1.2fr) 400px;
     gap: 48px;
-    align-items: center;
+    align-items: flex-start;
     max-width: 1280px;
     margin: 0 auto;
 }
 
 .artwork-image-wrap {
-    background: #fff;
-    padding: 20px;
-    border-radius: 18px;
-    box-shadow: 0 24px 70px rgba(0,0,0,.08);
+    background: #000;
+    padding: 16px;
+    border: 1px solid var(--cds-border-subtle);
 }
 
 .artwork-image {
     width: 100%;
-    max-height: 76vh;
+    max-height: 70vh;
     object-fit: contain;
     display: block;
 }
 
 .artwork-details {
-    background: rgba(255,255,255,.72);
-    border: 1px solid rgba(0,0,0,.08);
-    border-radius: 22px;
-    padding: 34px;
-}
-
-.detail-logo {
-    width: 86px;
-    display: block;
-    margin: 0 auto 28px;
+    background: var(--cds-layer-01);
+    border: 1px solid var(--cds-border-subtle);
+    padding: 32px;
 }
 
 .artwork-code {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
-    letter-spacing: .18em;
+    letter-spacing: .1em;
     text-transform: uppercase;
-    color: #777;
+    color: var(--cds-text-secondary);
 }
 
 .artwork-details h1 {
-    font-size: 34px;
-    line-height: 1.05;
-    margin: 8px 0 22px;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 8px 0 24px;
 }
 
 .meta p {
     margin: 8px 0;
-    font-size: 15px;
+    font-size: 14px;
+    color: var(--cds-text-secondary);
 }
 
 .description {
-    margin-top: 26px;
-    font-size: 16px;
-    line-height: 1.7;
+    margin-top: 24px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--cds-text-primary);
 }
 
-.qr-box {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(0,0,0,.12);
-    text-align: center;
-}
-
-.qr-box img {
-    width: 130px;
-    height: 130px;
-}
-
-.qr-box p {
-    font-size: 12px;
-    color: #777;
-    margin-top: 8px;
-}
-
-@media (max-width: 900px) {
-    .artwork-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .artwork-page {
-        padding: 18px;
-    }
-
-    .artwork-details h1 {
-        font-size: 28px;
-    }
-}
-
+/* Botones de acción en detalle de obra */
 .like-btn,
 .whatsapp-btn {
     display: block;
     width: 100%;
-    margin-top: 14px;
-    padding: 14px 18px;
-    border-radius: 999px;
+    margin-top: 12px;
+    padding: 12px 16px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     font-size: 14px;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease;
 }
 
 .like-btn {
-    border: 1px solid #0d2f6f;
-    background: white;
-    color: #0d2f6f;
+    border: 1px solid var(--cds-border-strong);
+    background: transparent;
+    color: var(--cds-text-primary);
+}
+
+.like-btn:hover {
+    background-color: var(--cds-layer-hover);
 }
 
 .whatsapp-btn {
-    border: 1px solid #0d2f6f;
-    background: #0d2f6f;
-    color: white;
-}.home-bg {
-     position: fixed;
-     inset: 0;
-     z-index: -3;
-     overflow: hidden;
-     background: #f3f0ea;
- }
-
-.bg-slide {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 2.4s ease-in-out;
+    border: 1px solid var(--accent-interactive);
+    background: var(--accent-interactive);
+    color: #ffffff;
 }
 
-.bg-slide.visible {
-    opacity: 1;
+.whatsapp-btn:hover {
+    background-color: #0353e9; /* IBM Blue Hover */
 }
 
-/* Capa grande: llena toda la pantalla, muy difuminada */
-.bg-cover {
-    object-fit: cover;
-    object-position: center;
-    filter: blur(18px) brightness(1.03) saturate(1.08);
-    transform: scale(1.08);
-    opacity: 0;
-}
-
-.bg-cover.visible {
-    opacity: 0.55;
-}
-
-/* Capa central: obra completa, suave y translúcida */
-.bg-focus {
-    object-fit: contain;
-    object-position: center;
-    filter: blur(2px) brightness(1.04) saturate(1.05);
-    transform: scale(0.92);
-    opacity: 0;
-}
-
-.bg-focus.visible {
-    opacity: 0.28;
-}
-
-.home-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background:
-            radial-gradient(circle at center,
-            rgba(243, 240, 234, 0.18),
-            rgba(243, 240, 234, 0.62)
-            ),
-            linear-gradient(to bottom,
-            rgba(255,255,255,0.18),
-            rgba(243,240,234,0.78)
-            );
+/* Ajustes Responsivos para detalle */
+@media (max-width: 900px) {
+    .artwork-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .artwork-page {
+        padding: 4rem 16px 2rem;
+    }
 }
