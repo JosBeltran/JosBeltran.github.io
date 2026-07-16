@@ -14,7 +14,7 @@ async function loadCatalog() {
     data.series.forEach((serie) => {
         // 1. Crear el wrapper de la serie
         const seriesGroup = document.createElement('div');
-        seriesGroup.style.marginBottom = '2rem';
+        seriesGroup.style.marginBottom = '3.5rem'; // Mayor separación entre colecciones
 
         // 2. Insertar el título formateado de la colección
         const title = document.createElement('h3');
@@ -22,19 +22,30 @@ async function loadCatalog() {
         title.textContent = serie.seriesTitle;
         seriesGroup.appendChild(title);
 
-        // 3. Crear la rejilla de botones exclusiva para esta serie
+        // 3. Crear la rejilla de tarjetas (galería visual) exclusiva para esta serie
         const subGrid = document.createElement('section');
-        subGrid.className = 'code-grid';
+        subGrid.className = 'code-grid'; // Usa los nuevos estilos grid de la galería
         subGrid.setAttribute('aria-label', `Colección ${serie.seriesTitle}`);
 
         serie.works.forEach((work, index) => {
             allWorks.push(work); // Almacenamos en plano para el carrusel global
 
+            // Crear la tarjeta de la galería
             const a = document.createElement('a');
-            a.className = 'code-btn';
+            a.className = 'artwork-card';
             a.href = `obras/${work.code}.html`;
             a.title = work.title;
-            a.innerHTML = `<span>${work.code}</span>`;
+
+            // Inyectamos la estructura visual: imagen + info elegante
+            a.innerHTML = `
+                <div class="artwork-card-image-wrapper">
+                    <img src="${work.image || 'assets/artworks/' + work.code + '.JPEG'}" alt="${work.title}" loading="lazy" />
+                </div>
+                <div class="artwork-card-info">
+                    <span class="artwork-card-code">${work.code}</span>
+                    <h4 class="artwork-card-title">${work.title}</h4>
+                </div>
+            `;
             a.style.setProperty('--i', index);
 
             subGrid.appendChild(a);

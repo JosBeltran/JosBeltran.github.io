@@ -1,36 +1,42 @@
 /* ==========================================================================
-   1. VARIABLES DE SISTEMA Y REESCRITURA DE TEMA (Forzado G100)
+   1. VARIABLES DE SISTEMA Y REESCRITURA DE TEMA (White Theme)
    ========================================================================== */
 :root {
-    --cds-background: #161616 !important;
-    --cds-layer-01: #262626 !important;
-    --cds-layer-02: #393939 !important;
-    --cds-layer-hover: #353535 !important;
-    --cds-text-primary: #f4f4f4 !important;
-    --cds-text-secondary: #c6c6c6 !important;
-    --cds-border-subtle: #4d4d4d !important;
-    --accent-interactive: #0f62fe !important;
+    --cds-background: #ffffff;
+    --cds-layer-01: #f4f4f4;
+    --cds-layer-02: #e0e0e0;
+    --cds-layer-hover: #e5e5e5;
+    --cds-text-primary: #161616;
+    --cds-text-secondary: #525252;
+    --cds-border-subtle: #e0e0e0;
+    --accent-interactive: #0f62fe;
 }
 
 html, body {
-    background-color: #161616 !important;
-    color: #f4f4f4 !important;
+    background-color: var(--cds-background) !important;
+    color: var(--cds-text-primary) !important;
     font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-/* Forzar barra superior de Carbon a mantenerse oscura */
+/* Barra superior de Carbon adaptada a tono claro y elegante */
 .cds--header {
-    background-color: #161616 !important;
-    border-bottom: 1px solid #393939 !important;
+    background-color: var(--cds-background) !important;
+    border-bottom: 1px solid var(--cds-border-subtle) !important;
 }
 .cds--header__name, .cds--header__menu-item {
-    color: #f4f4f4 !important;
+    color: var(--cds-text-primary) !important;
 }
 .cds--header__menu-item:hover {
-    background-color: #262626 !important;
-    color: #ffffff !important;
+    background-color: var(--cds-layer-01) !important;
+    color: var(--cds-text-primary) !important;
+}
+
+.main-content-wrapper {
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+    background-color: var(--cds-background) !important;
 }
 
 /* ==========================================================================
@@ -157,39 +163,91 @@ html, body {
     opacity: 1;
     z-index: 2;
 }
-
 /* ==========================================================================
-   4. COMPONENTE: ÍNDICE DE OBRAS POR SERIES
+   4. COMPONENTE: ÍNDICE DE OBRAS POR SERIES (Galería en Grid)
    ========================================================================== */
 .catalog-wrapper {
     margin-top: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem; /* Separación elegante entre colecciones */
+    gap: 3.5rem; /* Más espacio para dejar respirar a las colecciones */
 }
 
 /* Títulos de las Series */
 .series-title {
     font-family: 'IBM Plex Sans', sans-serif;
-    color: var(--cds-text-secondary) !important;
-    font-size: 0.75rem !important;
+    color: var(--cds-text-primary) !important;
+    font-size: 0.875rem !important;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin: 0 0 0.75rem 0 !important;
+    margin: 0 0 1.5rem 0 !important;
     border-left: 2px solid var(--accent-interactive);
-    padding-left: 8px;
+    padding-left: 12px;
+    font-weight: 600;
 }
 
-/* La rejilla monolítica ahora se adapta de forma fluida a cada sub-bloque */
+/* Grid de galería limpio, asimétrico y responsivo */
 .code-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 1px;
-    background-color: var(--cds-border-subtle);
-    border: 1px solid var(--cds-border-subtle);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px; /* Espaciado moderno entre cuadros */
+    background-color: transparent !important;
+    border: none !important;
     width: 100%;
 }
 
+/* Estilo para cada tarjeta individual de obra dentro de la galería */
+.artwork-card {
+    background-color: var(--cds-layer-01);
+    border: 1px solid var(--cds-border-subtle);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none; /* Por si toda la tarjeta es un enlace */
+    color: inherit;
+}
+
+.artwork-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    background-color: var(--cds-layer-hover);
+}
+
+.artwork-card-image-wrapper {
+    width: 100%;
+    height: 320px; /* Altura uniforme para las imágenes en la galería */
+    background-color: #f7f7f7; /* Gris muy tenue para enmarcar las obras */
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.artwork-card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Evita que la obra se recorte */
+    display: block;
+    padding: 12px;
+}
+
+.artwork-card-info {
+    padding: 4px 0;
+}
+
+.artwork-card-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--cds-text-secondary);
+    text-transform: uppercase;
+}
+
+.artwork-card-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--cds-text-primary);
+    margin: 4px 0;
+}
 /* ==========================================================================
    5. VISTA DE DETALLE DE OBRA (Páginas Obras/JBU-xxx)
    ========================================================================== */
