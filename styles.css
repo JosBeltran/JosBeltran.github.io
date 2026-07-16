@@ -412,7 +412,6 @@ html, body {
     cursor: not-allowed;
     pointer-events: none; /* Evita que hagan click */
 }
-
 /* Botones de Prints de la galería */
 .print-order-btn {
     display: flex;
