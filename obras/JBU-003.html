@@ -5,6 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JBU-003 | Probability Wave</title>
   <link rel="stylesheet" href="../styles.css" />
+  <style>
+    /* Estilos locales para armonizar los botones */
+    .purchase-section {
+      margin: 2rem 0 1rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .artwork-price {
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    /* Rediseño elegante del botón de WhatsApp (Secundario) */
+    .whatsapp-btn-secondary {
+      display: block;
+      text-align: center;
+      padding: 14px;
+      border: 1px solid #333333;
+      background-color: transparent;
+      color: #cccccc;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+    
+    .whatsapp-btn-secondary:hover {
+      background-color: #222222;
+      color: #ffffff;
+      border-color: #444444;
+    }
+
+    /* Contenedor para mitigar el impacto visual de la tarjeta de Stripe si decides dejarla */
+    .stripe-container {
+      background-color: #1e1e1e;
+      border: 1px solid #2d2d2d;
+      padding: 4px;
+      /* Fuerza un ligero ajuste para que no brille tanto el blanco */
+      border-radius: 4px; 
+    }
+  </style>
 </head>
 <body style="background-color: #161616; color: #f4f4f4;">
 
@@ -18,7 +64,6 @@
           <img src="../assets/artworks/JBU-003.JPEG" alt="Probability Wave" class="artwork-image" />
         </div>
         <!-- Inyección de bloque de documentación del proceso creativo -->
-        
       </div>
 
       <aside class="artwork-details">
@@ -33,25 +78,33 @@
 
         <p class="description">Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción.</p>
 
+        <!-- Sección de Compra y Precio -->
+        <div class="purchase-section">
+          <div class="artwork-price">$3,350 MXN</div>
+          
+          <!-- Botón de Pago Stripe -->
+          <div class="stripe-container">
+            <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+            <stripe-buy-button
+              buy-button-id="buy_btn_1TtvVOPkpDd0hdFDVcPiathp"
+              publishable-key="pk_live_51Ttu48PkpDd0hdFD2fkLU5xCTrSQ71Moi8TBs1xUv8RCoIBSk9pJf8bJvPaEF5aImCBrpPshPmVmM3XYOHjq64xM00jK59Psde"
+            >
+            </stripe-buy-button>
+          </div>
+
+          <!-- Botón de WhatsApp estilizado como secundario -->
+          <a class="whatsapp-btn-secondary"
+             target="_blank"
+             href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-003%20-%20Probability%20Wave%20de%20la%20serie%20Orbitals">
+            Preguntar por WhatsApp
+          </a>
+        </div>
+
+        <!-- Código QR al final como información de utilidad -->
         <div class="qr-box" style="text-align: center; margin: 2rem 0; padding: 16px; border: 1px dashed var(--cds-border-subtle);">
           <img src="../assets/qr/JBU-003.png" alt="QR JBU-003" style="width: 120px; height: 120px; filter: invert(0.9); display: block; margin: 0 auto 8px;" />
           <p class="cds--type-label-01" style="color: var(--cds-text-secondary); font-size: 11px;">Escanea para compartir o abrir en dispositivo móvil</p>
         </div>
-
-        <a class="whatsapp-btn"
-           target="_blank"
-           href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-003%20-%20Probability%20Wave%20de%20la%20serie%20Orbitals">
-          Preguntar por WhatsApp
-        </a>
-        <script async
-  src="https://js.stripe.com/v3/buy-button.js">
-</script>
-
-<stripe-buy-button
-  buy-button-id="buy_btn_1TtvVOPkpDd0hdFDVcPiathp"
-  publishable-key="pk_live_51Ttu48PkpDd0hdFD2fkLU5xCTrSQ71Moi8TBs1xUv8RCoIBSk9pJf8bJvPaEF5aImCBrpPshPmVmM3XYOHjq64xM00jK59Psde"
->
-</stripe-buy-button>
       </aside>
     </section>
   </div>
