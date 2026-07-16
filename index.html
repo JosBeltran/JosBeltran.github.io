@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="es" data-theme="g100">
+<!DOCTYPE html>
+<html lang="es" data-theme="white">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,63 +8,99 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
     <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body style="background-color: var(--cds-background); color: var(--cds-text-primary);">
 
-<!-- Barra de Navegación Superior (Carbon UI Shell) -->
-<header class="cds--header" role="banner" aria-label="JBU Portfolio">
+<!-- Barra de Navegación Superior (Carbon UI Shell - White Theme) -->
+<header class="cds--header" role="banner" aria-label="JBU Portfolio" style="border-bottom: 1px solid var(--cds-border-subtle);">
     <a class="cds--header__name" href="#">
         <span class="cds--header__name--prefix">JBU</span>&nbsp;Portfolio
     </a>
-    <nav class="cds--header__nav" aria-label="Plataforma">
+    
+    <nav class="cds--header__nav" aria-label="Navegación Principal">
         <ul class="cds--header__menu-bar" role="menubar">
-            <li>
-                <a class="cds--header__menu-item" href="#galeria" role="menuitem" tabindex="0">Galería</a>
+            <!-- Menú de Colecciones -->
+            <li class="cds--header__submenu" role="none">
+                <a class="cds--header__menu-item cds--header__menu-title" href="#galeria" role="menuitem" aria-haspopup="true" tabindex="0">
+                    Colecciones
+                </a>
+                <ul class="cds--header__menu" role="menu" aria-label="Colecciones">
+                    <li>
+                        <a class="cds--header__menu-item" href="#serie-orbitals" role="menuitem" tabindex="-1">Orbitals</a>
+                    </li>
+                    <!-- Puedes añadir más series dinámicas aquí o manejarlas desde tu app.js -->
+                </ul>
             </li>
-            <li>
-                <a class="cds--header__menu-item" href="#info" role="menuitem" tabindex="-1">Información</a>
+
+            <!-- Menú de Información / Legal de la Tienda -->
+            <li class="cds--header__submenu" role="none">
+                <a class="cds--header__menu-item cds--header__menu-title" href="#" role="menuitem" aria-haspopup="true" tabindex="-1">
+                    Información y Compra
+                </a>
+                <ul class="cds--header__menu" role="menu" aria-label="Información y Compra">
+                    <li>
+                        <a class="cds--header__menu-item" href="info/soporte.html" role="menuitem" tabindex="-1">Soporte y Contacto</a>
+                    </li>
+                    <li>
+                        <a class="cds--header__menu-item" href="info/terminos-de-servicio.html" role="menuitem" tabindex="-1">Términos de Servicio</a>
+                    </li>
+                    <li>
+                        <a class="cds--header__menu-item" href="info/politica-de-privacidad.html" role="menuitem" tabindex="-1">Política de Privacidad</a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </nav>
 </header>
 
 <!-- Contenedor Principal (Grid de Carbon) -->
-<main class="cds--grid main-content-wrapper">
-    <!-- Agregamos la clase "split-container" para forzar el comportamiento side-by-side -->
+<main class="cds--grid main-content-wrapper" style="padding-top: 3rem;">
+    <!-- Comportamiento side-by-side -->
     <div class="cds--row split-container">
 
-        <!-- PANEL IZQUIERDO (Identidad) -->
-        <aside class="sidebar-panel">
-            <div class="sidebar-sticky-content">
-                <div class="logo-container">
-                    <img class="logo-clean" id="logo" src="assets/logo.png" alt="JBU Logo">
+        <!-- PANEL IZQUIERDO (Identidad Fija y Minimalista) -->
+        <aside class="sidebar-panel cds--col-lg-4 cds--col-md-3 cds--col-sm-4">
+            <div class="sidebar-sticky-content" style="padding: 2rem 0;">
+                <div class="logo-container" style="margin-bottom: 2rem;">
+                    <img class="logo-clean" id="logo" src="assets/logo.png" alt="JBU Logo" style="max-width: 80px; filter: none;">
                 </div>
-                <h1 class="cds--type-productive-heading-05 artist-name">Josue Beltran Uresti</h1>
-                <p class="cds--type-body-short-01 brand-phrase" id="homePhrase">
+                <h1 class="cds--type-productive-heading-05 artist-name" style="font-weight: 400; letter-spacing: -0.5px; color: var(--cds-text-primary);">
+                    Josue Beltran Uresti
+                </h1>
+                <p class="cds--type-body-short-01 brand-phrase" id="homePhrase" style="color: var(--cds-text-secondary); margin-top: 1rem; max-width: 280px; line-height: 1.5;">
                     Cada obra es una posibilidad: una imagen que espera ser observada para existir.
                 </p>
             </div>
         </aside>
 
-        <!-- PANEL DERECHO (Carrusel y Catálogo) -->
-        <section id="galeria" class="content-panel">
+        <!-- PANEL DERECHO (Obras en Vista Clara) -->
+        <section id="galeria" class="content-panel cds--col-lg-12 cds--col-md-5 cds--col-sm-4" style="border-left: 1px solid var(--cds-border-subtle); padding-left: 2rem;">
 
-            <!-- Hero Panel (Carrusel) -->
-            <div class="cds--tile hero-panel">
-                <div class="hero-carousel-wrapper">
-                    <img id="homeBgA" class="bg-slide visible" src="" alt="" />
-                    <img id="homeBgB" class="bg-slide" src="" alt="" />
+            <!-- Hero Panel (Carrusel Visual Destacado) -->
+            <div class="cds--tile hero-panel" style="background-color: var(--cds-layer-01); border: 1px solid var(--cds-border-subtle); padding: 0; overflow: hidden; margin-bottom: 3rem;">
+                <div class="hero-carousel-wrapper" style="position: relative; height: 400px; background: #fafafa;">
+                    <img id="homeBgA" class="bg-slide visible" src="" alt="" style="width: 100%; height: 100%; object-fit: contain;" />
+                    <img id="homeBgB" class="bg-slide" src="" alt="" style="width: 100%; height: 100%; object-fit: contain;" />
                 </div>
-                <div class="hero-info-bar">
-                    <span class="cds--type-label-01 info-label">Exhibición</span>
-                    <p id="artworkTitle" class="cds--type-expressive-heading-03">Cargando...</p>
+                <div class="hero-info-bar" style="padding: 16px; border-top: 1px solid var(--cds-border-subtle); background-color: var(--cds-background);">
+                    <span class="cds--type-label-01 info-label" style="color: var(--cds-text-secondary); text-transform: uppercase; font-size: 10px; tracking: 0.5px;">Destacado</span>
+                    <p id="artworkTitle" class="cds--type-expressive-heading-03" style="color: var(--cds-text-primary); font-weight: 400; margin-top: 4px;">Cargando...</p>
                 </div>
             </div>
 
-            <!-- Índice de Obras -->
+            <!-- Índice de Obras Estructurado en Colecciones -->
             <div class="catalog-wrapper">
-                <h2 class="cds--type-label-01" style="color: var(--cds-text-primary); opacity: 0.4; margin-bottom: 0.5rem;">Colecciones</h2>
-                <!-- Este contenedor ahora recibirá los grupos estructurados de series creados desde app.js -->
-                <div id="codeGrid"></div>
+                <div class="cds--row">
+                    <div class="cds--col-lg-16">
+                        <h2 class="cds--type-heading-02" style="color: var(--cds-text-primary); font-weight: 300; margin-bottom: 2rem; letter-spacing: -0.3px;">
+                            Catálogo de Colecciones
+                        </h2>
+                    </div>
+                </div>
+                
+                <!-- El contenedor receptor de los grupos del app.js -->
+                <div id="codeGrid" class="cds--grid--condensed">
+                    <!-- Tu script inyectará dinámicamente bloques estructurados aquí -->
+                </div>
             </div>
 
         </section>
