@@ -79,26 +79,43 @@
         <p class="description">Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción.</p>
 
         <!-- Sección de Compra y Precio -->
-        <div class="purchase-section">
-          <div class="artwork-price">$3,350 MXN</div>
-          
-          <!-- Botón de Pago Stripe -->
-          <div class="stripe-container">
-            <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-            <stripe-buy-button
-              buy-button-id="buy_btn_1TtvVOPkpDd0hdFDVcPiathp"
-              publishable-key="pk_live_51Ttu48PkpDd0hdFD2fkLU5xCTrSQ71Moi8TBs1xUv8RCoIBSk9pJf8bJvPaEF5aImCBrpPshPmVmM3XYOHjq64xM00jK59Psde"
-            >
-            </stripe-buy-button>
-          </div>
+        <!-- Contenedor de Compra Dinámico -->
+<div class="purchase-section" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 20px;">
 
-          <!-- Botón de WhatsApp estilizado como secundario -->
-          <a class="whatsapp-btn-secondary"
-             target="_blank"
-             href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-003%20-%20Probability%20Wave%20de%20la%20serie%20Orbitals">
-            Preguntar por WhatsApp
-          </a>
-        </div>
+  <!-- Bloque de la Obra Original -->
+  <div class="original-purchase-box">
+    <!-- El botón se renderizará dinámicamente aquí mediante JavaScript -->
+    <div id="original-cta-container"></div>
+  </div>
+
+  <!-- Sección Fija de Reproducciones Giclée (Prints de Prodigi) -->
+  <div class="prints-purchase-box" style="padding: 16px; border: 1px solid var(--cds-border-subtle); background-color: var(--cds-layer-01);">
+    <span class="cds--type-label-01" style="color: var(--cds-text-secondary); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">
+      Reproducciones Giclée (Prints)
+    </span>
+    <p style="font-size: 12px; color: var(--cds-text-secondary); margin-bottom: 16px; line-height: 1.4;">
+      Impresión fine art de calidad de museo bajo demanda, gestionada por Prodigi.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <a class="print-order-btn" href="TU_URL_DE_PRODIGI_O_STRIPE_PRINT_A4" target="_blank">
+        <span>Tamaño A4</span>
+        <strong style="color: var(--accent-interactive);">$650 MXN →</strong>
+      </a>
+      <a class="print-order-btn" href="TU_URL_DE_PRODIGI_O_STRIPE_PRINT_A3" target="_blank">
+        <span>Tamaño A3</span>
+        <strong style="color: var(--accent-interactive);">$950 MXN →</strong>
+      </a>
+    </div>
+  </div>
+
+  <!-- Enlace Secundario para Consultas -->
+  <a class="whatsapp-btn-secondary" target="_blank"
+     href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-003%20-%20Probability%20Wave">
+    Preguntar por WhatsApp
+  </a>
+
+</div>
 
         <!-- Código QR al final como información de utilidad -->
         <div class="qr-box" style="text-align: center; margin: 2rem 0; padding: 16px; border: 1px dashed var(--cds-border-subtle);">
@@ -109,6 +126,38 @@
     </section>
   </div>
 </main>
+<script>
+  // Simulación del estado de la obra (estos datos idealmente los leerás de tu artworks.json)
+const artworkStatus = {
+    price: "$3,350 MXN",
+    stripeUrl: "https://buy.stripe.com/tu_enlace_de_pago_directo", // URL directa de Stripe en vez del script embed
+    isAvailable: true // Cambia a false cuando se venda para probar el estado "Sold"
+};
+
+function renderOriginalCTA(status) {
+    const container = document.getElementById('original-cta-container');
+    if (!container) return;
+
+    if (status.isAvailable) {
+        // Renderiza el botón activo con el precio implícito en la acción
+        container.innerHTML = `
+            <a href="${status.stripeUrl}" target="_blank" class="btn-original-buy">
+                Adquirir Original — ${status.price}
+            </a>
+        `;
+    } else {
+        // Renderiza el estado bloqueado de colección privada
+        container.innerHTML = `
+            <div class="btn-original-sold">
+                Sold — Colección Privada
+            </div>
+        `;
+    }
+}
+
+// Inicializar la carga del componente
+renderOriginalCTA(artworkStatus);
+</script>
 
 </body>
 </html>

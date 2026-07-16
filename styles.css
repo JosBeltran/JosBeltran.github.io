@@ -374,3 +374,59 @@ html, body {
         padding: 4rem 16px 2rem;
     }
 }
+
+/* Botón Principal de Compra (Original Disponible) */
+.btn-original-buy {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    background-color: var(--accent-interactive);
+    color: #ffffff !important;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--accent-interactive);
+    transition: background-color 0.15s ease;
+}
+
+.btn-original-buy:hover {
+    background-color: #0353e9; /* Tono hover interactivo de Carbon */
+}
+
+/* Estado Vendido (Deshabilitado y elegante) */
+.btn-original-sold {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    background-color: transparent;
+    color: var(--cds-text-secondary) !important;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px dashed var(--cds-border-subtle);
+    cursor: not-allowed;
+    pointer-events: none; /* Evita que hagan click */
+}
+
+/* Botones de Prints de la galería */
+.print-order-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--cds-border-subtle);
+    color: var(--cds-text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.print-order-btn:hover {
+    background-color: var(--cds-layer-hover) !important;
+    border-color: var(--cds-text-secondary) !important;
+}
