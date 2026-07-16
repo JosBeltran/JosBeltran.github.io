@@ -36,7 +36,7 @@ html, body {
 .main-content-wrapper {
     padding-top: 6rem;
     padding-bottom: 4rem;
-    background-color: var(--cds-background) !important;
+    background-color: var(--cds-background) !important; /* Ahora usará el blanco de tu :root */
 }
 
 /* ==========================================================================
@@ -70,14 +70,14 @@ html, body {
 }
 
 .artist-name {
-    color: #f4f4f4 !important;
+    color: var(--cds-text-primary) !important;
     font-weight: 400;
     font-size: 1.25rem;
     margin: 1rem 0 0.5rem 0;
 }
 
 .brand-phrase {
-    color: #c6c6c6 !important;
+    color: var(--cds-text-secondary) !important;
     font-size: 0.875rem;
     line-height: 1.5;
 }
@@ -91,12 +91,12 @@ html, body {
         gap: 3rem;
     }
 
-    .sidebar-panel {
-        flex: 0 0 25% !important;
-        max-width: 25% !important;
-        border-right: 1px solid #4d4d4d;
-        padding-right: 2rem;
-    }
+ .sidebar-panel {
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+    border-right: 1px solid var(--cds-border-subtle);
+    padding-right: 2rem;
+}
 
     .content-panel {
         flex: 0 0 75% !important;
