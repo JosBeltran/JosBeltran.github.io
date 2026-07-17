@@ -357,13 +357,13 @@ function updateSidebarMetadata(art) {
     if (sizeEl) sizeEl.textContent = art.size;
     if (yearEl) yearEl.textContent = art.year;
 
-    // Redirección directa a su respectiva página obras/JBU-XXX.html
+    // Redirección directa a su respectiva página obras/JBU-XXX.html evaluando disponibilidad real
     if (ctaWrapper) {
-        if (art.marketplaceTitle) {
+        if (art.isAvailable) {
             ctaWrapper.innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
                     <span class="meta-value" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #198038; font-weight: 600;">
-                        ✓ Disponible para adquisición
+                        ✓ Disponible para adquisición — ${art.originalPrice || ''}
                     </span>
                     <a href="obras/${art.code}.html" class="btn-editorial-action" style="display: block; text-align: center; text-decoration: none; padding: 10px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
                         Consultar Adquisición
@@ -382,6 +382,9 @@ function updateSidebarMetadata(art) {
     }
 }
 
+/**
+ * Actualiza el Hero Visual y sus etiquetas usando una transición de opacidad.
+ */
 /**
  * Actualiza el Hero Visual y sus etiquetas usando una transición de opacidad.
  */
@@ -406,7 +409,7 @@ function updateHeroSection(art) {
 
         // Redirección directa a obras/JBU-XXX.html desde el botón del Hero
         if (heroActionContainer) {
-            if (art.marketplaceTitle) {
+            if (art.isAvailable) {
                 heroActionContainer.innerHTML = `
                     <a href="obras/${art.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
                         Solicitar Ficha Técnica — ${art.code}
@@ -448,7 +451,7 @@ function setupInitialState(initialArt) {
     
     // Redirección directa a obras/JBU-XXX.html desde el estado inicial
     if (heroActionContainer) {
-        if (initialArt.marketplaceTitle) {
+        if (initialArt.isAvailable) {
             heroActionContainer.innerHTML = `
                 <a href="obras/${initialArt.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
                     Solicitar Ficha Técnica — ${initialArt.code}
@@ -486,4 +489,125 @@ function setupLazyLoadingObserver() {
     }, observerOptions);
 
     cards.forEach(card => observer.observe(card));
+}
+
+/**
+ * Hidratación dinámica para las páginas individuales de obras (/obras/JBU-XXX.html)
+ * Se ejecuta automáticamente al inicializar el DOM si detecta el contenedor de la obra.
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    // Intentamos detectar si estamos en una página de detalle individual
+    const detailContainer = document.getElementById("live-original-cta");
+    if (detailContainer) {
+        hydrateDetailPage();
+    }
+});
+
+async function hydrateDetailPage() {
+    const originalContainer = document.getElementById("live-original-cta");
+    const printsContainer = document.getElementById("live-prints-cta");
+    
+    if (!originalContainer) return;
+    
+    // Obtenemos el código de la obra desde el atributo del contenedor
+    const WORK_CODE = originalContainer.getAttribute("data-work-code");
+    if (!WORK_CODE) return;
+
+    try {
+        // Si el dataset global aún no se ha cargado en el index principal, 
+        // o si entran directo por link a la obra, disparamos una carga rápida del CSV
+        if (!galleryDataset.series || galleryDataset.series.length === 0) {
+            const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+            if (!response.ok) throw new Error("Error leyendo base de datos");
+            const csvText = await response.text();
+            galleryDataset = parseCSVToGalleryDataset(csvText);
+        }
+
+        // Buscamos la obra en nuestro dataset global ya parseado
+        const currentWork = findArtworkByCode(WORK_CODE);
+
+        if (currentWork) {
+            originalContainer.classList.remove("loading-pulse");
+            
+            // 1. Renderizar CTA de Obra Original
+            if (currentWork.isAvailable) {
+                if (currentWork.stripeUrl && currentWork.stripeUrl.trim() !== "") {
+                    originalContainer.innerHTML = `
+                        <a href="${currentWork.stripeUrl}" target="_blank" class="btn-original-buy">
+                            Adquirir Original — ${currentWork.originalPrice}
+                        </a>`;
+                } else {
+                    originalContainer.innerHTML = `
+                        <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
+                            <div style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted);">
+                                Disponible — ${currentWork.originalPrice}
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                                Pasarela de pago directo en línea para esta pieza en proceso de configuración. Si deseas adquirirla hoy, puedes contactarme directamente dando clic al botón de WhatsApp de abajo.
+                            </p>
+                        </div>`;
+                }
+            } else {
+                originalContainer.innerHTML = `
+                    <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
+                        <div class="btn-original-sold" style="margin-bottom: 12px; font-weight: 600; color: #888;">
+                            Obra Original: Vendida
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                            Esta pieza única ya forma parte de una colección privada. Sin embargo, puedes adquirir una <strong>reproducción Giclée autorizada</strong> abajo o contactarme directamente para encargar una obra comisionada similar.
+                        </p>
+                    </div>`;
+            }
+
+            // 2. Renderizar Prints (Reproducciones) utilizando el NUEVO formato dinámico
+            if (printsContainer && currentWork.prints && currentWork.prints.length > 0) {
+                const printButtons = currentWork.prints.map(print => {
+                    // Extraemos directamente las propiedades del nuevo JSON sin condicionales de tamaño
+                    const buttonText = print.label || "Adquirir Reproducción";
+                    let finalUrl = print.url || "#";
+
+                    // Acoplamos dinámicamente el parámetro de tracking nativo de Stripe si hay un link válido
+                    if (finalUrl !== "#") {
+                        const separator = finalUrl.includes("?") ? "&" : "?";
+                        finalUrl = `${finalUrl}${separator}client_reference_id=${currentWork.code}`;
+                    }
+
+                    // Separamos visualmente la descripción y el precio si usas el formato "Texto - $Precio"
+                    let displayLabel = buttonText;
+                    let displayAction = "Adquirir →";
+                    
+                    if (buttonText.includes(" - ")) {
+                        const parts = buttonText.split(" - ");
+                        displayLabel = parts[0];
+                        displayAction = `${parts[1]} →`;
+                    }
+
+                    return `
+                        <a class="print-order-btn" href="${finalUrl}" target="_blank">
+                            <span>${displayLabel}</span>
+                            <strong>${displayAction}</strong>
+                        </a>`;
+                }).join("");
+
+                printsContainer.innerHTML = `
+                    <div class="prints-box" style="margin-top: 16px;">
+                        <span class="prints-title">Reproducciones Giclée (Prints)</span>
+                        <p class="prints-desc">Impresión fine art de calidad de museo bajo demanda, gestionada por Prodigi.</p>
+                        <div class="print-options-grid">
+                            ${printButtons}
+                        </div>
+                    </div>`;
+            } else if (printsContainer) {
+                // Limpiar el contenedor si esta obra en específico no tiene reproducciones configuradas
+                printsContainer.innerHTML = "";
+            }
+        }
+    } catch (e) {
+        console.error("Error al hidratar los detalles de la obra:", e);
+        originalContainer.classList.remove("loading-pulse");
+        originalContainer.innerHTML = `
+            <div class="btn-original-sold" style="color: var(--text-muted);">
+                Precios online temporalmente no disponibles
+            </div>`;
+    }
 }

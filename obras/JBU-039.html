@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <!-- SEO & Social Previews Estáticos para Pinterest y WhatsApp -->
+  <!-- SEO & Social Previews Estáticos -->
   <title>JBU-039 | Ascensión Gráfica</title>
   <meta name="description" content="Líneas angulares y flechas que simulan el dinamismo de las calles rodean a una figura central enigmática de tonos olivas y dorados." />
   <meta property="og:title" content="JBU-039 | Ascensión Gráfica" />
@@ -88,8 +88,8 @@
       <p class="description">Líneas angulares y flechas que simulan el dinamismo de las calles rodean a una figura central enigmática de tonos olivas y dorados.</p>
       
       <div class="purchase-section">
-        <!-- Loader inicial de disponibilidad en tiempo real -->
-        <div id="live-original-cta" class="loading-pulse">
+        <!-- El div ahora lleva el atributo data-work-code para que app.js lo identifique e hidrate -->
+        <div id="live-original-cta" data-work-code="JBU-039" class="loading-pulse">
             <div class="btn-original-sold">Sincronizando estado actual...</div>
         </div>
         
@@ -108,102 +108,8 @@
   </section>
 </main>
 
-<script>
-  (async function hydratePage() {
-    const WORK_CODE = "JBU-039";
-    const API_URL = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec"; // Tu URL de Google Apps Script
-    
-    const STRIPE_CONFIG = {
-        generic_print_a4_url: "https://buy.stripe.com/genericA4Link",
-        generic_print_a3_url: "https://buy.stripe.com/genericA3Link"
-    };
-
-    try {
-      const response = await fetch(API_URL);
-      const artworks = await response.json();
-      const currentWork = artworks.find(w => w.code.toLowerCase() === WORK_CODE.toLowerCase());
-
-      if (currentWork) {
-        const originalContainer = document.getElementById("live-original-cta");
-        originalContainer.classList.remove("loading-pulse");
-        
-        // Comprobar si la obra está marcada como disponible y tiene un link de Stripe activo en Google Sheets
-        if (currentWork.availability && currentWork.availability.isAvailable) {
-            if (currentWork.availability.stripeUrl && currentWork.availability.stripeUrl.trim() !== "") {
-                // Si ya tiene link de Stripe mañana, se habilita el CTA de compra directa
-                originalContainer.innerHTML = `
-                <a href="${currentWork.availability.stripeUrl}" target="_blank" class="btn-original-buy">
-                    Adquirir Original — ${currentWork.availability.price}
-                </a>`;
-            } else {
-                // Si la obra es disponible pero aún no colocas el link de Stripe (por ejemplo hoy)
-                originalContainer.innerHTML = `
-                <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
-                    <div style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted);">
-                        Disponible — ${currentWork.availability.price}
-                    </div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                        Pasarela de pago directo en línea para esta pieza en proceso de configuración. Si deseas adquirirla hoy, puedes contactarme directamente dando clic al botón de WhatsApp de abajo.
-                    </p>
-                </div>`;
-            }
-        } else {
-            // Si está vendida
-            originalContainer.innerHTML = `
-            <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
-                <div class="btn-original-sold" style="margin-bottom: 12px; font-weight: 600; color: #888;">
-                    Obra Original: Vendida
-                </div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                    Esta pieza única ya forma parte de una colección privada. Sin embargo, puedes adquirir una <strong>reproducción Giclée autorizada</strong> abajo o contactarme directamente para encargar una obra comisionada similar.
-                </p>
-            </div>`;
-        }
-
-        // 2. Cargar sección de Prints
-        const printsContainer = document.getElementById("live-prints-cta");
-        if (currentWork.prints && currentWork.prints.length > 0) {
-            const printButtons = currentWork.prints.map(print => {
-                let baseStripeUrl = "";
-                if (print.size.includes("A4")) {
-                    baseStripeUrl = STRIPE_CONFIG.generic_print_a4_url;
-                } else if (print.size.includes("A3")) {
-                    baseStripeUrl = STRIPE_CONFIG.generic_print_a3_url;
-                }
-
-                const descriptionText = encodeURIComponent(`Reproducción de la obra: ${currentWork.title} (${currentWork.code})`);
-                const dynamicPrintUrl = baseStripeUrl 
-                    ? `${baseStripeUrl}?client_reference_id=${currentWork.code}&description=${descriptionText}`
-                    : "#";
-
-                return `
-                <a class="print-order-btn" href="${dynamicPrintUrl}" target="_blank">
-                    <span>${print.size}</span>
-                    <strong>${print.price} →</strong>
-                </a>`;
-            }).join("");
-
-            printsContainer.innerHTML = `
-            <div class="prints-box" style="margin-top: 16px;">
-                <span class="prints-title">Reproducciones Giclée (Prints)</span>
-                <p class="prints-desc">Impresión fine art de calidad de museo bajo demanda, gestionada por Prodigi.</p>
-                <div class="print-options-grid">
-                    ${printButtons}
-                </div>
-            </div>`;
-        }
-      }
-    } catch (e) {
-      console.error("Error al sincronizar datos en tiempo real de Google Sheets:", e);
-      const originalContainer = document.getElementById("live-original-cta");
-      originalContainer.classList.remove("loading-pulse");
-      originalContainer.innerHTML = `
-      <div class="btn-original-sold" style="color: var(--text-muted);">
-          Precios online temporalmente no disponibles
-      </div>`;
-    }
-  })();
-</script>
+<!-- Cargamos de forma global el script del motor principal que ahora contiene la lógica de hidratación -->
+<script src="../app.js"></script>
 
 </body>
 </html>
