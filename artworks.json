@@ -2,6 +2,10 @@
   "artist": "Josue Beltran Uresti",
   "logo": "assets/logo.png",
   "homePhrase": "2026"  ,
+  "stripe_config": {
+    "generic_print_a4_url": "https://buy.stripe.com/tu_enlace_generico_A4",
+    "generic_print_a3_url": "https://buy.stripe.com/tu_enlace_generico_A3"
+  },
   "series": [
     {
       "seriesId": "orbitals",
@@ -19,24 +23,23 @@
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
-          "code": "JBU-002",
-          "title": "Observer Effect",
-          "marketplaceTitle": "Observer Effect | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
-          "year": "2026",
-          "technique": "Técnica mixta sobre papel",
-          "size": "Por definir",
-          "image": "assets/artworks/JBU-002.png",
-          "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
-        },
-        {
           "code": "JBU-003",
           "title": "Probability Wave",
           "marketplaceTitle": "Probability Wave | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-003.JPEG",
+          "image": "assets/artworks/JBU-003.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
+        ,"availability": {
+            "isAvailable": true,
+            "price": "$3,350 MXN",
+            "stripeUrl": "https://buy.stripe.com/tu_enlace_de_pago_directo"
+          },
+          "prints": [
+            { "size": "Tamaño A4", "price": "$650 MXN" },
+            { "size": "Tamaño A3", "price": "$950 MXN" }
+          ]
         },
         {
           "code": "JBU-004",
@@ -55,7 +58,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-005.jpeg",
+          "image": "assets/artworks/JBU-005.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -85,7 +88,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-008.JPG",
+          "image": "assets/artworks/JBU-008.jpg",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -105,17 +108,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-010.jpeg",
-          "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
-        },
-        {
-          "code": "JBU-011",
-          "title": "Infinite Observer",
-          "marketplaceTitle": "Infinite Observer | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
-          "year": "2026",
-          "technique": "Técnica mixta sobre papel",
-          "size": "Por definir",
-          "image": "assets/artworks/JBU-011.jpeg",
+          "image": "assets/artworks/JBU-010.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -165,7 +158,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-016.jpeg",
+          "image": "assets/artworks/JBU-016.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -215,7 +208,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-021.JPG",
+          "image": "assets/artworks/JBU-021.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -235,7 +228,7 @@
           "year": "2026",
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
-          "image": "assets/artworks/JBU-023.JPG",
+          "image": "assets/artworks/JBU-023.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -246,16 +239,6 @@
           "technique": "Técnica mixta sobre papel",
           "size": "Por definir",
           "image": "assets/artworks/JBU-024.png",
-          "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
-        },
-        {
-          "code": "JBU-025",
-          "title": "Observer's Paradox",
-          "marketplaceTitle": "Observer's Paradox | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
-          "year": "2026",
-          "technique": "Técnica mixta sobre papel",
-          "size": "Por definir",
-          "image": "assets/artworks/JBU-025.png",
           "description": "Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción."
         },
         {
@@ -294,8 +277,37 @@
           "technique": "Acrylic on Paper",
           "size": "13 x 19 in",
           "description": "A variation of The Translucent Being emerging through crimson geometric bursts and fragmented structures. The composition explores contrast between organic presence and constructed reality.",
-          "image": "assets/artworks/JBU-029.JPG"
-        }
+          "image": "assets/artworks/JBU-029.png"
+        },{
+    "code": "JBU-041",
+    "title": "Solar Nexus",
+    "marketplaceTitle": "Solar Nexus | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+    "year": "2026",
+    "technique": "Técnica mixta sobre papel",
+    "size": "Por definir",
+    "image": "assets/artworks/JBU-041.png",
+    "description": "Una composición cargada de energía cósmica donde líneas de fuerza doradas irradian desde un núcleo místico. La superposición de tonos violetas, azules y ocres evoca la colisión de partículas y la calidez de un sol abstracto."
+  },
+  {
+    "code": "JBU-042",
+    "title": "Monochrome Totem",
+    "marketplaceTitle": "Monochrome Totem | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+    "year": "2026",
+    "technique": "Técnica mixta sobre papel",
+    "size": "Por definir",
+    "image": "assets/artworks/JBU-042.png",
+    "description": "Exploración de la identidad contemporánea y la cultura pop a través de una silueta totémica rodeada de trazos caóticos en amarillo, rojo y gris. Las texturas de patrones tramados contrastan con la espontaneidad del fondo gestual."
+  },
+  {
+    "code": "JBU-043",
+    "title": "Neon Eclipse",
+    "marketplaceTitle": "Neon Eclipse | Obra Original Firmada | Arte Contemporáneo | Marco Incluido",
+    "year": "2026",
+    "technique": "Técnica mixta sobre papel",
+    "size": "Por definir",
+    "image": "assets/artworks/JBU-043.png",
+    "description": "Una pieza magnética que enmarca una figura icónica en un halo rosa eléctrico de alto contraste. El fondo de texturas densas en verde oliva y negro se entrelaza con órbitas lineales que sugieren campos de fuerza y magnetismo invisible."
+  }
       ]
     },{
       "seriesId": "identidades-y-raices",
@@ -416,5 +428,51 @@
           "description": "Pieza de gran textura y capas superpuestas que evocan el desgaste de los muros urbanos frente a la permanencia de la iconografía moderna."
         }
       ]
-    }]
+    },{
+  "seriesId": "skulls",
+  "seriesTitle": "Skulls",
+  "seriesDescription": "Serie que explora la mística de la calavera y el memento mori a través de un prisma neoexpresionista, utilizando coronas de luz, órbitas vibrantes y una densa textura matérica.",
+  "works": [
+    {
+      "code": "JBU-002",
+      "title": "Vortex Skull",
+      "marketplaceTitle": "Vortex Skull | Obra Original Firmada | Serie Skulls | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-002.png",
+      "description": "Una pieza de gran dinamismo donde una calavera central queda envuelta en un torbellino de líneas radiales oscuras y un fondo texturizado en tonos rosas, violetas y verdes."
+    },
+    {
+      "code": "JBU-011",
+      "title": "Orbital Skull",
+      "marketplaceTitle": "Orbital Skull | Obra Original Firmada | Serie Skulls | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-011.png",
+      "description": "Exploración gestual donde anillos orbitales de color naranja encendido delimitan una calavera texturizada, suspendida sobre un fondo oscuro salpicado de trazos expresivos y destellos de color."
+    },
+    {
+      "code": "JBU-025",
+      "title": "Helios Skull",
+      "marketplaceTitle": "Helios Skull | Obra Original Firmada | Serie Skulls | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-025.png",
+      "description": "Una calavera abstracta de cuencas encendidas emerge en el centro de una corona solar de trazos naranjas y amarillos. El fondo en lavanda y verde aporta una atmósfera mística y ceremonial."
+    },
+    {
+      "code": "JBU-041",
+      "title": "Solar Nexus Skull",
+      "marketplaceTitle": "Solar Nexus Skull | Obra Original Firmada | Serie Skulls | Marco Incluido",
+      "year": "2026",
+      "technique": "Técnica mixta sobre papel",
+      "size": "Por definir",
+      "image": "assets/artworks/JBU-041.png",
+      "description": "Una composición cargada de energía cósmica donde líneas de fuerza doradas irradian desde una calavera mística central. La superposición de tonos violetas, azules y ocres evoca la calidez de un sol abstracto."
+    }
+  ]
+}]
 }

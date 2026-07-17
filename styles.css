@@ -1,431 +1,593 @@
 /* ==========================================================================
-   1. VARIABLES DE SISTEMA Y REESCRITURA DE TEMA (White Theme)
+   1. VARIABLES DE DISEÑO EDITORIAL (Pace / Gagosian Inspired)
    ========================================================================== */
 :root {
-    --cds-background: #ffffff;
-    --cds-layer-01: #f4f4f4;
-    --cds-layer-02: #e0e0e0;
-    --cds-layer-hover: #e5e5e5;
-    --cds-text-primary: #161616;
-    --cds-text-secondary: #525252;
-    --cds-border-subtle: #e0e0e0;
-    --accent-interactive: #0f62fe;
+    /* Paleta Cromática Minimalista de Galería */
+    --color-bg: #ffffff;
+    --color-text-primary: #121212;
+    --color-text-secondary: #707070;
+    --color-border-thin: #e5e5e5;
+    --color-accent: #0f62fe; /* El único acento interactivo heredado de Carbon */
+    
+    /* Escala Tipográfica Estricta (4 Tamaños) */
+    --fs-label: 11px;
+    --fs-body: 16px;
+    --fs-title: 32px;
+    --fs-hero: 60px;
+
+    /* Espaciados Modulares Editorial (Duplicados) */
+    --space-xs: 12px;
+    --space-sm: 24px;
+    --space-md: 48px;
+    --space-lg: 96px;
+    --space-xl: 144px;
+
+    /* Transiciones de Alta Gama */
+    --transition-smooth: all 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+/* Reset y Tipografía Base */
 html, body {
-    background-color: var(--cds-background) !important;
-    color: var(--cds-text-primary) !important;
+    background-color: var(--color-bg) !important;
+    color: var(--color-text-primary) !important;
     font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   2. HEADER & NAVEGACIÓN MINIMALISTA
+   ========================================================================== */
+.gallery-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-border-thin);
+    z-index: 1000;
+    height: 70px;
+    display: flex;
+    align-items: center;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gallery-brand {
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    display: flex;
+    gap: 8px;
+}
+
+.brand-prefix {
+    font-weight: 600;
+}
+
+.brand-suffix {
+    font-weight: 300;
+    color: var(--color-text-secondary);
+}
+
+.gallery-nav .nav-menu {
+    list-style: none;
+    display: flex;
+    gap: var(--space-md);
     margin: 0;
     padding: 0;
 }
 
-/* Barra superior de Carbon adaptada a tono claro y elegante */
-.cds--header {
-    background-color: var(--cds-background) !important;
-    border-bottom: 1px solid var(--cds-border-subtle) !important;
-}
-.cds--header__name, .cds--header__menu-item {
-    color: var(--cds-text-primary) !important;
-}
-.cds--header__menu-item:hover {
-    background-color: var(--cds-layer-01) !important;
-    color: var(--cds-text-primary) !important;
-}
-
-.main-content-wrapper {
-    padding-top: 6rem;
-    padding-bottom: 4rem;
-    background-color: var(--cds-background) !important; /* Ahora usará el blanco de tu :root */
-}
-
-/* ==========================================================================
-   2. DISTRIBUCIÓN DEL LAYOUT ASIMÉTRICO (Control Total)
-   ========================================================================== */
-.main-content-wrapper {
-    padding-top: 6rem; /* Más espacio por la barra fija */
-    padding-bottom: 4rem;
-    background-color: #161616 !important;
-}
-
-/* --- Panel Izquierdo (1/4 - Control de Logo y Textos) --- */
-.sidebar-panel {
-    margin-bottom: 2.5rem;
-    box-sizing: border-box;
-}
-
-.logo-container {
-    margin-bottom: 1.5rem;
-    display: block;
-    width: 100%;
-}
-
-/* Restricción absoluta para evitar que el logo se deforme o crezca descontrolado */
-.logo-clean {
-    width: 100% !important;
-    max-width: 120px !important; /* Ajusta este valor al tamaño ideal que quieras para tu firma/logo */
-    height: auto !important;
-    display: block;
-    opacity: 0.9;
-}
-
-.artist-name {
-    color: var(--cds-text-primary) !important;
-    font-weight: 400;
-    font-size: 1.25rem;
-    margin: 1rem 0 0.5rem 0;
-}
-
-.brand-phrase {
-    color: var(--cds-text-secondary) !important;
-    font-size: 0.875rem;
-    line-height: 1.5;
-}
-
-/* --- Comportamiento de Columnas Flexbox en Escritorio --- */
-@media (min-width: 66rem) {
-    .split-container {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 3rem;
-    }
-
- .sidebar-panel {
-    flex: 0 0 25% !important;
-    max-width: 25% !important;
-    border-right: 1px solid var(--cds-border-subtle);
-    padding-right: 2rem;
-}
-
-    .content-panel {
-        flex: 0 0 75% !important;
-        max-width: 75% !important;
-        box-sizing: border-box;
-    }
-
-    .sidebar-sticky-content {
-        position: sticky;
-        top: 6rem;
-    }
-}
-
-/* Vista Móvil */
-@media (max-width: 65.99rem) {
-    .split-container {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    .sidebar-panel {
-        width: 100% !important;
-        max-width: 100% !important;
-        border-bottom: 1px solid #4d4d4d;
-        padding-bottom: 2rem;
-    }
-    .content-panel {
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-}
-/* ==========================================================================
-   3. COMPONENTE: HERO PANEL (Carrusel Contenido)
-   ========================================================================== */
-.hero-panel {
-    padding: 0 !important;
-    border: 1px solid var(--cds-border-subtle);
-    background-color: var(--cds-layer-01);
-    overflow: hidden;
-    margin-bottom: 2.5rem;
-}
-
-.hero-carousel-wrapper {
-    position: relative;
-    width: 100%;
-    height: 520px; /* Un poco más de aire vertical */
-    background-color: #000000; /* Fondo negro puro para enmarcar obras verticales/cuadradas */
-}
-
-.hero-carousel-wrapper .bg-slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* CAMBIO CLAVE: "contain" asegura que la obra de arte se vea COMPLETA sin recortes */
-    object-fit: contain;
-    padding: 24px; /* Pequeño margen estilo galería de arte */
-    opacity: 0;
-    z-index: 1;
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-carousel-wrapper .bg-slide.visible {
-    opacity: 1;
-    z-index: 2;
-}
-/* ==========================================================================
-   4. COMPONENTE: ÍNDICE DE OBRAS POR SERIES (Galería en Grid)
-   ========================================================================== */
-.catalog-wrapper {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 3.5rem; /* Más espacio para dejar respirar a las colecciones */
-}
-
-/* Títulos de las Series */
-.series-title {
-    font-family: 'IBM Plex Sans', sans-serif;
-    color: var(--cds-text-primary) !important;
-    font-size: 0.875rem !important;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin: 0 0 1.5rem 0 !important;
-    border-left: 2px solid var(--accent-interactive);
-    padding-left: 12px;
-    font-weight: 600;
-}
-
-/* Grid de galería limpio, asimétrico y responsivo */
-.code-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px; /* Espaciado moderno entre cuadros */
-    background-color: transparent !important;
-    border: none !important;
-    width: 100%;
-}
-
-/* Estilo para cada tarjeta individual de obra dentro de la galería */
-.artwork-card {
-    background-color: var(--cds-layer-01);
-    border: 1px solid var(--cds-border-subtle);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-decoration: none; /* Por si toda la tarjeta es un enlace */
-    color: inherit;
-}
-
-.artwork-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-    background-color: var(--cds-layer-hover);
-}
-
-.artwork-card-image-wrapper {
-    width: 100%;
-    height: 320px; /* Altura uniforme para las imágenes en la galería */
-    background-color: #f7f7f7; /* Gris muy tenue para enmarcar las obras */
-    overflow: hidden;
-    margin-bottom: 12px;
-    border: 1px solid rgba(0,0,0,0.03);
-}
-
-.artwork-card-image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Evita que la obra se recorte */
-    display: block;
-    padding: 12px;
-}
-
-.artwork-card-info {
-    padding: 4px 0;
-}
-
-.artwork-card-code {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--cds-text-secondary);
-    text-transform: uppercase;
-}
-
-.artwork-card-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--cds-text-primary);
-    margin: 4px 0;
-}
-/* ==========================================================================
-   5. VISTA DE DETALLE DE OBRA (Páginas Obras/JBU-xxx)
-   ========================================================================== */
-.artwork-page {
-    min-height: 100vh;
-    padding-top: 5rem;
-    padding-bottom: 4rem;
-    background-color: var(--cds-background);
-}
-
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 24px;
+.nav-link {
     text-decoration: none;
-    color: var(--cds-text-secondary);
-    font-size: 14px;
-    transition: color 0.15s ease;
+    color: var(--color-text-secondary);
+    font-size: var(--fs-body);
+    font-weight: 400;
+    transition: var(--transition-smooth);
 }
 
-.back-link:hover {
-    color: var(--cds-text-primary);
+.nav-link:hover {
+    color: var(--color-text-primary);
 }
 
-.artwork-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) 400px;
-    gap: 48px;
-    align-items: flex-start;
-    max-width: 1280px;
+/* ==========================================================================
+   3. DISTRIBUCIÓN ASIMÉTRICA PRINCIPAL
+   ========================================================================== */
+.main-editorial-wrapper {
+    padding-top: var(--space-xl) !important;
+    padding-bottom: var(--space-lg) !important;
+    background-color: var(--color-bg) !important;
+    max-width: 1600px !important;
     margin: 0 auto;
 }
 
-.artwork-image-wrap {
-    background: #000;
-    padding: 16px;
-    border: 1px solid var(--cds-border-subtle);
+.gallery-split-layout {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--space-lg);
 }
 
-.artwork-image {
-    width: 100%;
-    max-height: 70vh;
-    object-fit: contain;
-    display: block;
-}
-
-.artwork-details {
-    background: var(--cds-layer-01);
-    border: 1px solid var(--cds-border-subtle);
-    padding: 32px;
-}
-
-.artwork-code {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--cds-text-secondary);
-}
-
-.artwork-details h1 {
-    font-size: 32px;
-    font-weight: 400;
-    line-height: 1.15;
-    margin: 8px 0 24px;
-}
-
-.meta p {
-    margin: 8px 0;
-    font-size: 14px;
-    color: var(--cds-text-secondary);
-}
-
-.description {
-    margin-top: 24px;
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--cds-text-primary);
-}
-
-/* Botones de acción en detalle de obra */
-.like-btn,
-.whatsapp-btn {
-    display: block;
-    width: 100%;
-    margin-top: 12px;
-    padding: 12px 16px;
-    text-align: center;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    font-size: 14px;
+/* --- Panel Izquierdo Sticky (280px estricto) --- */
+.sidebar-editorial-panel {
+    flex: 0 0 280px !important;
+    max-width: 280px !important;
     box-sizing: border-box;
-    transition: background-color 0.15s ease;
 }
 
-.like-btn {
-    border: 1px solid var(--cds-border-strong);
-    background: transparent;
-    color: var(--cds-text-primary);
+.sidebar-sticky-wrapper {
+    position: sticky;
+    top: calc(70px + var(--space-md));
+    height: calc(100vh - 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.like-btn:hover {
-    background-color: var(--cds-layer-hover);
+.logo-wrapper-chromic {
+    margin-bottom: var(--space-sm);
 }
 
-.whatsapp-btn {
-    border: 1px solid var(--accent-interactive);
-    background: var(--accent-interactive);
-    color: #ffffff;
-}
-
-.whatsapp-btn:hover {
-    background-color: #0353e9; /* IBM Blue Hover */
-}
-
-/* Ajustes Responsivos para detalle */
-@media (max-width: 900px) {
-    .artwork-layout {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-    .artwork-page {
-        padding: 4rem 16px 2rem;
-    }
-}
-
-/* Botón Principal de Compra (Original Disponible) */
-.btn-original-buy {
+.logo-clean {
+    width: 100% !important;
+    max-width: 160px !important;
+    height: auto !important;
     display: block;
-    width: 100%;
-    padding: 14px 16px;
-    background-color: var(--accent-interactive);
-    color: #ffffff !important;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    border: 1px solid var(--accent-interactive);
-    transition: background-color 0.15s ease;
+    image-rendering: -webkit-optimize-contrast;
 }
 
-.btn-original-buy:hover {
-    background-color: #0353e9; /* Tono hover interactivo de Carbon */
+.artist-display-name {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    margin: var(--space-xs) 0 4px 0;
+    color: var(--color-text-primary);
 }
 
-/* Estado Vendido (Deshabilitado y elegante) */
-.btn-original-sold {
-    display: block;
-    width: 100%;
-    padding: 14px 16px;
-    background-color: transparent;
-    color: var(--cds-text-secondary) !important;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 1px;
+.artist-discipline-label {
+    font-size: var(--fs-label);
     text-transform: uppercase;
-    border: 1px dashed var(--cds-border-subtle);
-    cursor: not-allowed;
-    pointer-events: none; /* Evita que hagan click */
+    letter-spacing: 1.5px;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: var(--space-sm);
 }
-/* Botones de Prints de la galería */
-.print-order-btn {
+
+.artist-manifesto {
+    font-size: var(--fs-body);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    font-weight: 300;
+}
+
+/* Metadata Dinámica en Sidebar */
+.dynamic-metadata-container {
+    margin-top: auto;
+}
+
+.separator-line {
+    border: none;
+    border-top: 1px solid var(--color-border-thin);
+    margin: var(--space-sm) 0;
+}
+
+.metadata-label {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.metadata-title {
+    font-size: var(--fs-title);
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    margin: 0 0 var(--space-sm) 0;
+    color: var(--color-text-primary);
+}
+
+.metadata-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-title-sub {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-secondary);
+}
+
+.meta-value {
+    font-size: var(--fs-body);
+    color: var(--color-text-primary);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+/* --- Panel Derecho (Contenido Editorial) --- */
+.content-editorial-panel {
+    flex: 1 1 auto !important;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   4. COMPONENTE: HERO EDITORIAL (Clean Presentation)
+   ========================================================================== */
+.hero-editorial-viewport {
+    width: 100%;
+    margin-bottom: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.hero-media-canvas {
+    width: 100%;
+    height: 550px;
+    background-color: #fafafa; /* Fondo galería suave */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: var(--space-md);
+    box-sizing: border-box;
+}
+
+.hero-image-render {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    opacity: 1; /* Asegura un estado inicial visible */
+    transition: opacity 250ms ease-in-out !important; /* Fuerza la transición del fade */
+}
+
+.hero-editorial-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.hero-artwork-title {
+    font-size: var(--fs-hero);
+    font-weight: 300;
+    letter-spacing: -1.5px;
+    margin: var(--space-xs) 0;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+}
+
+.hero-artwork-specs {
+    font-size: var(--fs-body);
+    color: var(--color-text-secondary);
+    font-weight: 300;
+    margin: 0;
+}
+
+/* ==========================================================================
+   5. COMPONENTE: GRID EDITORIAL ASIMÉTRICO (Estilo Artsy)
+   ========================================================================== */
+.catalog-editorial-container {
+    margin-top: var(--space-lg);
+    border-top: 1px solid var(--color-border-thin);
+    padding-top: var(--space-md);
+}
+
+.catalog-header-block {
+    margin-bottom: var(--space-lg);
+}
+
+.catalog-section-title {
+    font-size: var(--fs-title);
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+/* Creación del Layout Editorial Asimétrico */
+.editorial-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--space-sm);
+    row-gap: var(--space-lg);
+    width: 100%;
+}
+
+/* Reglas de Colocación de Tarjetas Desnudas */
+.editorial-artwork-card {
+    cursor: pointer;
+    grid-column: span 6; /* Predeterminado: dos columnas equilibradas */
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    opacity: 0; /* Para IntersectionObserver */
+    transform: translateY(20px);
+    transition: opacity 600ms cubic-bezier(0.215, 0.61, 0.355, 1), 
+                transform 600ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* Definición de Asimetría (Orden Editorial) */
+.editorial-artwork-card:nth-child(3n+1) {
+    grid-column: span 8; /* Piezas principales más grandes */
+}
+
+.editorial-artwork-card:nth-child(3n+2) {
+    grid-column: span 4; /* Piezas de acompañamiento lateral */
+    margin-top: var(--space-md); /* Desfase vertical */
+}
+
+.editorial-artwork-card:nth-child(3n+3) {
+    grid-column: span 6; /* Cierre de bloque balanceado */
+}
+
+/* Contenedor de la Imagen */
+.card-media-canvas {
+    width: 100%;
+    height: 480px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: var(--space-sm);
+    box-sizing: border-box;
+}
+
+.card-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: var(--transition-smooth);
+}
+
+/* Efecto Hover Premium */
+.editorial-artwork-card:hover .card-image {
+    transform: scale(1.02);
+}
+
+/* Bloque de Información Desnudo (Sin cajas ni bordes) */
+.card-caption-details {
+    padding-top: var(--space-xs);
+}
+
+.card-title-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+}
+
+.card-title {
+    font-size: var(--fs-body);
+    font-weight: 500;
+    margin: 0;
+    color: var(--color-text-primary);
+}
+
+.card-year {
+    font-size: var(--fs-body);
+    color: var(--color-text-secondary);
+    font-weight: 300;
+}
+
+.card-medium {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Estado de Visibilidad por Scroll */
+.editorial-artwork-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   6. BOTONES Y ACCIONES (Nativos & Limpios)
+   ========================================================================== */
+.btn-editorial-action {
+    display: inline-block;
+    padding: 14px 28px;
+    background-color: var(--color-text-primary);
+    color: #ffffff !important;
+    text-decoration: none;
+    font-size: var(--fs-body);
+    font-weight: 500;
+    border: 1px solid var(--color-text-primary);
+    text-align: center;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.btn-editorial-action:hover {
+    background-color: transparent;
+    color: var(--color-text-primary) !important;
+}
+
+.label-editorial-sold {
+    display: inline-block;
+    padding: 14px 0;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   7. FOOTER INSTITUCIONAL SUTIL
+   ========================================================================== */
+.gallery-footer {
+    border-top: 1px solid var(--color-border-thin);
+    padding: var(--space-md) 0;
+    margin-top: var(--space-xl);
+}
+
+.footer-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 var(--space-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    border: 1px solid var(--cds-border-subtle);
-    color: var(--cds-text-primary);
-    text-decoration: none;
-    font-size: 13px;
-    transition: background 0.2s, border-color 0.2s;
 }
 
-.print-order-btn:hover {
-    background-color: var(--cds-layer-hover) !important;
-    border-color: var(--cds-text-secondary) !important;
+.footer-copyright, .footer-utility-links a {
+    font-size: var(--fs-label);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+}
+
+.footer-utility-links {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.footer-utility-links a:hover {
+    color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   8. DISEÑO RESPONSIVO (Rediseño Estructural por Dispositivo)
+   ========================================================================== */
+
+/* Tablet Viewport */
+@media (max-width: 1024px) {
+    .gallery-split-layout {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .sidebar-editorial-panel {
+        flex: 1 1 auto !important;
+        max-width: 100% !important;
+    }
+
+    .sidebar-sticky-wrapper {
+        position: relative;
+        top: 0;
+        height: auto;
+    }
+
+    .dynamic-metadata-container {
+        display: none; /* Se oculta de la barra lateral; los datos se aprecian en el flujo */
+    }
+
+    .editorial-gallery-grid {
+        gap: var(--space-md);
+    }
+
+    .editorial-artwork-card,
+    .editorial-artwork-card:nth-child(3n+1),
+    .editorial-artwork-card:nth-child(3n+2),
+    .editorial-artwork-card:nth-child(3n+3) {
+        grid-column: span 6;
+        margin-top: 0;
+    }
+}
+
+/* Mobile Viewport */
+@media (max-width: 640px) {
+    :root {
+        --space-md: 24px;
+        --space-lg: 48px;
+        --space-xl: 72px;
+        --fs-hero: 36px;
+        --fs-title: 24px;
+    }
+
+    .header-container {
+        padding: 0 var(--space-sm);
+    }
+
+    .gallery-nav {
+        display: none; /* Menú colapsado bajo criterio estético en móvil */
+    }
+
+    .main-editorial-wrapper {
+        padding-top: var(--space-xl) !important;
+    }
+
+    .editorial-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .editorial-artwork-card,
+    .editorial-artwork-card:nth-child(3n+1),
+    .editorial-artwork-card:nth-child(3n+2),
+    .editorial-artwork-card:nth-child(3n+3) {
+        grid-column: span 12;
+    }
+
+    .card-media-canvas {
+        height: 320px;
+    }
+
+    .hero-media-canvas {
+        height: 350px;
+    }
+
+    .hero-editorial-caption {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+}
+/* --- ANIMACIONES Y ESTILOS DE INTERACCIÓN GALERÍA JBU --- */
+
+/* Transición suave para cambiar de obra en el Hero */
+.hero-image-render {
+    transition: opacity 250ms ease-in-out;
+}
+
+/* Estado base para el efecto fade-in en el scroll de tarjetas */
+.editorial-artwork-card {
+    opacity: 0;
+    transform: translateY(15px);
+    transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+/* Clase añadida automáticamente por JS al entrar al viewport */
+.editorial-artwork-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hover sutil sobre las tarjetas del catálogo */
+.editorial-artwork-card:hover .card-media-canvas img {
+    transform: scale(1.02);
+    transition: transform 0.4s ease-in-out;
+}
+
+.card-media-canvas {
+    overflow: hidden;
+}
+
+.card-media-canvas img {
+    transition: transform 0.4s ease-in-out;
 }
