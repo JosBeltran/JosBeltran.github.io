@@ -1,115 +1,75 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="white">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- SEO & Social Previews Estáticos -->
   <title>JBU-014 | Consciousness Drift</title>
   <meta name="description" content="Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción." />
-  <meta property="og:title" content="JBU-014 | Consciousness Drift" />
-  <meta property="og:description" content="Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción." />
-  <meta property="og:image" content="https://josuebeltranuresti.com/assets/artworks/JBU-014.png" />
-  <meta property="og:url" content="https://josuebeltranuresti.com/obras/JBU-014.html" />
-  <meta property="og:type" content="article" />
-  <meta name="twitter:card" content="summary_large_image" />
-
   <link rel="stylesheet" href="../styles.css" />
   <style>
-    :root {
-      --bg-dark: #161616;
-      --bg-card: #1f1f1f;
-      --border-color: #2d2d2d;
-      --text-main: #f4f4f4;
-      --text-muted: #a0a0a0;
-    }
     body {
-      background-color: var(--bg-dark); color: var(--text-main);
+      background-color: #ffffff; color: #111111;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0; padding: 0;
     }
     .artwork-container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
-    .back-link { display: inline-flex; align-items: center; text-decoration: none; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; transition: all 0.2s; }
-    .back-link:hover { color: var(--text-main); transform: translateX(-4px); }
+    .back-link { display: inline-flex; align-items: center; text-decoration: none; color: #666666; font-size: 0.9rem; margin-bottom: 32px; transition: all 0.2s; }
+    .back-link:hover { color: #111111; transform: translateX(-4px); }
     .artwork-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; align-items: start; }
     @media (max-width: 900px) { .artwork-layout { grid-template-columns: 1fr; gap: 40px; } }
     .artwork-image-column { display: flex; flex-direction: column; gap: 20px; }
-    .artwork-image-wrap { background-color: #101010; border: 1px solid var(--border-color); padding: 24px; display: flex; justify-content: center; align-items: center; }
-    .artwork-image { max-width: 100%; max-height: 70vh; object-fit: contain; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+    .artwork-image-wrap { background-color: #fcfcfc; border: 1px solid #e5e5e5; padding: 24px; display: flex; justify-content: center; align-items: center; }
+    .artwork-image { max-width: 100%; max-height: 70vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
     .artwork-details { position: sticky; top: 40px; }
-    .artwork-code { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin: 0 0 12px 0; }
+    .artwork-code { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #666666; margin: 0 0 12px 0; }
     h1 { font-size: 2.5rem; font-weight: 400; line-height: 1.2; margin: 0 0 24px 0; letter-spacing: -0.5px; }
-    .meta-grid { border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 16px 0; margin-bottom: 24px; }
+    .meta-grid { border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; padding: 16px 0; margin-bottom: 24px; }
     .meta-item { display: flex; justify-content: space-between; font-size: 0.95rem; padding: 6px 0; }
-    .meta-item strong { color: var(--text-muted); font-weight: 400; }
-    .description { font-size: 1rem; line-height: 1.6; color: #cccccc; margin-bottom: 32px; }
-    .purchase-section { display: flex; flex-direction: column; gap: 16px; }
-    .btn-original-buy { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: var(--text-main); color: var(--bg-dark); text-decoration: none; font-weight: 500; font-size: 15px; transition: background-color 0.2s; }
-    .btn-original-buy:hover { background-color: #e0e0e0; }
-    .btn-original-sold { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: transparent; color: #555555; border: 1px solid #333333; font-size: 15px; cursor: not-allowed; }
-    .prints-box { border: 1px solid var(--border-color); background-color: var(--bg-card); padding: 20px; }
-    .prints-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 6px; display: block; }
-    .prints-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin: 0 0 16px 0; }
-    .print-options-grid { display: flex; flex-direction: column; gap: 10px; }
-    .print-order-btn { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background-color: #282828; border: 1px solid #383838; color: var(--text-main); text-decoration: none; font-size: 0.85rem; transition: all 0.2s; }
-    .print-order-btn:hover { background-color: #333333; border-color: #444444; }
-    .print-order-btn strong { color: #9cdb24; }
-    .whatsapp-btn-secondary { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 14px; border: 1px solid var(--border-color); background-color: transparent; color: var(--text-muted); text-decoration: none; font-size: 14px; transition: all 0.2s; }
-    .whatsapp-btn-secondary:hover { background-color: #222222; color: var(--text-main); border-color: #444444; }
-    .qr-box { text-align: center; margin-top: 32px; padding: 20px; border: 1px dashed var(--border-color); }
-    .qr-img { width: 110px; height: 110px; filter: invert(0.9); display: block; margin: 0 auto 12px; }
-    .qr-text { color: var(--text-muted); font-size: 0.75rem; margin: 0; }
-    
-    .loading-pulse { animation: pulse 1.5s infinite ease-in-out; opacity: 0.6; }
-    @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 0.8; } 100% { opacity: 0.4; } }
+    .meta-item strong { color: #666666; font-weight: 400; }
+    .description { font-size: 1rem; line-height: 1.6; color: #333333; margin-bottom: 32px; }
+    .btn-original-buy { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: #111111; color: #ffffff; text-decoration: none; font-weight: 500; font-size: 15px; transition: background-color 0.2s; }
+    .btn-original-buy:hover { background-color: #333333; }
+    .btn-original-sold { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: #f5f5f5; color: #999999; border: 1px solid #e5e5e5; font-size: 15px; cursor: not-allowed; }
+    .whatsapp-btn-secondary { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 14px; border: 1px solid #e5e5e5; background-color: transparent; color: #555555; text-decoration: none; font-size: 14px; margin-top: 12px; transition: all 0.2s; }
+    .whatsapp-btn-secondary:hover { background-color: #f9f9f9; color: #111111; border-color: #888888; }
+    .qr-box { text-align: center; margin-top: 32px; padding: 20px; border: 1px dashed #e5e5e5; }
+    .qr-img { width: 110px; height: 110px; display: block; margin: 0 auto 12px; }
+    .qr-text { color: #666666; font-size: 0.75rem; margin: 0; }
+    .loading-pulse { animation: pulse 1.5s infinite ease-in-out; }
+    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
   </style>
 </head>
 <body>
-
 <main class="artwork-container">
   <a href="../index.html" class="back-link">← Volver al catálogo</a>
   <section class="artwork-layout">
-    
     <div class="artwork-image-column">
-      <div class="artwork-image-wrap">
-        <img src="../assets/artworks/JBU-014.png" alt="Consciousness Drift" class="artwork-image" />
-      </div>
+      <div class="artwork-image-wrap"><img src="../assets/artworks/JBU-014.png" alt="Consciousness Drift" class="artwork-image" /></div>
       
     </div>
-
     <aside class="artwork-details">
       <p class="artwork-code">JBU-014 — Serie: Orbitals</p>
       <h1>Consciousness Drift</h1>
       <div class="meta-grid">
         <div class="meta-item"><strong>Año:</strong><span>2026</span></div>
         <div class="meta-item"><strong>Técnica:</strong><span>Técnica mixta sobre papel</span></div>
-        <div class="meta-item"><strong>Medida:</strong><span>Por definir</span></div>
+        <div class="meta-item"><strong>Medida:</strong><span>13 x 19 in</span></div>
       </div>
       <p class="description">Obra original de Josue Beltran Uresti perteneciente a una serie inspirada en la física cuántica, la memoria y la percepción.</p>
-      
       <div class="purchase-section">
-        <!-- El div ahora lleva el atributo data-work-code para que app.js lo identifique e hidrate -->
         <div id="live-original-cta" data-work-code="JBU-014" class="loading-pulse">
             <div class="btn-original-sold">Sincronizando estado actual...</div>
         </div>
-        
         <div id="live-prints-cta"></div>
-
-        <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-014%20-%20Consciousness%20Drift%20de%20la%20serie%20Orbitals">
-          Preguntar por WhatsApp
-        </a>
+        <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-014%20-%20Consciousness%20Drift%20de%20la%20serie%20Orbitals">Preguntar por WhatsApp</a>
       </div>
-
       <div class="qr-box">
         <img src="../assets/qr/JBU-014.png" alt="QR JBU-014" class="qr-img" />
-        <p class="qr-text">Escanea para compartir o abrir en dispositivo móvil</p>
+        <p class="qr-text">Escanea para abrir en tu móvil</p>
       </div>
     </aside>
   </section>
 </main>
-
-<!-- Cargamos de forma global el script del motor principal que ahora contiene la lógica de hidratación -->
 <script src="../app.js"></script>
-
 </body>
 </html>
