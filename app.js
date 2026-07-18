@@ -2,49 +2,45 @@
  * ==========================================================================
  * ENGINE: Galería, Tienda y Archivo Editorial (JBU)
  * Carga dinámica desde Google Sheets (Publicado como CSV)
+ * Optimized for Incremental / Lazy Rendering (2026)
  * ==========================================================================
  */
 
-// Estado global de la aplicación para guardar los datos una vez cargados
 let galleryDataset = { series: [] };
 
 // CONFIGURACIÓN DE GOOGLE SHEETS
-// 1. Reemplaza este ID con tu ID de Google Sheet real
 const SPREADSHEET_ID = "1uY0_p8BCl4Fs-MZMzWWYVdT33_d4BHEI-BVJtS3ednw"; 
-// 2. Nombre exacto de tu pestaña en Google Sheets
 const SHEET_NAME = "Catalogo"; 
-// URL para consultar la hoja publicada como CSV
 const GOOGLE_SHEETS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRU6VDnbC00SbibTH3o8zEmOUplzNQKNV-3I99GB8MI9NVBz1J4PUdHahXGqSi_4JBVvFerrpQpwlYw/pub?output=csv`;
 
-// 1. Inicialización del Motor de la Galería al cargar el DOM
+// Variables para control de carga incremental
+let pendingSeriesToRender = [];
+const SERIES_BATCH_SIZE = 1; // Renderiza 1 serie completa a la vez durante el scroll
+
 document.addEventListener("DOMContentLoaded", () => {
     loadGalleryData();
+    
+    // Inicializar hidratación si estamos en página de detalle
+    if (document.getElementById("live-original-cta")) {
+        hydrateDetailPage();
+    }
 });
 
 /**
- * Carga los datos de la hoja de cálculo de Google y los procesa
+ * Carga los datos de Google Sheets de forma eficiente
  */
 async function loadGalleryData() {
     try {
-        console.log("Sincronizando con Google Sheets...");
-        console.log("Intentando conectar a:", GOOGLE_SHEETS_CSV_URL); // Añade esto
-
+        console.log("Sincronizando de forma incremental con Google Sheets...");
         const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-        if (!response.ok) {
-            throw new Error(`Error al leer Google Sheets: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
         
         const csvText = await response.text();
-        
-        // Convertimos el CSV plano a la estructura agrupada por series que usa la UI
         galleryDataset = parseCSVToGalleryDataset(csvText);
         
-        // Inicializar los componentes visuales con los datos cargados
         initGalleryEngine();
-        
     } catch (error) {
-        console.error("No se pudo inicializar la galería desde Google Sheets:", error);
-        // Fallback visual amigable en el grid por si falla la carga
+        console.error("No se pudo inicializar la galería:", error);
         const gridContainer = document.getElementById("codeGrid");
         if (gridContainer) {
             gridContainer.innerHTML = `
@@ -58,48 +54,44 @@ async function loadGalleryData() {
 }
 
 /**
- * Utilidad robusta para procesar el CSV respetando comillas y saltos de línea
+ * Parser CSV Ultra-Rápido basado en Expresiones Regulares
+ */
+/**
+ * Parser CSV Seguro y de Alto Rendimiento (Corrige el bucle infinito)
  */
 function parseCSVToGalleryDataset(csvText) {
-    const lines = [];
-    let row = [""];
-    let inQuotes = false;
-
-    // Procesamiento caracter por caracter para evitar fallos con comas dentro de descripciones
-    for (let i = 0; i < csvText.length; i++) {
-        const char = csvText[i];
-        const nextChar = csvText[i + 1];
-        
-        if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-                row[row.length - 1] += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ',' && !inQuotes) {
-            row.push('');
-        } else if ((char === '\r' || char === '\n') && !inQuotes) {
-            if (char === '\r' && nextChar === '\n') {
-                i++;
-            }
-            lines.push(row);
-            row = [''];
-        } else {
-            row[row.length - 1] += char;
-        }
-    }
-    if (row.length > 1 || row[0] !== '') {
-        lines.push(row);
-    }
-
+    const lines = csvText.split(/\r?\n/);
     if (lines.length < 2) return { series: [] };
 
-    // Extraemos las cabeceras (Fila 1) y removemos posibles espacios
-    const headers = lines[0].map(h => h.trim());
-    const rawRows = lines.slice(1);
+    // Función auxiliar para parsear una sola línea respetando comillas dobles
+    const parseCSVLine = (line) => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                if (inQuotes && line[i + 1] === '"') {
+                    current += '"';
+                    i++; // Ignora la segunda comilla
+                } else {
+                    inQuotes = !inQuotes; // Entra o sale de comillas
+                }
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current);
+        return result;
+    };
 
-    // Mapeamos los índices de las columnas según tu estructura
+    // Extraer cabeceras limpias de la primera fila
+    const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
     const colIdx = {
         seriesTitle: headers.indexOf("Series Title"),
         code: headers.indexOf("Code"),
@@ -118,100 +110,95 @@ function parseCSVToGalleryDataset(csvText) {
 
     const seriesMap = new Map();
 
-    rawRows.forEach(cells => {
-        // Ignoramos filas vacías o sin código de obra
-        if (cells.length < headers.length || !cells[colIdx.code]) return;
+    // Procesar las filas de datos
+    for (let i = 1; i < lines.length; i++) {
+        const rowText = lines[i];
+        if (!rowText.trim()) continue; // Ignorar filas vacías de separación
 
-        const seriesTitle = cells[colIdx.seriesTitle].trim();
-        
-        // Creamos la serie en el mapa si aún no existe
+        const cells = parseCSVLine(rowText);
+
+        // Validar que al menos exista el código de la obra para procesar
+        if (cells.length < headers.length || !cells[colIdx.code]) continue;
+
+        const seriesTitle = (cells[colIdx.seriesTitle] || "General").trim();
         if (!seriesMap.has(seriesTitle)) {
             seriesMap.set(seriesTitle, {
                 seriesTitle: seriesTitle,
-                seriesDescription: `Colección de obras pertenecientes a la serie ${seriesTitle}.`, // Descripción por defecto o dinámica
+                seriesDescription: `Colección de obras pertenecientes a la serie ${seriesTitle}.`,
                 works: []
             });
         }
 
-        // Parseo seguro de Prints JSON si está presente
         let prints = [];
-        try {
-            const rawPrints = cells[colIdx.printsJson];
-            if (rawPrints && rawPrints.trim() !== "" && rawPrints !== "[]") {
-                prints = JSON.parse(rawPrints);
+        const rawPrints = cells[colIdx.printsJson];
+        if (rawPrints && rawPrints.trim() !== "" && rawPrints !== "[]") {
+            try { 
+                prints = JSON.parse(rawPrints); 
+            } catch(e) {
+                console.warn(`Error parseando prints en fila ${i}:`, e);
             }
-        } catch (e) {
-            console.warn(`Error parseando prints para la obra ${cells[colIdx.code]}:`, e);
         }
 
-        // Construimos el objeto de la obra idéntico a tu JSON original
-        const artwork = {
-            code: cells[colIdx.code].trim(),
-            title: cells[colIdx.title].trim(),
-            year: cells[colIdx.year].trim(),
-            technique: cells[colIdx.technique].trim(),
-            size: cells[colIdx.size].trim(),
-            image: cells[colIdx.image].trim(),
-            description: cells[colIdx.description].trim(),
-            isAvailable: cells[colIdx.isAvailable].trim().toUpperCase() === "TRUE",
+        seriesMap.get(seriesTitle).works.push({
+            code: (cells[colIdx.code] || "").trim(),
+            title: (cells[colIdx.title] || "").trim(),
+            year: (cells[colIdx.year] || "").trim(),
+            technique: (cells[colIdx.technique] || "").trim(),
+            size: (cells[colIdx.size] || "").trim(),
+            image: (cells[colIdx.image] || "").trim(),
+            description: (cells[colIdx.description] || "").trim(),
+            isAvailable: (cells[colIdx.isAvailable] || "").trim().toUpperCase() === "TRUE",
             originalPrice: cells[colIdx.originalPrice] ? cells[colIdx.originalPrice].trim() : "",
             stripeUrl: cells[colIdx.stripeUrl] ? cells[colIdx.stripeUrl].trim() : "",
             prints: prints,
             marketplaceTitle: cells[colIdx.marketplaceTitle] ? cells[colIdx.marketplaceTitle].trim() : ""
-        };
+        });
+    }
 
-        seriesMap.get(seriesTitle).works.push(artwork);
-    });
-
-    return {
-        series: Array.from(seriesMap.values())
-    };
+    return { series: Array.from(seriesMap.values()) };
 }
 
 /**
- * Orquesta la renderización y eventos tras una carga exitosa
+ * Inicialización asíncrona y progresiva del catálogo
  */
 function initGalleryEngine() {
-    renderEditorialCatalog();
-    
-    // Extraer la primera obra de la primera serie para el estado inicial del Hero
     const firstActiveWork = getFirstAvailableArtwork();
     if (firstActiveWork) {
         setupInitialState(firstActiveWork);
     }
+
+    // Clonamos las series para el renderizado por demanda
+    pendingSeriesToRender = [...galleryDataset.series];
     
-    setupLazyLoadingObserver();
-}
-
-/**
- * Obtiene la primera obra física del set de datos sin importar la serie
- */
-function getFirstAvailableArtwork() {
-    if (galleryDataset.series && galleryDataset.series.length > 0) {
-        const firstSeriesWithWorks = galleryDataset.series.find(s => s.works && s.works.length > 0);
-        if (firstSeriesWithWorks) {
-            return firstSeriesWithWorks.works[0];
-        }
-    }
-    return null;
-}
-
-/**
- * Renderiza el Catálogo agrupando por las series de tu JSON
- */
-function renderEditorialCatalog() {
     const gridContainer = document.getElementById("codeGrid");
-    if (!gridContainer) return;
+    if (gridContainer) gridContainer.innerHTML = ""; 
 
-    gridContainer.innerHTML = ""; // Limpieza previa
+    // Renderizado del lote inicial (Primera serie) de manera inmediata
+    renderNextSeriesBatch();
 
-    // Buscamos el bloque de cabecera de la sección para hacerlo dinámico también
+    // Configurar el scroll infinito / incremental para el resto
+    setupIncrementalRenderObserver();
+}
+
+/**
+ * Renderiza el siguiente bloque/lote de series sin saturar el hilo principal
+ */
+function renderNextSeriesBatch() {
+    const gridContainer = document.getElementById("codeGrid");
+    if (!gridContainer || pendingSeriesToRender.length === 0) return;
+
     const catalogHeaderBlock = document.querySelector(".catalog-header-block");
+    // Extraemos la cantidad configurada en el lote
+    const batch = pendingSeriesToRender.splice(0, SERIES_BATCH_SIZE);
+    
+    // Determinamos el índice global actual basado en lo ya renderizado
+    const currentIndex = galleryDataset.series.length - pendingSeriesToRender.length - batch.length;
+    let htmlBuffer = "";
 
-    galleryDataset.series.forEach((currentSeries, seriesIndex) => {
-        
-        // Si es la primera serie, podemos actualizar el título principal del catálogo si existe
-        if (seriesIndex === 0 && catalogHeaderBlock) {
+    batch.forEach((currentSeries, index) => {
+        const absoluteIndex = currentIndex + index;
+
+        if (absoluteIndex === 0 && catalogHeaderBlock) {
             catalogHeaderBlock.innerHTML = `
                 <span class="metadata-label">Archivo de Obra</span>
                 <h3 class="catalog-section-title">Colección ${currentSeries.seriesTitle}</h3>
@@ -219,9 +206,8 @@ function renderEditorialCatalog() {
                     ${currentSeries.seriesDescription || ''}
                 </p>
             `;
-        } else if (seriesIndex > 0) {
-            // Para series subsecuentes, creamos un nuevo bloque separador dentro del grid
-            const seriesHeaderHTML = `
+        } else {
+            htmlBuffer += `
                 <div class="catalog-header-block" style="grid-column: span 12; width: 100%; margin-top: 60px; margin-bottom: 30px;">
                     <span class="metadata-label">Colección</span>
                     <h3 class="catalog-section-title" style="margin-top: 5px;">${currentSeries.seriesTitle}</h3>
@@ -231,13 +217,11 @@ function renderEditorialCatalog() {
                     <hr class="separator-line" style="margin-top: 20px; border: 0; border-top: 1px solid var(--cds-border-subtle, #e0e0e0);">
                 </div>
             `;
-            gridContainer.insertAdjacentHTML("beforeend", seriesHeaderHTML);
         }
 
-        // Inyectar las obras correspondientes a esta serie específica
-        currentSeries.works.forEach((art) => {
-            const cardHTML = `
-                <article class="editorial-artwork-card" data-code="${art.code}">
+        currentSeries.works.forEach(art => {
+            htmlBuffer += `
+                <article class="editorial-artwork-card dynamic-load" data-code="${art.code}">
                     <div class="card-media-canvas">
                         <img class="card-image" src="${art.image}" alt="${art.title}" loading="lazy">
                     </div>
@@ -250,101 +234,140 @@ function renderEditorialCatalog() {
                     </div>
                 </article>
             `;
-            gridContainer.insertAdjacentHTML("beforeend", cardHTML);
         });
     });
 
-    // Enlazar interacciones táctiles y de cursor
-    setupInteractions();
+    // Una sola inserción masiva al DOM por lote (Gran mejora de rendimiento)
+    gridContainer.insertAdjacentHTML("beforeend", htmlBuffer);
+
+    // Enlazar eventos e interacciones visuales sólo para los nuevos elementos
+    setupInteractionsForCards();
+    setupLazyLoadingObserver();
 }
 
 /**
- * Configura los eventos de interacción para Sidebar (hover) y Hero (click/dblclick).
+ * Observer para detectar cuándo el usuario se acerca al final de la página y cargar más series
  */
-function setupInteractions() {
-    const cards = document.querySelectorAll(".editorial-artwork-card");
+function setupIncrementalRenderObserver() {
+    const gridContainer = document.getElementById("codeGrid");
+    if (!gridContainer) return;
+
+    // Elemento centinela al final del grid
+    let sentinel = document.getElementById("render-sentinel");
+    if (!sentinel) {
+        sentinel = document.createElement("div");
+        sentinel.id = "render-sentinel";
+        sentinel.style.height = "20px";
+        sentinel.style.gridColumn = "span 12";
+        gridContainer.after(sentinel);
+    }
+
+    const scrollObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && pendingSeriesToRender.length > 0) {
+            renderNextSeriesBatch();
+        }
+    }, { rootMargin: "300px" }); // Empieza a cargar 300px antes de llegar al fondo
+
+    scrollObserver.observe(sentinel);
+}
+
+/**
+ * Enlaza interacciones sólo a las tarjetas recién inyectadas
+ */
+function setupInteractionsForCards() {
+    const cards = document.querySelectorAll(".editorial-artwork-card.dynamic-load");
     
     cards.forEach(card => {
+        card.classList.remove("dynamic-load"); // Evitamos duplicar eventos en el futuro
         const artCode = card.getAttribute("data-code");
         const selectedArt = findArtworkByCode(artCode);
-
         if (!selectedArt) return;
 
-        // ACCIÓN 1: Al pasar el cursor, actualizamos los datos en el Sidebar Izquierdo (Hover)
-        card.addEventListener("mouseenter", () => {
-            updateSidebarMetadata(selectedArt);
-        });
-
-        // ACCIÓN 2: Al hacer click simple, cambiamos la obra destacada en el Hero con transición suave
+        card.addEventListener("mouseenter", () => updateSidebarMetadata(selectedArt));
+        
         card.addEventListener("click", (e) => {
             e.preventDefault();
             updateHeroSection(selectedArt);
-            
-            // Si está en dispositivo móvil o tablet, hace un scroll suave hacia el Hero para ver el cambio visual
             if (window.innerWidth <= 1024) {
-                const heroSection = document.getElementById("hero-editorial-section");
-                if (heroSection) {
-                    heroSection.scrollIntoView({ behavior: 'smooth' });
-                }
+                document.getElementById("hero-editorial-section")?.scrollIntoView({ behavior: 'smooth' });
             }
         });
 
-        // ACCIÓN NUEVA: Doble click sobre la tarjeta del catálogo para abrir la obra directamente
         card.addEventListener("dblclick", () => {
             window.location.href = `obras/${selectedArt.code}.html`;
         });
     });
 
-    // ACCIÓN NUEVA: Doble click sobre la imagen principal del Hero para abrir la obra
+    // Configurar Hero una sola vez de forma segura
     const heroImg = document.getElementById("hero-img-display");
-    if (heroImg) {
+    if (heroImg && !heroImg.dataset.hooked) {
+        heroImg.dataset.hooked = "true";
+        heroImg.style.cursor = "pointer";
         heroImg.addEventListener("dblclick", () => {
-            // Buscamos el código actual que tenga asignado el Hero en el título u otro contenedor
             const heroTitleEl = document.getElementById("hero-title-display");
             if (heroTitleEl) {
-                // Buscamos la obra por el nombre/título para obtener el código exacto
                 const activeArt = findArtworkByTitle(heroTitleEl.textContent);
-                if (activeArt) {
-                    window.location.href = `obras/${activeArt.code}.html`;
-                }
+                if (activeArt) window.location.href = `obras/${activeArt.code}.html`;
             }
         });
-        // Agregar cursor pointer a la imagen del Hero para que el usuario intuya interacción
-        heroImg.style.cursor = "pointer";
     }
 }
 
 /**
- * Busca una obra por su código único JBU-XXX a lo largo de todas las series.
+ * IntersectionObserver para efectos visuales Fade-In nativos en las tarjetas
  */
+function setupLazyLoadingObserver() {
+    const cards = document.querySelectorAll(".editorial-artwork-card:not(.observed)");
+    
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05 });
+
+    cards.forEach(card => {
+        card.classList.add("observed");
+        observer.observe(card);
+    });
+}
+
+// ==========================================================================
+// FUNCIONES AUXILIARES Y DE BÚSQUEDA (Mantenidas idénticas para compatibilidad)
+// ==========================================================================
+
+function getFirstAvailableArtwork() {
+    if (galleryDataset.series?.length > 0) {
+        const firstSeriesWithWorks = galleryDataset.series.find(s => s.works?.length > 0);
+        return firstSeriesWithWorks ? firstSeriesWithWorks.works[0] : null;
+    }
+    return null;
+}
+
 function findArtworkByCode(code) {
-    let foundArtwork = null;
+    let found = null;
     if (galleryDataset.series) {
-        galleryDataset.series.forEach(s => {
-            const art = s.works.find(w => w.code === code);
-            if (art) foundArtwork = art;
-        });
+        for (const s of galleryDataset.series) {
+            found = s.works.find(w => w.code === code);
+            if (found) break;
+        }
     }
-    return foundArtwork;
+    return found;
 }
 
-/**
- * Busca una obra auxiliar por su título para resolver interacciones en el Hero.
- */
 function findArtworkByTitle(title) {
-    let foundArtwork = null;
+    let found = null;
     if (galleryDataset.series) {
-        galleryDataset.series.forEach(s => {
-            const art = s.works.find(w => w.title === title);
-            if (art) foundArtwork = art;
-        });
+        for (const s of galleryDataset.series) {
+            found = s.works.find(w => w.title === title);
+            if (found) break;
+        }
     }
-    return foundArtwork;
+    return found;
 }
 
-/**
- * Actualiza los metadatos en el Panel Sticky Izquierdo (Sidebar).
- */
 function updateSidebarMetadata(art) {
     const titleEl = document.getElementById("meta-title");
     const mediumEl = document.getElementById("meta-medium");
@@ -357,7 +380,6 @@ function updateSidebarMetadata(art) {
     if (sizeEl) sizeEl.textContent = art.size;
     if (yearEl) yearEl.textContent = art.year;
 
-    // Redirección directa a su respectiva página obras/JBU-XXX.html evaluando disponibilidad real
     if (ctaWrapper) {
         if (art.isAvailable) {
             ctaWrapper.innerHTML = `
@@ -368,26 +390,18 @@ function updateSidebarMetadata(art) {
                     <a href="obras/${art.code}.html" class="btn-editorial-action" style="display: block; text-align: center; text-decoration: none; padding: 10px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
                         Consultar Adquisición
                     </a>
-                </div>
-            `;
+                </div>`;
         } else {
             ctaWrapper.innerHTML = `
                 <div style="margin-top: 15px;">
                     <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f;">
                         Colección Privada
                     </span>
-                </div>
-            `;
+                </div>`;
         }
     }
 }
 
-/**
- * Actualiza el Hero Visual y sus etiquetas usando una transición de opacidad.
- */
-/**
- * Actualiza el Hero Visual y sus etiquetas usando una transición de opacidad.
- */
 function updateHeroSection(art) {
     const heroImg = document.getElementById("hero-img-display");
     const heroTitle = document.getElementById("hero-title-display");
@@ -395,11 +409,8 @@ function updateHeroSection(art) {
     const heroActionContainer = document.getElementById("hero-action-container");
 
     if (!heroImg) return;
-
-    // 1. Desvanecer la imagen actual
     heroImg.style.opacity = "0";
 
-    // 2. Intercambiar la metadata y el src de la imagen a mitad del fade
     setTimeout(() => {
         heroImg.src = art.image;
         heroImg.alt = `Obra seleccionada: ${art.title}`;
@@ -407,31 +418,19 @@ function updateHeroSection(art) {
         if (heroTitle) heroTitle.textContent = art.title;
         if (heroSpecs) heroSpecs.textContent = `${art.technique} — ${art.size} (${art.year})`;
 
-        // Redirección directa a obras/JBU-XXX.html desde el botón del Hero
         if (heroActionContainer) {
-            if (art.isAvailable) {
-                heroActionContainer.innerHTML = `
-                    <a href="obras/${art.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
-                        Solicitar Ficha Técnica — ${art.code}
-                    </a>
-                `;
-            } else {
-                heroActionContainer.innerHTML = `
-                    <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f; font-weight: 600;">
-                        Colección Privada
-                    </span>
-                `;
-            }
+            heroActionContainer.innerHTML = art.isAvailable ? `
+                <a href="obras/${art.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                    Solicitar Ficha Técnica — ${art.code}
+                </a>` : `
+                <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f; font-weight: 600;">
+                    Colección Privada
+                </span>`;
         }
-
-        // 3. Devolver opacidad para la animación de Fade In
         heroImg.style.opacity = "1";
-    }, 250); // Emparejado exactamente con el tiempo de transición CSS (250ms)
+    }, 250);
 }
 
-/**
- * Configura la carga inicial en el Hero y el Sidebar sin provocar retrasos de animación.
- */
 function setupInitialState(initialArt) {
     updateSidebarMetadata(initialArt);
     
@@ -442,80 +441,33 @@ function setupInitialState(initialArt) {
         heroImg.style.opacity = "1";
     }
     
-    const heroTitle = document.getElementById("hero-title-display");
-    const heroSpecs = document.getElementById("hero-specs-display");
+    if (document.getElementById("hero-title-display")) document.getElementById("hero-title-display").textContent = initialArt.title;
+    if (document.getElementById("hero-specs-display")) document.getElementById("hero-specs-display").textContent = `${initialArt.technique} — ${initialArt.size} (${initialArt.year})`;
+    
     const heroActionContainer = document.getElementById("hero-action-container");
-
-    if (heroTitle) heroTitle.textContent = initialArt.title;
-    if (heroSpecs) heroSpecs.textContent = `${initialArt.technique} — ${initialArt.size} (${initialArt.year})`;
-    
-    // Redirección directa a obras/JBU-XXX.html desde el estado inicial
     if (heroActionContainer) {
-        if (initialArt.isAvailable) {
-            heroActionContainer.innerHTML = `
-                <a href="obras/${initialArt.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
-                    Solicitar Ficha Técnica — ${initialArt.code}
-                </a>
-            `;
-        } else {
-            heroActionContainer.innerHTML = `
-                <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f; font-weight: 600;">
-                    Colección Privada
-                </span>
-            `;
-        }
+        heroActionContainer.innerHTML = initialArt.isAvailable ? `
+            <a href="obras/${initialArt.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                Solicitar Ficha Técnica — ${initialArt.code}
+            </a>` : `
+            <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f; font-weight: 600;">
+                Colección Privada
+            </span>`;
     }
 }
 
 /**
- * IntersectionObserver para que las tarjetas de obra aparezcan con un sutil Fade-In al hacer scroll.
+ * Hidratación optimizada para páginas de detalles individuales
  */
-function setupLazyLoadingObserver() {
-    const cards = document.querySelectorAll(".editorial-artwork-card");
-    
-    const observerOptions = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.05
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("is-visible");
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    cards.forEach(card => observer.observe(card));
-}
-
-/**
- * Hidratación dinámica para las páginas individuales de obras (/obras/JBU-XXX.html)
- * Se ejecuta automáticamente al inicializar el DOM si detecta el contenedor de la obra.
- */
-document.addEventListener("DOMContentLoaded", () => {
-    // Intentamos detectar si estamos en una página de detalle individual
-    const detailContainer = document.getElementById("live-original-cta");
-    if (detailContainer) {
-        hydrateDetailPage();
-    }
-});
-
 async function hydrateDetailPage() {
     const originalContainer = document.getElementById("live-original-cta");
     const printsContainer = document.getElementById("live-prints-cta");
-    
     if (!originalContainer) return;
     
-    // Obtenemos el código de la obra desde el atributo del contenedor
     const WORK_CODE = originalContainer.getAttribute("data-work-code");
     if (!WORK_CODE) return;
 
     try {
-        // Si el dataset global aún no se ha cargado en el index principal, 
-        // o si entran directo por link a la obra, disparamos una carga rápida del CSV
         if (!galleryDataset.series || galleryDataset.series.length === 0) {
             const response = await fetch(GOOGLE_SHEETS_CSV_URL);
             if (!response.ok) throw new Error("Error leyendo base de datos");
@@ -523,59 +475,43 @@ async function hydrateDetailPage() {
             galleryDataset = parseCSVToGalleryDataset(csvText);
         }
 
-        // Buscamos la obra en nuestro dataset global ya parseado
         const currentWork = findArtworkByCode(WORK_CODE);
-
         if (currentWork) {
             originalContainer.classList.remove("loading-pulse");
             
-            // 1. Renderizar CTA de Obra Original
             if (currentWork.isAvailable) {
-                if (currentWork.stripeUrl && currentWork.stripeUrl.trim() !== "") {
-                    originalContainer.innerHTML = `
-                        <a href="${currentWork.stripeUrl}" target="_blank" class="btn-original-buy">
-                            Adquirir Original — ${currentWork.originalPrice}
-                        </a>`;
-                } else {
-                    originalContainer.innerHTML = `
-                        <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
-                            <div style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted);">
-                                Disponible — ${currentWork.originalPrice}
-                            </div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                                Pasarela de pago directo en línea para esta pieza en proceso de configuración. Si deseas adquirirla hoy, puedes contactarme directamente dando clic al botón de WhatsApp de abajo.
-                            </p>
-                        </div>`;
-                }
+                originalContainer.innerHTML = currentWork.stripeUrl?.trim() ? `
+                    <a href="${currentWork.stripeUrl}" target="_blank" class="btn-original-buy">
+                        Adquirir Original — ${currentWork.originalPrice}
+                    </a>` : `
+                    <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
+                        <div style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted);">Disponible — ${currentWork.originalPrice}</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+                            Pasarela de pago directo en línea para esta pieza en proceso de configuración. Si deseas adquirirla hoy, puedes contactarme directamente dando clic al botón de WhatsApp de abajo.
+                        </p>
+                    </div>`;
             } else {
                 originalContainer.innerHTML = `
                     <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
-                        <div class="btn-original-sold" style="margin-bottom: 12px; font-weight: 600; color: #888;">
-                            Obra Original: Vendida
-                        </div>
+                        <div class="btn-original-sold" style="margin-bottom: 12px; font-weight: 600; color: #888;">Obra Original: Vendida</div>
                         <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
                             Esta pieza única ya forma parte de una colección privada. Sin embargo, puedes adquirir una <strong>reproducción Giclée autorizada</strong> abajo o contactarme directamente para encargar una obra comisionada similar.
                         </p>
                     </div>`;
             }
 
-            // 2. Renderizar Prints (Reproducciones) utilizando el NUEVO formato dinámico
-            if (printsContainer && currentWork.prints && currentWork.prints.length > 0) {
+            if (printsContainer && currentWork.prints?.length > 0) {
                 const printButtons = currentWork.prints.map(print => {
-                    // Extraemos directamente las propiedades del nuevo JSON sin condicionales de tamaño
                     const buttonText = print.label || "Adquirir Reproducción";
                     let finalUrl = print.url || "#";
 
-                    // Acoplamos dinámicamente el parámetro de tracking nativo de Stripe si hay un link válido
                     if (finalUrl !== "#") {
                         const separator = finalUrl.includes("?") ? "&" : "?";
                         finalUrl = `${finalUrl}${separator}client_reference_id=${currentWork.code}`;
                     }
 
-                    // Separamos visualmente la descripción y el precio si usas el formato "Texto - $Precio"
                     let displayLabel = buttonText;
                     let displayAction = "Adquirir →";
-                    
                     if (buttonText.includes(" - ")) {
                         const parts = buttonText.split(" - ");
                         displayLabel = parts[0];
@@ -593,21 +529,15 @@ async function hydrateDetailPage() {
                     <div class="prints-box" style="margin-top: 16px;">
                         <span class="prints-title">Reproducciones Giclée (Prints)</span>
                         <p class="prints-desc">Impresión fine art de calidad de museo bajo demanda, gestionada por Prodigi.</p>
-                        <div class="print-options-grid">
-                            ${printButtons}
-                        </div>
+                        <div class="print-options-grid">${printButtons}</div>
                     </div>`;
             } else if (printsContainer) {
-                // Limpiar el contenedor si esta obra en específico no tiene reproducciones configuradas
                 printsContainer.innerHTML = "";
             }
         }
     } catch (e) {
-        console.error("Error al hidratar los detalles de la obra:", e);
+        console.error("Error al hidratar los detalles:", e);
         originalContainer.classList.remove("loading-pulse");
-        originalContainer.innerHTML = `
-            <div class="btn-original-sold" style="color: var(--text-muted);">
-                Precios online temporalmente no disponibles
-            </div>`;
+        originalContainer.innerHTML = `<div class="btn-original-sold" style="color: var(--text-muted);">Precios online temporalmente no disponibles</div>`;
     }
 }
