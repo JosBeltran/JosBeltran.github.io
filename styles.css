@@ -591,3 +591,32 @@ html, body {
 .card-media-canvas img {
     transition: transform 0.4s ease-in-out;
 }
+
+.includes-panel{
+    margin-top:32px;
+    border-top:1px solid #e5e5e5;
+    padding-top:24px;
+}
+
+.includes-panel h3{
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:#666;
+    margin-bottom:18px;
+}
+
+.includes-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.includes-list li{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px solid #f2f2f2;
+    font-size:.95rem;
+}

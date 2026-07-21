@@ -134,7 +134,26 @@ function transformRowsToSeriesStructure(rows) {
             } else {
                 purchaseBtnHtml = `<div class="btn-original-sold">${soldBtnText}</div>`;
             }
+let includesHtml = "";
 
+if (!isCase) {
+    includesHtml = `
+    <div class="includes-panel">
+        <h3>Lo que incluye</h3>
+
+        <ul class="includes-list">
+            <li>✓ Obra original única (1 de 1)</li>
+            <li>✓ Firmada por el artista</li>
+            <li>✓ Certificado de autenticidad</li>
+            <li>✓ Marco de presentación incluido (México)</li>
+            <li>✓ Lista para exhibirse inmediatamente</li>
+            <li>✓ Embalaje profesional</li>
+            <li>✓ Envío asegurado</li>
+            <li>✓ Número de rastreo</li>
+        </ul>
+    </div>
+    `;
+}
             const html = `<!DOCTYPE html>
 <html lang="es" data-theme="white">
 <head>
@@ -197,6 +216,7 @@ function transformRowsToSeriesStructure(rows) {
         </div>
         <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">Preguntar por WhatsApp</a>
       </div>
+      ${includesHtml}
       <div class="qr-box">
         <img src="../assets/qr/${work.code}.png" alt="QR ${work.code}" class="qr-img" />
         <p class="qr-text">Escanea para abrir en tu móvil</p>
