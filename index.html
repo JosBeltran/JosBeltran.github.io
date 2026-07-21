@@ -4,132 +4,397 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>JBU — Galería, Tienda y Archivo de Obra</title>
-    <!-- Carbon Design System Core Stylesheets (Used strictly for Grid, Typography base, and Accessibility structures) -->
+    <!-- Carbon Design System Core Stylesheets -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
     <link rel="stylesheet" href="styles.css" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="assets/logo.png" />
+
+    <style>
+        /* ESTRUCTURA GENERAL Y BARRA LATERAL FIJA */
+        .editorial-layout-wrapper {
+            display: flex;
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            align-items: flex-start;
+        }
+
+      /* FORZAR FLUJO VERTICAL EN LA BARRA LATERAL */
+.artist-info-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 5rem;
+    height: fit-content;
+    display: flex;
+    flex-direction: column; /* Alineación vertical estricta */
+    align-items: flex-start;
+}
+
+        /* Área de Mosaico principal */
+        .catalog-main-area {
+            flex-grow: 1;
+            min-width: 0; /* Evita desbordamiento de grid/flex */
+        }
+
+        /* MOSAICO EDITORIAL MASONRY */
+        .editorial-gallery-grid {
+            column-count: 3;
+            column-gap: 12px;
+            width: 100%;
+        }
+
+        .editorial-artwork-card {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 12px;
+            overflow: hidden;
+            background-color: #f4f4f4;
+            border-radius: 0px;
+            cursor: pointer;
+            vertical-align: top;
+        }
+
+        .card-media-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .editorial-artwork-card:hover .card-image {
+            transform: scale(1.03);
+        }
+
+        /* OVERLAY MINIMALISTA */
+        .card-caption-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.75);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            backdrop-filter: blur(1px);
+        }
+
+        .editorial-artwork-card:hover .card-caption-overlay {
+            opacity: 1;
+        }
+
+        .mosaic-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 0 0.3rem 0;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+
+        .mosaic-meta {
+            font-size: 0.78rem;
+            color: #d0d0d0;
+            margin-bottom: 0.25rem;
+            font-weight: 300;
+        }
+
+        .mosaic-medium {
+            font-size: 0.7rem;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        /* RESPONSIVO PARA MÓVILES Y TABLETS */
+        @media (max-width: 1024px) {
+            .editorial-layout-wrapper {
+                flex-direction: column;
+                padding: 1.5rem 1rem;
+                gap: 2rem;
+            }
+
+            .artist-info-sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+                border-bottom: 1px solid #eaeaea;
+                padding-bottom: 1.5rem;
+            }
+
+            .editorial-gallery-grid {
+                column-count: 2;
+                column-gap: 8px;
+            }
+            .editorial-artwork-card {
+                margin-bottom: 8px;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .editorial-gallery-grid {
+                column-count: 1;
+            }
+        }
+
+        /* ESTILOS DEL LIGHTBOX / CARRUSEL MODAL */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(10, 10, 12, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-btn-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 10001;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .lightbox-btn-close:hover { opacity: 1; }
+
+        .lightbox-stage {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .lightbox-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 85vw;
+            max-height: 85vh;
+        }
+
+        #lightbox-img {
+            max-width: 100%;
+            max-height: 65vh;
+            object-fit: contain;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .lightbox-caption {
+            text-align: center;
+            color: #ffffff;
+            margin-top: 1.2rem;
+        }
+
+        .lightbox-caption h3 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin: 0 0 0.3rem 0;
+            color: #fff;
+        }
+
+        .lightbox-caption p {
+            font-size: 0.85rem;
+            color: #aaaaaa;
+            margin: 0 0 1rem 0;
+        }
+
+        .lightbox-cta-btn {
+            display: inline-block;
+            padding: 0.6rem 1.4rem;
+            background: #ffffff;
+            color: #111111;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+
+        .lightbox-cta-btn:hover { background: #dddddd; }
+
+        .lightbox-nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: #ffffff;
+            font-size: 2rem;
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .lightbox-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .lightbox-stage { padding: 1rem 0.5rem; }
+            #lightbox-img { max-height: 55vh; }
+            .lightbox-nav-btn { font-size: 1.5rem; padding: 1rem 0.5rem; }
+            .lightbox-btn-close { top: 1rem; right: 1rem; }
+        }
+
+        .hero-editorial-caption {
+    display: flex;
+    flex-direction: column; /* Apila el título, subtítulo y manifiesto uno debajo del otro */
+    width: 100%;
+}
+
+.hero-artwork-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #111;
+    word-break: normal; /* Evita saltos de línea bruscos en el nombre */
+    line-height: 1.2;
+}
+
+.hero-artwork-specs {
+    letter-spacing: 1.2px;
+    font-weight: 600;
+    font-size: 0.72rem;
+    color: #666;
+    margin-top: 0.4rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+
+.artist-manifesto {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #444;
+    margin: 0;
+}
+    </style>
 </head>
 <body class="editorial-gallery-body">
 
-    <!-- Header de Navegación Minimalista (Inspiración Gagosian/Pace) -->
+    <!-- Header de Navegación Minimalista -->
     <header class="gallery-header" role="banner">
         <div class="header-container">
             <a class="gallery-brand" href="#" aria-label="JBU - Volver al inicio">
                 <span class="brand-prefix">JBU</span>
                 <span class="brand-suffix">Galería & Archivo</span>
             </a>
-            <!-- Busca esta sección dentro de tu index.html y reemplázala -->
-<nav class="gallery-nav" aria-label="Navegación principal de la galería">
-    <ul class="nav-menu" role="menubar">
-        <li role="none"><a class="nav-link" href="#galeria" role="menuitem">Colecciones</a></li>
-        <li role="none"><a class="nav-link" href="#archivo" role="menuitem">Archivo</a></li>
-        <li role="none"><a class="nav-link" href="cases.html" role="menuitem" style="font-weight: 500; color: #111111;">Case Devices</a></li>
-        <li role="none"><a class="nav-link" href="#sobre-artista" role="menuitem">Sobre el Artista</a></li>
-        <li role="none"><a class="nav-link" href="info/soporte.html" role="menuitem">Contacto</a></li>
-    </ul>
-</nav>
+            <nav class="gallery-nav" aria-label="Navegación principal de la galería">
+                <ul class="nav-menu" role="menubar">
+                    <li role="none"><a class="nav-link" href="index.html" role="menuitem">Originales</a></li>
+                    <li role="none"><a class="nav-link" href="cases.html" role="menuitem" style="font-weight: 500; color: #111111;">Case Devices</a></li>
+                    <li role="none"><a class="nav-link" href="info/soporte.html" role="menuitem">Contacto</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <!-- Contenedor Principal con Grid Asimétrico de Carbon -->
-    <main class="cds--grid main-editorial-wrapper">
-        <div class="cds--row gallery-split-layout">
+    <!-- Contenedor Principal (2 Columnas: Info Fija Izquierda + Mosaico) -->
+    <main class="editorial-layout-wrapper">
 
-            <!-- PANEL IZQUIERDO (Identidad, Manifiesto y Metadata Dinámica - Sticky) -->
-            <aside class="sidebar-editorial-panel cds--col-lg-4 cds--col-md-3 cds--col-sm-4">
-                <div class="sidebar-sticky-wrapper">
-                    
-                    <!-- Identidad Principal -->
-                    <div class="artist-identity-block">
-                        <div class="logo-wrapper-chromic">
-                            <img class="logo-clean" id="logo" src="assets/logo.png" alt="Firma JBU">
-                        </div>
-                        <h1 class="artist-display-name">Josue Beltran Uresti</h1>
-                        <span class="artist-discipline-label">Artista Visual</span>
-                        <p class="artist-manifesto" id="homePhrase">
-                            Cada obra es una posibilidad: una imagen que espera ser observada para existir.
-                        </p>
-                    </div>
+ <!-- PANEL IZQUIERDO FIJO (IDENTIDAD DEL ARTISTA) -->
+<aside class="artist-info-sidebar">
+    <div class="logo-wrapper-chromic" style="margin-bottom: 1.25rem; text-align: left;">
+        <img class="logo-clean" id="logo" src="assets/logo.png" alt="Firma JBU" style="max-height: 90px; width: auto; object-fit: contain;">
+    </div>
 
-                    <!-- Metadata de Obra Seleccionada (Se actualiza dinámicamente con Hover/Scroll) -->
-                    <div id="dynamic-metadata-panel" class="dynamic-metadata-container">
-                        <hr class="separator-line">
-                        <span class="metadata-label">Obra Seleccionada</span>
-                        <h2 id="meta-title" class="metadata-title">—</h2>
-                        <div class="metadata-grid">
-                            <div class="meta-item">
-                                <span class="meta-title-sub">Técnica</span>
-                                <span id="meta-medium" class="meta-value">—</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-title-sub">Dimensiones</span>
-                                <span id="meta-size" class="meta-value">—</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-title-sub">Año</span>
-                                <span id="meta-year" class="meta-value">—</span>
-                            </div>
-                        </div>
-                        <div id="original-cta-wrapper" class="metadata-cta-box">
-                            <!-- Inyección dinámica de botón de Stripe o etiqueta de Sold -->
-                        </div>
-                    </div>
+    <div class="hero-editorial-caption">
+        <h2 class="hero-artwork-title">Josue Beltran Uresti</h2>
+        <p class="hero-artwork-specs">
+            Arquitecto de Software<br>— Artista Visual
+        </p>
+        <p class="artist-manifesto" id="homePhrase">
+            Cada obra es una posibilidad: una imagen que espera ser observada para existir.
+        </p>
+    </div>
+</aside>
 
-                </div>
-            </aside>
-
-            <!-- PANEL DERECHO (Hero Editorial e Índice de Obras de Alto Nivel) -->
-            <section class="content-editorial-panel cds--col-lg-12 cds--col-md-5 cds--col-sm-4">
-
-                <!-- 1. HERO EDITORIAL (Sustituye por completo al antiguo Banner/Tile) -->
-                <div id="hero-editorial-section" class="hero-editorial-viewport" aria-label="Obra destacada de la serie">
-                    <!-- ASÍ DEBE QUEDAR EN TU INDEX.HTML -->
-<div class="hero-media-canvas">
-    <img id="hero-img-display" class="hero-image-render" src="" alt="Obra de arte destacada" />
-</div>
-                    <div class="hero-editorial-caption">
-                        <div class="hero-caption-meta">
-                            <span class="metadata-label">Destacado</span>
-                            <h2 id="hero-title-display" class="hero-artwork-title">Cargando obra destacada...</h2>
-                            <p id="hero-specs-display" class="hero-artwork-specs">—</p>
-                        </div>
-                        <div id="hero-action-container" class="hero-action-wrapper">
-                            <!-- Botón dinámico del original -->
-                        </div>
-                    </div>
+        <!-- ÁREA PRINCIPAL: MOSAICO DE OBRAS -->
+        <section class="catalog-main-area">
+            <div id="galeria" class="catalog-editorial-container">
+                <div class="catalog-header-block" style="margin-bottom: 1.5rem;">
+                    <span class="metadata-label" style="text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; color: #888; font-weight: 600;">ARCHIVO DE OBRA</span>
+                    <h3 class="catalog-section-title" style="font-size: 1.5rem; margin-top: 0.2rem;">Colección Orbitals</h3>
+                    <p class="catalog-subtitle" style="color: #666; font-size: 0.9rem;">Colección de obras pertenecientes a la serie Orbitals.</p>
                 </div>
 
-                <!-- 2. CATÁLOGO / ÍNDICE DE OBRAS CON GRID EDITORIAL ASIMÉTRICO (Estilo Artsy) -->
-                <div id="galeria" class="catalog-editorial-container">
-                    <div class="catalog-header-block">
-                        <span class="metadata-label">Archivo de Obra</span>
-                        <h3 class="catalog-section-title">Colección Orbitals</h3>
-                    </div>
-
-                    <!-- Contenedor del Grid Editorial Asimétrico -->
-                    <div id="codeGrid" class="editorial-gallery-grid">
-                        <!-- El script app.js inyectará dinámicamente las tarjetas limpias aquí -->
-                    </div>
+                <!-- Grid Mosaico Dynamic Load -->
+                <div id="codeGrid" class="editorial-gallery-grid">
+                    <!-- Inyección dinámica desde app.js -->
                 </div>
+            </div>
+        </section>
 
-            </section>
-
-        </div>
     </main>
 
-    <!-- Footer Institucional Sutil -->
-    <footer class="gallery-footer" role="contentinfo">
-        <div class="footer-inner">
-            <span class="footer-copyright">© 2026 JBU. Todos los derechos reservados.</span>
-            <div class="footer-utility-links">
-                <a href="info/terminos-de-servicio.html">Términos</a>
-                <a href="info/politica-de-privacidad.html">Privacidad</a>
+    <!-- Footer -->
+    <footer class="gallery-footer" role="contentinfo" style="margin-top: 5rem; padding: 2rem 0; border-top: 1px solid #eaeaea;">
+        <div class="footer-inner" style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0 1.5rem;">
+            <span class="footer-copyright" style="font-size: 0.85rem; color: #666;">© 2026 JBU. Todos los derechos reservados.</span>
+            <div class="footer-utility-links" style="display: flex; gap: 1.5rem; font-size: 0.85rem;">
+                <a href="info/terminos-de-servicio.html" style="color: #444; text-decoration: none;">Términos</a>
+                <a href="info/politica-de-privacidad.html" style="color: #444; text-decoration: none;">Privacidad</a>
             </div>
         </div>
     </footer>
 
-    <!-- Carga del Motor de la Galería -->
+    <!-- VISUALIZADOR LIGHTBOX EN PANTALLA COMPLETA (MODAL) -->
+    <div id="artwork-lightbox" class="lightbox-modal" role="dialog" aria-hidden="true">
+        <button id="lightbox-close" class="lightbox-btn-close" aria-label="Cerrar visualizador">&times;</button>
+        
+        <!-- Contenedor del Carrusel / Navegación -->
+        <div class="lightbox-stage">
+            <button id="lightbox-prev" class="lightbox-nav-btn prev-btn" aria-label="Obra anterior">&#10094;</button>
+            
+            <div class="lightbox-content">
+                <img id="lightbox-img" src="" alt="Obra ampliada" />
+                <div class="lightbox-caption">
+                    <h3 id="lightbox-title">—</h3>
+                    <p id="lightbox-specs">—</p>
+                    <a id="lightbox-cta" href="#" class="lightbox-cta-btn">Consultar / Ficha Técnica</a>
+                </div>
+            </div>
+            
+            <button id="lightbox-next" class="lightbox-nav-btn next-btn" aria-label="Siguiente obra">&#10095;</button>
+        </div>
+    </div>
+
+    <!-- JS -->
     <script src="app.js"></script>
 </body>
 </html>

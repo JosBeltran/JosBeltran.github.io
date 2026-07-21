@@ -181,17 +181,15 @@ function initGalleryEngine() {
 }
 
 /**
- * Renderiza el siguiente bloque/lote de series sin saturar el hilo principal
+ * Renderiza el lote de series en formato Masonry continuo
  */
 function renderNextSeriesBatch() {
     const gridContainer = document.getElementById("codeGrid");
     if (!gridContainer || pendingSeriesToRender.length === 0) return;
 
     const catalogHeaderBlock = document.querySelector(".catalog-header-block");
-    // Extraemos la cantidad configurada en el lote
     const batch = pendingSeriesToRender.splice(0, SERIES_BATCH_SIZE);
     
-    // Determinamos el índice global actual basado en lo ya renderizado
     const currentIndex = galleryDataset.series.length - pendingSeriesToRender.length - batch.length;
     let htmlBuffer = "";
 
@@ -208,10 +206,10 @@ function renderNextSeriesBatch() {
             `;
         } else {
             htmlBuffer += `
-                <div class="catalog-header-block" style="grid-column: span 12; width: 100%; margin-top: 60px; margin-bottom: 30px;">
+                <div class="catalog-header-block" style="column-span: all; width: 100%; margin-top: 50px; margin-bottom: 25px;">
                     <span class="metadata-label">Colección</span>
                     <h3 class="catalog-section-title" style="margin-top: 5px;">${currentSeries.seriesTitle}</h3>
-                    <p class="artist-manifesto" style="margin-top: 12px; max-width: 600px; font-size: 0.95rem; line-height: 1.6;">
+                    <p class="artist-manifesto" style="margin-top: 8px; max-width: 600px; font-size: 0.95rem; line-height: 1.6;">
                         ${currentSeries.seriesDescription || ''}
                     </p>
                     <hr class="separator-line" style="margin-top: 20px; border: 0; border-top: 1px solid var(--cds-border-subtle, #e0e0e0);">
@@ -225,22 +223,18 @@ function renderNextSeriesBatch() {
                     <div class="card-media-canvas">
                         <img class="card-image" src="${art.image}" alt="${art.title}" loading="lazy">
                     </div>
-                    <div class="card-caption-details">
-                        <div class="card-title-line">
-                            <h4 class="card-title">${art.title}</h4>
-                            <span class="card-year">${art.year}</span>
-                        </div>
-                        <p class="card-medium">${art.technique}</p>
+                    <div class="card-caption-overlay">
+                        <h4 class="mosaic-title">${art.title}</h4>
+                        <span class="mosaic-meta">${art.year} — ${art.size}</span>
+                        <span class="mosaic-medium">${art.technique}</span>
                     </div>
                 </article>
             `;
         });
     });
 
-    // Una sola inserción masiva al DOM por lote (Gran mejora de rendimiento)
     gridContainer.insertAdjacentHTML("beforeend", htmlBuffer);
 
-    // Enlazar eventos e interacciones visuales sólo para los nuevos elementos
     setupInteractionsForCards();
     setupLazyLoadingObserver();
 }
@@ -271,48 +265,49 @@ function setupIncrementalRenderObserver() {
     scrollObserver.observe(sentinel);
 }
 
-/**
- * Enlaza interacciones sólo a las tarjetas recién inyectadas
- */
 function setupInteractionsForCards() {
     const cards = document.querySelectorAll(".editorial-artwork-card.dynamic-load");
     
     cards.forEach(card => {
-        card.classList.remove("dynamic-load"); // Evitamos duplicar eventos en el futuro
+        card.classList.remove("dynamic-load"); // Evitamos duplicar eventos
         const artCode = card.getAttribute("data-code");
         const selectedArt = findArtworkByCode(artCode);
         if (!selectedArt) return;
 
+        // 1. En Desktop (mouse): Actualiza el panel lateral al pasar el cursor
         card.addEventListener("mouseenter", () => updateSidebarMetadata(selectedArt));
         
+        // 2. Clic directo: Abre el Lightbox para navegar obra por obra en pantalla completa
         card.addEventListener("click", (e) => {
             e.preventDefault();
+            
+            // Actualiza la barra lateral/hero en segundo plano por si el usuario cierra el modal
+            updateSidebarMetadata(selectedArt);
             updateHeroSection(selectedArt);
-            if (window.innerWidth <= 1024) {
-                document.getElementById("hero-editorial-section")?.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
 
-        card.addEventListener("dblclick", () => {
-            window.location.href = `obras/${selectedArt.code}.html`;
+            // ABRE EL LIGHTBOX INTERACTIVO
+            if (typeof openLightboxByCode === "function") {
+                openLightboxByCode(selectedArt.code);
+            }
         });
     });
 
-    // Configurar Hero una sola vez de forma segura
+    // Configuración del Hero (mantiene la interacción si el usuario hace doble clic en el panel)
     const heroImg = document.getElementById("hero-img-display");
     if (heroImg && !heroImg.dataset.hooked) {
         heroImg.dataset.hooked = "true";
         heroImg.style.cursor = "pointer";
-        heroImg.addEventListener("dblclick", () => {
-            const heroTitleEl = document.getElementById("hero-title-display");
+        heroImg.addEventListener("click", () => {
+            const heroTitleEl = document.getElementById("meta-title") || document.getElementById("hero-title-display");
             if (heroTitleEl) {
                 const activeArt = findArtworkByTitle(heroTitleEl.textContent);
-                if (activeArt) window.location.href = `obras/${activeArt.code}.html`;
+                if (activeArt && typeof openLightboxByCode === "function") {
+                    openLightboxByCode(activeArt.code);
+                }
             }
         });
     }
 }
-
 /**
  * IntersectionObserver para efectos visuales Fade-In nativos en las tarjetas
  */
@@ -541,3 +536,133 @@ async function hydrateDetailPage() {
         originalContainer.innerHTML = `<div class="btn-original-sold" style="color: var(--text-muted);">Precios online temporalmente no disponibles</div>`;
     }
 }
+
+// ==========================================================================
+// MÓDULO LIGHTBOX / NAVEGADOR OBRAPOR OBRA (CARRUSEL FULLSCREEN)
+// ==========================================================================
+
+let allWorksFlat = []; // Arreglo plano para navegar fácilmente
+let currentWorkIndex = 0;
+
+// Variables para gestos táctiles (Swipe en móvil)
+let touchStartX = 0;
+let touchEndX = 0;
+
+function initLightboxEngine() {
+    const modal = document.getElementById("artwork-lightbox");
+    const closeBtn = document.getElementById("lightbox-close");
+    const prevBtn = document.getElementById("lightbox-prev");
+    const nextBtn = document.getElementById("lightbox-next");
+
+    if (!modal) return;
+
+    // Cerrar modal
+    closeBtn.addEventListener("click", closeLightbox);
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeLightbox();
+    });
+
+    // Navegación con botones
+    prevBtn.addEventListener("click", showPrevArtwork);
+    nextBtn.addEventListener("click", showNextArtwork);
+
+    // Navegación con teclado (Flechas y ESC)
+    document.addEventListener("keydown", (e) => {
+        if (!modal.classList.contains("active")) return;
+        if (e.key === "ArrowLeft") showPrevArtwork();
+        if (e.key === "ArrowRight") showNextArtwork();
+        if (e.key === "Escape") closeLightbox();
+    });
+
+    // Soporte para gestos táctiles (Móvil)
+    modal.addEventListener("touchstart", (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    modal.addEventListener("touchend", (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipeGesture();
+    }, false);
+}
+
+function updateFlatWorksList() {
+    allWorksFlat = [];
+    if (galleryDataset.series) {
+        galleryDataset.series.forEach(s => {
+            if (s.works) allWorksFlat.push(...s.works);
+        });
+    }
+}
+
+function openLightboxByCode(code) {
+    updateFlatWorksList();
+    const index = allWorksFlat.findIndex(w => w.code === code);
+    if (index !== -1) {
+        currentWorkIndex = index;
+        renderLightboxActiveWork();
+        const modal = document.getElementById("artwork-lightbox");
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden"; // Evita el scroll de fondo
+    }
+}
+
+function closeLightbox() {
+    const modal = document.getElementById("artwork-lightbox");
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = ""; // Restaura el scroll
+}
+
+function showPrevArtwork() {
+    if (allWorksFlat.length === 0) return;
+    currentWorkIndex = (currentWorkIndex - 1 + allWorksFlat.length) % allWorksFlat.length;
+    renderLightboxActiveWork();
+}
+
+function showNextArtwork() {
+    if (allWorksFlat.length === 0) return;
+    currentWorkIndex = (currentWorkIndex + 1) % allWorksFlat.length;
+    renderLightboxActiveWork();
+}
+
+function renderLightboxActiveWork() {
+    const art = allWorksFlat[currentWorkIndex];
+    if (!art) return;
+
+    const img = document.getElementById("lightbox-img");
+    const title = document.getElementById("lightbox-title");
+    const specs = document.getElementById("lightbox-specs");
+    const cta = document.getElementById("lightbox-cta");
+
+    // Efecto de transición suave
+    img.style.opacity = "0";
+    img.style.transform = "scale(0.97)";
+
+    setTimeout(() => {
+        img.src = art.image;
+        img.alt = art.title;
+        title.textContent = art.title;
+        specs.textContent = `${art.technique} — ${art.size} (${art.year})`;
+        cta.href = `obras/${art.code}.html`;
+        cta.textContent = art.isAvailable ? `Consultar Adquisición — ${art.originalPrice || ''}` : "Ver Ficha de Obra";
+
+        img.style.opacity = "1";
+        img.style.transform = "scale(1)";
+    }, 150);
+}
+
+function handleSwipeGesture() {
+    const swipeThreshold = 50; // Mínimo de distancia en px para detectar el swipe
+    if (touchEndX < touchStartX - swipeThreshold) {
+        showNextArtwork(); // Swipe hacia la izquierda -> Siguiente
+    }
+    if (touchEndX > touchStartX + swipeThreshold) {
+        showPrevArtwork(); // Swipe hacia la derecha -> Anterior
+    }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener("DOMContentLoaded", () => {
+    initLightboxEngine();
+});
