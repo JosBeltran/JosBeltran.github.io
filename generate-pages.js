@@ -55,11 +55,11 @@ function transformRowsToSeriesStructure(rows) {
         const workObj = {
             code: code.trim(),
             title: title.trim(),
-            year: year.trim(),
-            technique: technique.trim(),
-            size: size.trim(),
-            image: image.trim(),
-            description: description.trim(),
+            year: year ? year.trim() : "",
+            technique: technique ? technique.trim() : "",
+            size: size ? size.trim() : "",
+            image: image ? image.trim() : "",
+            description: description ? description.trim() : "",
             availability: {
                 isAvailable,
                 price: originalPrice ? originalPrice.trim() : "",
@@ -91,18 +91,29 @@ function transformRowsToSeriesStructure(rows) {
     // 1. GENERACIÓN DE SUBPÁGINAS INDIVIDUALES (obras/*.html)
     // =======================================================
     for (const serie of seriesData) {
+        const isCase = serie.seriesTitle === "Case Devices";
+
         for (const work of serie.works) {
             const pageUrl = `${SITE_URL}/obras/${work.code}.html`;
             const qrPath = path.join(qrDir, `${work.code}.png`);
 
             await QRCode.toFile(qrPath, pageUrl, { width: 500, margin: 2 });
 
+            // Textos dinámicos según el tipo de producto
+            const backLinkText = isCase ? "← Volver a Case Devices" : "← Volver al catálogo";
+            const backLinkHref = isCase ? "../cases.html" : "../index.html";
+            const itemLabel = isCase ? "Funda" : "Obra";
+            const buyBtnText = isCase ? "Comprar Funda" : "Adquirir Original";
+            const soldBtnText = isCase ? "Agotado" : "Obra Vendida";
+
             const whatsappText = encodeURIComponent(
-                `Hola, me interesa la obra ${work.code} - ${work.title} de la serie ${serie.seriesTitle}`
+                isCase 
+                  ? `Hola, me interesa la funda ${work.code} - ${work.title} de Case Devices`
+                  : `Hola, me interesa la obra ${work.code} - ${work.title} de la serie ${serie.seriesTitle}`
             );
 
             let documentationHtml = "";
-            if (work.documentation) {
+            if (work.documentation && !isCase) {
                 const hasSketch = !!work.documentation.sketchUrl;
                 documentationHtml = `
                 <div class="documentation-panel" style="margin-top: 2rem; background: #f9f9f9; border: 1px solid #e0e0e0; padding: 24px;">
@@ -112,6 +123,16 @@ function transformRowsToSeriesStructure(rows) {
                     </div>` : ''}
                     ${work.documentation.notes ? `<p style="font-style: italic; color: #555555; line-height: 1.5; font-size: 14px; margin: 0;">"${work.documentation.notes}"</p>` : ''}
                 </div>`;
+            }
+
+            // Bloque dinámico para botón de Stripe/Compra
+            let purchaseBtnHtml = "";
+            if (work.availability.isAvailable && work.availability.stripeUrl) {
+                purchaseBtnHtml = `<a class="btn-original-buy" target="_blank" href="${work.availability.stripeUrl}">${buyBtnText} (${work.availability.price})</a>`;
+            } else if (work.availability.isAvailable) {
+                purchaseBtnHtml = `<a class="btn-original-buy" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">Consultar Disponibilidad</a>`;
+            } else {
+                purchaseBtnHtml = `<div class="btn-original-sold">${soldBtnText}</div>`;
             }
 
             const html = `<!DOCTYPE html>
@@ -151,32 +172,29 @@ function transformRowsToSeriesStructure(rows) {
     .qr-box { text-align: center; margin-top: 32px; padding: 20px; border: 1px dashed #e5e5e5; }
     .qr-img { width: 110px; height: 110px; display: block; margin: 0 auto 12px; }
     .qr-text { color: #666666; font-size: 0.75rem; margin: 0; }
-    .loading-pulse { animation: pulse 1.5s infinite ease-in-out; }
-    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
   </style>
 </head>
 <body>
 <main class="artwork-container">
-  <a href="../index.html" class="back-link">← Volver al catálogo</a>
+  <a href="${backLinkHref}" class="back-link">${backLinkText}</a>
   <section class="artwork-layout">
     <div class="artwork-image-column">
       <div class="artwork-image-wrap"><img src="../${work.image}" alt="${work.title}" class="artwork-image" /></div>
       ${documentationHtml}
     </div>
     <aside class="artwork-details">
-      <p class="artwork-code">${work.code} — Serie: ${serie.seriesTitle}</p>
+      <p class="artwork-code">${work.code} — ${isCase ? 'Colección' : 'Serie'}: ${serie.seriesTitle}</p>
       <h1>${work.title}</h1>
       <div class="meta-grid">
         <div class="meta-item"><strong>Año:</strong><span>${work.year}</span></div>
-        <div class="meta-item"><strong>Técnica:</strong><span>${work.technique}</span></div>
-        <div class="meta-item"><strong>Medida:</strong><span>${work.size}</span></div>
+        <div class="meta-item"><strong>${isCase ? 'Compatibilidad / Modelo' : 'Técnica'}:</strong><span>${work.technique}</span></div>
+        <div class="meta-item"><strong>${isCase ? 'Dimensiones' : 'Medida'}:</strong><span>${work.size}</span></div>
       </div>
       <p class="description">${work.description}</p>
       <div class="purchase-section">
-        <div id="live-original-cta" data-work-code="${work.code}" class="loading-pulse">
-            <div class="btn-original-sold">Sincronizando estado actual...</div>
+        <div id="live-original-cta">
+            ${purchaseBtnHtml}
         </div>
-        <div id="live-prints-cta"></div>
         <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">Preguntar por WhatsApp</a>
       </div>
       <div class="qr-box">
@@ -200,18 +218,11 @@ function transformRowsToSeriesStructure(rows) {
     const caseSeries = seriesData.filter(s => s.seriesTitle === "Case Devices");
     fs.writeFileSync(path.join(__dirname, "cases.html"), buildCasesCatalogTemplate(caseSeries), "utf8");
 
-    console.log("¡Hecho! index.html protegido. Se generaron las subpáginas y la sección cases.html en blanco.");
+    console.log("¡Hecho! Se generaron las subpáginas personalizadas y la sección cases.html.");
 })();
 
-/**
- * Genera el layout limpio de las fundas (Blanco) imitando la estructura de cabecera de JBU
- */
-/**
- * Genera el layout de las fundas clonando de forma exacta la identidad de JBU
- */
 function buildCasesCatalogTemplate(filteredSeries) {
     const contentHtml = filteredSeries.map(serie => {
-        // Mapeo de items con las mismas clases y diseño editorial limpio
         const worksGrid = serie.works.map(work => `
             <div class="artwork-card" style="border: 1px solid #e5e5e5; padding: 16px; background: #ffffff; transition: transform 0.2s ease, border-color 0.2s ease; position: relative;">
                 <a href="obras/${work.code}.html" style="text-decoration: none; color: inherit; display: block;">
@@ -246,18 +257,15 @@ function buildCasesCatalogTemplate(filteredSeries) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>JBU — Case Devices Colección</title>
-    <!-- Mismos Estilos Core de Carbon Design System que usas en el Index -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" type="image/png" href="assets/logo.png" />
     <style>
-        /* Ajuste específico para que mantenga el efecto hover exacto de tu CSS global */
         .artwork-card:hover { transform: translateY(-4px); border-color: #111111 !important; }
     </style>
 </head>
 <body class="editorial-gallery-body">
 
-    <!-- Header de Navegación Cloncado de tu Index (Idéntico e Inalterado) -->
     <header class="gallery-header" role="banner">
         <div class="header-container">
             <a class="gallery-brand" href="index.html" aria-label="JBU - Volver al inicio">
@@ -276,7 +284,6 @@ function buildCasesCatalogTemplate(filteredSeries) {
         </div>
     </header>
 
-    <!-- Contenedor Principal con Grid de Carbon idéntico al bloque derecho de tu Index -->
     <main class="cds--grid main-editorial-wrapper" style="padding-top: 2rem;">
         <div class="cds--row">
             <section class="content-editorial-panel cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
@@ -287,7 +294,6 @@ function buildCasesCatalogTemplate(filteredSeries) {
         </div>
     </main>
 
-    <!-- Footer Institucional Sutil Cloncado -->
     <footer class="gallery-footer" role="contentinfo">
         <div class="footer-inner">
             <span class="footer-copyright">© 2026 JBU. Todos los derechos reservados.</span>

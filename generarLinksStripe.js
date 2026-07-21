@@ -1,6 +1,6 @@
 const { google } = require('googleapis');
 // Reemplaza con tu Secret Key real (sk_test_... o sk_live_...)
-const stripe = require('stripe')("TU_API_KEY"); 
+const stripe = require('stripe')('ttest'); 
 const path = require('path');
 
 // Configuración de Google Sheets
