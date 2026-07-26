@@ -117,6 +117,12 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
         const pageUrl = `${SITE_URL}/obras/${work.cleanCode}.html`;
         const qrPath = path.join(qrDir, `${work.cleanCode}.png`);
         await QRCode.toFile(qrPath, pageUrl, { width: 300, margin: 2 });
+const isCaseDevice = work.series === "Case Devices";
+
+        const buyButtonText = isCaseDevice
+    ? "Buy Premium Case"
+    : "Acquire Original Artwork";
+
 
         const isAvailable = work.status === "AVAILABLE" || work.status === "DISPONIBLE";
         const statusBadge = isAvailable 
@@ -124,7 +130,7 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
             : '<span class="status-badge sold">○ Sold / Private Collection</span>';
 
         const buyButtonHtml = isAvailable && work.stripeLink 
-            ? `<a href="${encodeURI(work.stripeLink)}" target="_blank" rel="noopener noreferrer" class="btn-primary-action">Acquire Artwork — ${escapeHtml(work.price)}</a>`
+            ? `<a href="${encodeURI(work.stripeLink)}" target="_blank" rel="noopener noreferrer" class="btn-primary-action">${buyButtonText} — ${escapeHtml(work.price)}</a>`
             : `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=Hello,%20I%20am%20interested%20in%20the%20artwork%20${encodeURIComponent(work.title)}%20(${encodeURIComponent(work.code)})" target="_blank" rel="noopener noreferrer" class="btn-secondary-action">Inquire / Reserve</a>`;
 
         // Generate Gallery Grid HTML
@@ -143,6 +149,45 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
     </div>`;
 }).join("");
 
+
+
+const ui = isCaseDevice
+    ? {
+        pageTitle: "JBU Premium Cases",
+        priceLabel: "Price:",
+        descriptionFallback: "Premium protective case designed with exclusive artwork.",
+        likeText: "❤️ Like Case",
+        likesLabel: "❤️ 0 likes",
+        savedText: "Saved",
+        unsavedText: "Unsaved",
+        savedMessage: "✨ Case added to your favorites!",
+        buyButtonText: "Buy Case",
+        qrLabel: "Product Code:"
+    }
+    : {
+        pageTitle: "JBU Artwork Archive",
+        priceLabel: "Price:",
+        descriptionFallback: "Original artwork signed by the artist. Certificate of authenticity included.",
+        likeText: "❤️ Like Artwork",
+        likesLabel: "❤️ 0 likes",
+        savedText: "Saved",
+        unsavedText: "Unsaved",
+        savedMessage: "✨ Artwork added to your favorites!",
+        buyButtonText: "Acquire Artwork",
+        qrLabel: "Code:"
+    };
+
+    const navItems = isCaseDevice
+    ? `
+        <li><a class="nav-link" href="../cases.html">Case Devices</a></li>
+        <li><a class="nav-link" href="../index.html">Original Art</a></li>
+        <li><a class="nav-link" href="../info/soporte.html">Support</a></li>
+    `
+    : `
+        <li><a class="nav-link" href="../index.html">Originals</a></li>
+        <li><a class="nav-link" href="../cases.html">Case Devices</a></li>
+        <li><a class="nav-link" href="../info/soporte.html">Support</a></li>
+    `;
         // Build Master Page Template
         const htmlContent = `<!DOCTYPE html>
 <html lang="en" data-theme="white">
@@ -162,9 +207,7 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
             </a>
             <nav class="main-nav" role="navigation">
                 <ul class="nav-list" role="menubar">
-                    <li role="none"><a class="nav-link" href="../index.html" role="menuitem">Gallery</a></li>
-                    <li role="none"><a class="nav-link" href="../cases.html" role="menuitem">Case Devices</a></li>
-                    <li role="none"><a class="nav-link" href="../info/soporte.html" role="menuitem">Contact</a></li>
+                    ${navItems}
                 </ul>
             </nav>
             <div id="global-user-status" class="user-status-container"></div>
@@ -194,7 +237,7 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
                         <span class="price-value">${escapeHtml(work.price)}</span>
                     </div>
 
-                    <p class="artwork-description">${escapeHtml(work.description) || "Original artwork signed by the artist. Certificate of authenticity included."}</p>
+                    <p class="artwork-description">${escapeHtml(work.description) || ui.descriptionFallback}</p>
 
                     <div class="interaction-block">
                         <div class="like-counter-wrapper">
@@ -203,11 +246,11 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
                         </div>
 
                         <button id="btn-ver-obra" class="btn-like-action">
-                            ❤️ Like Artwork
+                             ${ui.likeText}
                         </button>
 
                         <div id="dossier-content" class="dossier-expanded-panel" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #555;">
-                            <p>✨ Added to your saved favorites!</p>
+                            <p>${ui.savedMessage}</p>
                         </div>
                     </div>
 
