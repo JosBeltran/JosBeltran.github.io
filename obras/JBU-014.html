@@ -12,10 +12,53 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0; padding: 0;
     }
-    .artwork-container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
-    .back-link { display: inline-flex; align-items: center; text-decoration: none; color: #666666; font-size: 0.9rem; margin-bottom: 32px; transition: all 0.2s; }
+    .artwork-header-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      max-width: 1200px; margin: 0 auto; padding: 20px 24px 0 24px;
+      border-bottom: 1px solid #f0f0f0; padding-bottom: 16px;
+    }
+    .artwork-container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .back-link { display: inline-flex; align-items: center; text-decoration: none; color: #666666; font-size: 0.9rem; transition: all 0.2s; }
     .back-link:hover { color: #111111; transform: translateX(-4px); }
-    .artwork-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; align-items: start; }
+    
+    /* ESTADO DE USUARIO GLOBAL */
+    .global-user-bar { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #444; }
+    .user-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 20px; }
+    .user-avatar-img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+    .user-status-dot { width: 8px; height: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; }
+
+    /* ESTILOS DEL BOTÓN DE INTERÉS */
+    .btn-interes {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #111111;
+      color: #ffffff;
+      border: 1px solid #111111;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    .btn-interes:hover {
+      background-color: #333333;
+      border-color: #333333;
+    }
+    .badge-vistas {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .artwork-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; align-items: start; margin-top: 24px; }
     @media (max-width: 900px) { .artwork-layout { grid-template-columns: 1fr; gap: 40px; } }
     .artwork-image-column { display: flex; flex-direction: column; gap: 20px; }
     .artwork-image-wrap { background-color: #fcfcfc; border: 1px solid #e5e5e5; padding: 24px; display: flex; justify-content: center; align-items: center; }
@@ -38,8 +81,16 @@
   </style>
 </head>
 <body>
-<main class="artwork-container">
+
+<header class="artwork-header-nav">
   <a href="../index.html" class="back-link">← Volver al catálogo</a>
+  <!-- INDICADOR DE USUARIO CONECTADO A NIVEL GLOBAL -->
+  <div id="global-user-status" class="global-user-bar">
+    <span style="color: #888;">Cargando usuario...</span>
+  </div>
+</header>
+
+<main class="artwork-container">
   <section class="artwork-layout">
     <div class="artwork-image-column">
       <div class="artwork-image-wrap"><img src="../assets/artworks/JBU-014.png" alt="Consciousness Drift" class="artwork-image" /></div>
@@ -61,21 +112,43 @@
         <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/528123518298?text=Hola%2C%20me%20interesa%20la%20obra%20JBU-014%20-%20Consciousness%20Drift%20de%20la%20serie%20Orbitals">Preguntar por WhatsApp</a>
       </div>
       
-    <div class="includes-panel">
-        <h3>Lo que incluye</h3>
+                <div class="dossier-section" style="margin-top: 24px; border: 1px solid #111; padding: 20px; background-color: #fafafa;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="margin: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #111;">📂 Dossier del Coleccionista</h3>
+                        <span id="dossier-status-tag" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #888;">Privado</span>
+                    </div>
+                    
+                    <!-- BOTÓN DE INTERÉS / DESCUBRIR OBRA -->
+                    <button id="btn-ver-obra" class="btn-interes" data-obra-id="JBU-014">
+                      ✨ Descubrir Obra
+                      <span id="contador-vistas" class="badge-vistas">🔥 ... vistas</span>
+                    </button>
 
-        <ul class="includes-list">
-            <li>✓ Obra original única (1 de 1)</li>
-            <li>✓ Firmada por el artista</li>
-            <li>✓ Certificado de autenticidad</li>
-            <li>✓ Marco de presentación incluido (México)</li>
-            <li>✓ Lista para exhibirse inmediatamente</li>
-            <li>✓ Embalaje profesional</li>
-            <li>✓ Envío asegurado</li>
-            <li>✓ Número de rastreo</li>
-        </ul>
-    </div>
-    
+                    <div id="dossier-content" style="display: none; margin-top: 20px; border-top: 1px solid #e0e0e0; padding-top: 16px;">
+                        <div style="font-size: 0.85rem; color: #333; line-height: 1.6;">
+                            <p style="margin: 0 0 8px;"><strong>Código de Registro:</strong> JBU-014</p>
+                            <p style="margin: 0 0 8px;"><strong>Estado de Conservación:</strong> Excelente (Firma original en frente y reverso)</p>
+                            <p style="margin: 0 0 8px;"><strong>Procedencia:</strong> Archivo directo del estudio del artista</p>
+                            <p style="margin: 0 0 8px;"><strong>Autenticidad:</strong> Pieza única 1/1 registrada en catálogo de serie</p>
+                            
+                        </div>
+                    </div>
+                </div>
+      
+                <div class="includes-panel" style="margin-top: 24px;">
+                    <h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; color: #666;">Lo que incluye</h3>
+                    <ul class="includes-list" style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem; color: #444; line-height: 1.8;">
+                        <li>✓ Obra original única (1 de 1)</li>
+                        <li>✓ Firmada por el artista</li>
+                        <li>✓ Certificado de autenticidad</li>
+                        <li>✓ Marco de presentación incluido (México)</li>
+                        <li>✓ Lista para exhibirse inmediatamente</li>
+                        <li>✓ Embalaje profesional</li>
+                        <li>✓ Envío asegurado</li>
+                        <li>✓ Número de rastreo</li>
+                    </ul>
+                </div>
+                
       <div class="qr-box">
         <img src="../assets/qr/JBU-014.png" alt="QR JBU-014" class="qr-img" />
         <p class="qr-text">Escanea para abrir en tu móvil</p>
@@ -83,6 +156,105 @@
     </aside>
   </section>
 </main>
+
 <script src="../app.js"></script>
+
+<!-- Script de Autenticación Global y Acción del Botón "Descubrir Obra" -->
+<!-- Script de Autenticación Global y Acción del Botón "Descubrir Obra" -->
+<!-- Script de Autenticación Global y Acción del Botón "Descubrir Obra" -->
+<script type="module">
+  import { guardarVista, obtenerTotalVistas } from "../js/firestore.js";
+  import { auth } from "../js/firebase-config.js";
+  import { 
+    GoogleAuthProvider, 
+    signInWithPopup,
+    onAuthStateChanged 
+  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+  const globalUserStatus = document.getElementById("global-user-status");
+  const btnVerObra = document.getElementById("btn-ver-obra");
+  const contadorVistas = document.getElementById("contador-vistas");
+  const dossierContent = document.getElementById("dossier-content");
+  const statusTag = document.getElementById("dossier-status-tag");
+
+  let desplegado = false;
+  const provider = new GoogleAuthProvider();
+
+  // 1. Cargar y mostrar vistas públicas inmediatamente (con comillas estándar)
+  async function cargarTotalVistas() {
+    if (!contadorVistas) return;
+    try {
+      const total = await obtenerTotalVistas("JBU-014");
+      contadorVistas.textContent = "🔥 " + total + " vistas";
+    } catch (err) {
+      console.error("💥 Error consultando vistas:", err);
+      contadorVistas.textContent = "🔥 0 vistas";
+    }
+  }
+
+  // Ejecución pública al cargar la página
+  cargarTotalVistas();
+
+  // 2. Escuchador en tiempo real del estado de sesión del usuario
+  onAuthStateChanged(auth, (user) => {
+    if (user && globalUserStatus) {
+      const name = user.displayName || user.email.split('@')[0];
+      const photo = user.photoURL 
+        ? '<img src="' + user.photoURL + '" alt="' + name + '" class="user-avatar-img" />' 
+        : '<span class="user-status-dot"></span>';
+      
+      globalUserStatus.innerHTML = '<div class="user-badge">' + photo + '<span>Conectado: <strong>' + name + '</strong></span></div>';
+    } else if (globalUserStatus) {
+      globalUserStatus.innerHTML = '<span style="color: #777;">👤 Visitante (Sin conectar)</span>';
+    }
+  });
+
+  // 3. Acción del Botón "Descubrir Obra" (Requiere login para ver el detalle)
+  if (btnVerObra) {
+    btnVerObra.addEventListener("click", async () => {
+      let user = auth.currentUser;
+
+      // Colapsar sin requerir auth si ya estaba desplegado
+      if (desplegado) {
+        desplegado = false;
+        if (dossierContent) dossierContent.style.display = "none";
+        if (statusTag) statusTag.textContent = "Privado";
+        return;
+      }
+
+      // Requerir login si no hay usuario activo
+      if (!user) {
+        try {
+          console.log("🔒 [Autenticación] Login requerido para ver el dossier...");
+          const result = await signInWithPopup(auth, provider);
+          user = result.user;
+          console.log("✅ [Autenticación] Sesión iniciada por:", user.displayName);
+        } catch (error) {
+          console.error("💥 [Autenticación] El usuario canceló o falló el login:", error);
+          alert("Debes iniciar sesión con tu cuenta de Google para acceder a la información privada y dossier de esta obra.");
+          return;
+        }
+      }
+
+      // Revelar detalle tras autenticación
+      desplegado = true;
+      if (dossierContent) dossierContent.style.display = "block";
+      if (statusTag) statusTag.textContent = "Verificado";
+
+      // Registrar vista única en Firestore
+      try {
+        const esNuevaVista = await guardarVista(user.uid, "JBU-014");
+        if (esNuevaVista) {
+          console.log("✅ [Firestore] Nueva vista única registrada para: JBU-014");
+          await cargarTotalVistas();
+        } else {
+          console.log("ℹ️ [Firestore] Registro existente. Conteo no duplicado.");
+        }
+      } catch (err) {
+        console.error("💥 [Firestore] Error al guardar la vista:", err);
+      }
+    });
+  }
+</script>
 </body>
 </html>

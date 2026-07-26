@@ -2,43 +2,68 @@
  * ==========================================================================
  * ENGINE: Galería, Tienda y Archivo Editorial (JBU)
  * Carga dinámica desde Google Sheets (Publicado como CSV)
- * Optimized for Incremental / Lazy Rendering (2026)
+ * Versión Unificada, Estable y Optimizada
  * ==========================================================================
  */
 
+// --- ESTADO GLOBAL ---
 let galleryDataset = { series: [] };
+let flatArtworks = [];      // Lista plana de obras
+let filteredArtworks = [];  // Obras tras aplicar filtros/búsqueda
+let currentPage = 1;
+const ITEMS_PER_PAGE = 12;
 
 // CONFIGURACIÓN DE GOOGLE SHEETS
 const SPREADSHEET_ID = "1uY0_p8BCl4Fs-MZMzWWYVdT33_d4BHEI-BVJtS3ednw"; 
 const SHEET_NAME = "Catalogo"; 
 const GOOGLE_SHEETS_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRU6VDnbC00SbibTH3o8zEmOUplzNQKNV-3I99GB8MI9NVBz1J4PUdHahXGqSi_4JBVvFerrpQpwlYw/pub?output=csv`;
 
-// Variables para control de carga incremental
-let pendingSeriesToRender = [];
-const SERIES_BATCH_SIZE = 1; // Renderiza 1 serie completa a la vez durante el scroll
+// Variables para Lightbox
+let currentWorkIndex = 0;
+let touchStartX = 0;
+let touchEndX = 0;
 
+// --- INICIALIZACIÓN ÚNICA DEL DOM ---
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Cargar datos principales
     loadGalleryData();
-    
-    // Inicializar hidratación si estamos en página de detalle
+
+    // 2. Inicializar Lightbox
+    initLightboxEngine();
+
+    // 3. Hidratación en página de detalle (si aplica)
     if (document.getElementById("live-original-cta")) {
         hydrateDetailPage();
     }
+
+    // 4. Configurar escuchadores de los filtros
+    setupFilterListeners();
 });
 
 /**
- * Carga los datos de Google Sheets de forma eficiente
+ * Carga los datos de Google Sheets
  */
 async function loadGalleryData() {
     try {
-        console.log("Sincronizando de forma incremental con Google Sheets...");
+        console.log("Sincronizando con Google Sheets...");
         const response = await fetch(GOOGLE_SHEETS_CSV_URL);
         if (!response.ok) throw new Error(`Error: ${response.statusText}`);
         
         const csvText = await response.text();
-        galleryDataset = parseCSVToGalleryDataset(csvText);
         
-        initGalleryEngine();
+        // Parsea CSV a lista plana y reconstruye dataset estructurado
+        flatArtworks = parseCSVToFlatArray(csvText);
+        console.log(JSON.stringify(flatArtworks));
+        galleryDataset = buildGalleryDatasetFromFlat(flatArtworks);
+console.log(`Se organizaron ${galleryDataset.series.length} series de obras.`);
+        // Configurar dropdowns de filtro e inicializar vista
+        populateSeriesDropdown();
+        applyFiltersAndRender();
+        
+        // Activar vista previa de Hero/Sidebar con la primera obra
+        const firstWork = getFirstAvailableArtwork();
+        if (firstWork) setupInitialState(firstWork);
+
     } catch (error) {
         console.error("No se pudo inicializar la galería:", error);
         const gridContainer = document.getElementById("codeGrid");
@@ -53,246 +78,241 @@ async function loadGalleryData() {
     }
 }
 
-/**
- * Parser CSV Ultra-Rápido basado en Expresiones Regulares
- */
-/**
- * Parser CSV Seguro y de Alto Rendimiento (Corrige el bucle infinito)
- */
-function parseCSVToGalleryDataset(csvText) {
+// ==========================================================================
+// PARSER CSV A DATASET (LINEAL Y SEGURO)
+function parseCSVToFlatArray(csvText) {
+    if (!csvText) return [];
     const lines = csvText.split(/\r?\n/);
-    if (lines.length < 2) return { series: [] };
+    if (lines.length < 2) return [];
 
-    // Función auxiliar para parsear una sola línea respetando comillas dobles
-    const parseCSVLine = (line) => {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            if (char === '"') {
-                if (inQuotes && line[i + 1] === '"') {
-                    current += '"';
-                    i++; // Ignora la segunda comilla
-                } else {
-                    inQuotes = !inQuotes; // Entra o sale de comillas
-                }
-            } else if (char === ',' && !inQuotes) {
-                result.push(current);
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        result.push(current);
-        return result;
-    };
+    // Normalizar encabezados: minúsculas, sin comillas, y removiendo espacios internos
+    const headers = parseCSVLine(lines[0]).map(h => 
+        h.trim().toLowerCase().replace(/['"]/g, '').replace(/\s+/g, '')
+    );
+    
+    const items = [];
+    console.log(`Encabezados normalizados: ${headers.join(", ")}`);
 
-    // Extraer cabeceras limpias de la primera fila
-    const headers = parseCSVLine(lines[0]).map(h => h.trim());
-
-    const colIdx = {
-        seriesTitle: headers.indexOf("Series Title"),
-        code: headers.indexOf("Code"),
-        title: headers.indexOf("Title"),
-        year: headers.indexOf("Year"),
-        technique: headers.indexOf("Technique"),
-        size: headers.indexOf("Size"),
-        image: headers.indexOf("Image"),
-        description: headers.indexOf("Description"),
-        isAvailable: headers.indexOf("IsAvailable"),
-        originalPrice: headers.indexOf("Original Price"),
-        stripeUrl: headers.indexOf("Stripe URL"),
-        printsJson: headers.indexOf("Prints JSON"),
-        marketplaceTitle: headers.indexOf("Marketplace Title")
-    };
-
-    const seriesMap = new Map();
-
-    // Procesar las filas de datos
     for (let i = 1; i < lines.length; i++) {
-        const rowText = lines[i];
-        if (!rowText.trim()) continue; // Ignorar filas vacías de separación
+        const line = lines[i].trim();
+        if (!line) continue;
 
-        const cells = parseCSVLine(rowText);
+        const values = parseCSVLine(line);
+        const row = {};
 
-        // Validar que al menos exista el código de la obra para procesar
-        if (cells.length < headers.length || !cells[colIdx.code]) continue;
+        headers.forEach((header, index) => {
+            row[header] = values[index] !== undefined ? values[index].trim() : "";
+        });
 
-        const seriesTitle = (cells[colIdx.seriesTitle] || "General").trim();
-        if (!seriesMap.has(seriesTitle)) {
-            seriesMap.set(seriesTitle, {
-                seriesTitle: seriesTitle,
-                seriesDescription: `Colección de obras pertenecientes a la serie ${seriesTitle}.`,
-                works: []
+        // Mapeo flexible detectando nombres de columnas
+        const code = row.code || row.codigo || row.id || "";
+        const title = row.title || row.titulo || row.obra || row.nombre || "";
+
+        if (code || title) {
+            const availableVal = String(row.isavailable || row.disponible || row.estatus || "").toUpperCase();
+            const isAvailable = availableVal !== "FALSE" && availableVal !== "VENDIDO" && availableVal !== "SOLD";
+
+            // Normalización del nombre de la serie
+            const seriesName = row.seriestitle || row.series || row.serie || row.serietitulo || "General";
+
+            items.push({
+                code: code,
+                title: title || "Sin Título",
+                series: seriesName,
+                seriesTitle: seriesName, // Por compatibilidad si otra función usa esta propiedad
+                year: row.year || row.anio || row.año || "",
+                medium: row.medium || row.technique || row.tecnica || row.medio || "",
+                technique: row.technique || row.medium || row.tecnica || row.medio || "",
+                dimensions: row.dimensions || row.size || row.medidas || row.dimensiones || "",
+                size: row.size || row.dimensions || row.medidas || row.dimensiones || "",
+                image: row.image || row.imagen || row.foto || row.url || "",
+                description: row.description || row.descripcion || "",
+                isAvailable: isAvailable,
+                originalPrice: row.originalprice || row.precio || row.price || "",
+                price: row.price || row.originalprice || row.precio || "0",
+                stripeUrl: row.stripeurl || row.stripe || row.link || "",
+                status: row.status || row.estatus || (isAvailable ? "AVAILABLE" : "SOLD")
             });
         }
-
-        let prints = [];
-        const rawPrints = cells[colIdx.printsJson];
-        if (rawPrints && rawPrints.trim() !== "" && rawPrints !== "[]") {
-            try { 
-                prints = JSON.parse(rawPrints); 
-            } catch(e) {
-                console.warn(`Error parseando prints en fila ${i}:`, e);
-            }
-        }
-
-        seriesMap.get(seriesTitle).works.push({
-            code: (cells[colIdx.code] || "").trim(),
-            title: (cells[colIdx.title] || "").trim(),
-            year: (cells[colIdx.year] || "").trim(),
-            technique: (cells[colIdx.technique] || "").trim(),
-            size: (cells[colIdx.size] || "").trim(),
-            image: (cells[colIdx.image] || "").trim(),
-            description: (cells[colIdx.description] || "").trim(),
-            isAvailable: (cells[colIdx.isAvailable] || "").trim().toUpperCase() === "TRUE",
-            originalPrice: cells[colIdx.originalPrice] ? cells[colIdx.originalPrice].trim() : "",
-            stripeUrl: cells[colIdx.stripeUrl] ? cells[colIdx.stripeUrl].trim() : "",
-            prints: prints,
-            marketplaceTitle: cells[colIdx.marketplaceTitle] ? cells[colIdx.marketplaceTitle].trim() : ""
-        });
     }
-
-    return { series: Array.from(seriesMap.values()) };
+    return items;
 }
 
-/**
- * Inicialización asíncrona y progresiva del catálogo
- */
-function initGalleryEngine() {
-    const firstActiveWork = getFirstAvailableArtwork();
-    if (firstActiveWork) {
-        setupInitialState(firstActiveWork);
-    }
+function parseCSVLine(line) {
+    const values = [];
+    let currentValue = '';
+    let insideQuotes = false;
 
-    // Clonamos las series para el renderizado por demanda
-    pendingSeriesToRender = [...galleryDataset.series];
-    
-    const gridContainer = document.getElementById("codeGrid");
-    if (gridContainer) gridContainer.innerHTML = ""; 
-
-    // Renderizado del lote inicial (Primera serie) de manera inmediata
-    renderNextSeriesBatch();
-
-    // Configurar el scroll infinito / incremental para el resto
-    setupIncrementalRenderObserver();
-}
-
-/**
- * Renderiza el lote de series en formato Masonry continuo
- */
-function renderNextSeriesBatch() {
-    const gridContainer = document.getElementById("codeGrid");
-    if (!gridContainer || pendingSeriesToRender.length === 0) return;
-
-    const catalogHeaderBlock = document.querySelector(".catalog-header-block");
-    const batch = pendingSeriesToRender.splice(0, SERIES_BATCH_SIZE);
-    
-    const currentIndex = galleryDataset.series.length - pendingSeriesToRender.length - batch.length;
-    let htmlBuffer = "";
-
-    batch.forEach((currentSeries, index) => {
-        const absoluteIndex = currentIndex + index;
-
-        if (absoluteIndex === 0 && catalogHeaderBlock) {
-            catalogHeaderBlock.innerHTML = `
-                <span class="metadata-label">Archivo de Obra</span>
-                <h3 class="catalog-section-title">Colección ${currentSeries.seriesTitle}</h3>
-                <p class="artist-manifesto" style="margin-top: 12px; max-width: 600px; font-size: 0.95rem; line-height: 1.6;">
-                    ${currentSeries.seriesDescription || ''}
-                </p>
-            `;
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+            values.push(currentValue.trim().replace(/^"|"$/g, ''));
+            currentValue = '';
         } else {
-            htmlBuffer += `
-                <div class="catalog-header-block" style="column-span: all; width: 100%; margin-top: 50px; margin-bottom: 25px;">
-                    <span class="metadata-label">Colección</span>
-                    <h3 class="catalog-section-title" style="margin-top: 5px;">${currentSeries.seriesTitle}</h3>
-                    <p class="artist-manifesto" style="margin-top: 8px; max-width: 600px; font-size: 0.95rem; line-height: 1.6;">
-                        ${currentSeries.seriesDescription || ''}
-                    </p>
-                    <hr class="separator-line" style="margin-top: 20px; border: 0; border-top: 1px solid var(--cds-border-subtle, #e0e0e0);">
-                </div>
-            `;
+            currentValue += char;
         }
+    }
+    values.push(currentValue.trim().replace(/^"|"$/g, ''));
+    return values;
+}
 
-        currentSeries.works.forEach(art => {
-            htmlBuffer += `
-                <article class="editorial-artwork-card dynamic-load" data-code="${art.code}">
-                    <div class="card-media-canvas">
-                        <img class="card-image" src="${art.image}" alt="${art.title}" loading="lazy">
-                    </div>
-                    <div class="card-caption-overlay">
-                        <h4 class="mosaic-title">${art.title}</h4>
-                        <span class="mosaic-meta">${art.year} — ${art.size}</span>
-                        <span class="mosaic-medium">${art.technique}</span>
-                    </div>
-                </article>
-            `;
+function buildGalleryDatasetFromFlat(flatList) {
+    const seriesMap = {};
+    flatList.forEach(item => {
+        const sName = item.seriestitle || "General";
+        if (!seriesMap[sName]) {
+            seriesMap[sName] = {
+                seriesTitle: sName,
+                seriesDescription: "",
+                works: []
+            };
+        }
+        seriesMap[sName].works.push(item);
+    });
+    return { series: Object.values(seriesMap) };
+}
+
+// ==========================================================================
+// FILTRADO, PAGINACIÓN Y RENDERIZADO
+// ==========================================================================
+
+function setupFilterListeners() {
+    const searchInput = document.getElementById("filterSearch");
+    const seriesSelect = document.getElementById("filterSeries") || document.getElementById("filter-series");
+    const statusSelect = document.getElementById("filterStatus") || document.getElementById("filter-status");
+    const sortSelect = document.getElementById("sortOrder") || document.getElementById("sort-by");
+    const btnLoadMore = document.getElementById("btnLoadMore");
+
+    if (searchInput) searchInput.addEventListener("input", applyFiltersAndRender);
+    if (seriesSelect) seriesSelect.addEventListener("change", applyFiltersAndRender);
+    if (statusSelect) statusSelect.addEventListener("change", applyFiltersAndRender);
+    if (sortSelect) sortSelect.addEventListener("change", applyFiltersAndRender);
+
+    if (btnLoadMore) {
+        btnLoadMore.addEventListener("click", () => {
+            currentPage++;
+            renderCurrentPage(true);
         });
+    }
+}
+
+function populateSeriesDropdown() {
+    const seriesSelect = document.getElementById("filterSeries") || document.getElementById("filter-series");
+    if (!seriesSelect) return;
+
+    seriesSelect.innerHTML = `<option value="ALL">Todas las series</option>`;
+    const seriesSet = new Set(flatArtworks.map(art => art.series).filter(Boolean));
+    
+    seriesSet.forEach(seriesName => {
+        const option = document.createElement("option");
+        option.value = seriesName;
+        option.textContent = seriesName;
+        seriesSelect.appendChild(option);
+    });
+}
+
+function applyFiltersAndRender() {
+    const searchVal = document.getElementById("filterSearch")?.value.toLowerCase().trim() || "";
+    const seriesVal = (document.getElementById("filterSeries") || document.getElementById("filter-series"))?.value || "ALL";
+    const statusVal = (document.getElementById("filterStatus") || document.getElementById("filter-status"))?.value || "ALL";
+    const sortVal = (document.getElementById("sortOrder") || document.getElementById("sort-by"))?.value || "DEFAULT";
+
+    // 1. Filtrar
+    filteredArtworks = flatArtworks.filter(art => {
+        const matchesSearch = !searchVal || 
+            (art.title && art.title.toLowerCase().includes(searchVal)) ||
+            (art.medium && art.medium.toLowerCase().includes(searchVal));
+            
+        const matchesSeries = (seriesVal === "ALL") || (art.series === seriesVal);
+        const matchesStatus = (statusVal === "ALL") || 
+            (statusVal === "AVAILABLE" && art.isAvailable) || 
+            (statusVal === "SOLD" && !art.isAvailable);
+
+        return matchesSearch && matchesSeries && matchesStatus;
     });
 
-    gridContainer.insertAdjacentHTML("beforeend", htmlBuffer);
+    // 2. Ordenar
+    filteredArtworks.sort((a, b) => {
+        if (sortVal === "TITLE_ASC") return (a.title || "").localeCompare(b.title || "");
+        if (sortVal === "TITLE_DESC") return (b.title || "").localeCompare(a.title || "");
+        if (sortVal === "PRICE_ASC") return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
+        if (sortVal === "PRICE_DESC") return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
+        if (sortVal === "NEWEST") return (b.year || 0) - (a.year || 0);
+        if (sortVal === "OLDEST") return (a.year || 0) - (b.year || 0);
+        return 0;
+    });
+
+    // 3. Resetear Paginación y Dibujar
+    currentPage = 1;
+    renderCurrentPage(false);
+}
+
+function renderCurrentPage(append = false) {
+    const grid = document.getElementById("codeGrid");
+    const loadMoreContainer = document.getElementById("loadMoreContainer");
+    if (!grid) return;
+
+    if (!append) grid.innerHTML = "";
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = currentPage * ITEMS_PER_PAGE;
+    const itemsToShow = filteredArtworks.slice(startIndex, endIndex);
+
+    let htmlChunk = "";
+    itemsToShow.forEach(art => {
+        htmlChunk += `
+            <article class="editorial-artwork-card dynamic-load" data-code="${art.code}">
+                <div class="card-media-canvas">
+                    <img class="card-image" src="${art.image}" alt="${art.title}" loading="lazy" />
+                </div>
+                <div class="card-caption-overlay">
+                    <h4 class="mosaic-title">${art.title || 'Sin Título'}</h4>
+                    <p class="mosaic-meta">${art.year || ''} ${art.dimensions ? '• ' + art.dimensions : ''}</p>
+                    <span class="mosaic-medium">${art.medium || ''}</span>
+                </div>
+            </article>
+        `;
+    });
+
+    grid.insertAdjacentHTML("beforeend", htmlChunk);
+
+    // Manejo de visibilidad del botón "Cargar Más"
+    if (loadMoreContainer) {
+        loadMoreContainer.style.display = endIndex < filteredArtworks.length ? "block" : "none";
+    }
 
     setupInteractionsForCards();
     setupLazyLoadingObserver();
 }
 
-/**
- * Observer para detectar cuándo el usuario se acerca al final de la página y cargar más series
- */
-function setupIncrementalRenderObserver() {
-    const gridContainer = document.getElementById("codeGrid");
-    if (!gridContainer) return;
-
-    // Elemento centinela al final del grid
-    let sentinel = document.getElementById("render-sentinel");
-    if (!sentinel) {
-        sentinel = document.createElement("div");
-        sentinel.id = "render-sentinel";
-        sentinel.style.height = "20px";
-        sentinel.style.gridColumn = "span 12";
-        gridContainer.after(sentinel);
-    }
-
-    const scrollObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && pendingSeriesToRender.length > 0) {
-            renderNextSeriesBatch();
-        }
-    }, { rootMargin: "300px" }); // Empieza a cargar 300px antes de llegar al fondo
-
-    scrollObserver.observe(sentinel);
-}
+// ==========================================================================
+// INTERACCIONES Y HERO / SIDEBAR
+// ==========================================================================
 
 function setupInteractionsForCards() {
     const cards = document.querySelectorAll(".editorial-artwork-card.dynamic-load");
     
     cards.forEach(card => {
-        card.classList.remove("dynamic-load"); // Evitamos duplicar eventos
+        card.classList.remove("dynamic-load");
         const artCode = card.getAttribute("data-code");
         const selectedArt = findArtworkByCode(artCode);
         if (!selectedArt) return;
 
-        // 1. En Desktop (mouse): Actualiza el panel lateral al pasar el cursor
         card.addEventListener("mouseenter", () => updateSidebarMetadata(selectedArt));
         
-        // 2. Clic directo: Abre el Lightbox para navegar obra por obra en pantalla completa
         card.addEventListener("click", (e) => {
             e.preventDefault();
-            
-            // Actualiza la barra lateral/hero en segundo plano por si el usuario cierra el modal
             updateSidebarMetadata(selectedArt);
             updateHeroSection(selectedArt);
 
-            // ABRE EL LIGHTBOX INTERACTIVO
             if (typeof openLightboxByCode === "function") {
                 openLightboxByCode(selectedArt.code);
             }
         });
     });
 
-    // Configuración del Hero (mantiene la interacción si el usuario hace doble clic en el panel)
     const heroImg = document.getElementById("hero-img-display");
     if (heroImg && !heroImg.dataset.hooked) {
         heroImg.dataset.hooked = "true";
@@ -308,12 +328,9 @@ function setupInteractionsForCards() {
         });
     }
 }
-/**
- * IntersectionObserver para efectos visuales Fade-In nativos en las tarjetas
- */
+
 function setupLazyLoadingObserver() {
     const cards = document.querySelectorAll(".editorial-artwork-card:not(.observed)");
-    
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -329,40 +346,6 @@ function setupLazyLoadingObserver() {
     });
 }
 
-// ==========================================================================
-// FUNCIONES AUXILIARES Y DE BÚSQUEDA (Mantenidas idénticas para compatibilidad)
-// ==========================================================================
-
-function getFirstAvailableArtwork() {
-    if (galleryDataset.series?.length > 0) {
-        const firstSeriesWithWorks = galleryDataset.series.find(s => s.works?.length > 0);
-        return firstSeriesWithWorks ? firstSeriesWithWorks.works[0] : null;
-    }
-    return null;
-}
-
-function findArtworkByCode(code) {
-    let found = null;
-    if (galleryDataset.series) {
-        for (const s of galleryDataset.series) {
-            found = s.works.find(w => w.code === code);
-            if (found) break;
-        }
-    }
-    return found;
-}
-
-function findArtworkByTitle(title) {
-    let found = null;
-    if (galleryDataset.series) {
-        for (const s of galleryDataset.series) {
-            found = s.works.find(w => w.title === title);
-            if (found) break;
-        }
-    }
-    return found;
-}
-
 function updateSidebarMetadata(art) {
     const titleEl = document.getElementById("meta-title");
     const mediumEl = document.getElementById("meta-medium");
@@ -371,8 +354,8 @@ function updateSidebarMetadata(art) {
     const ctaWrapper = document.getElementById("original-cta-wrapper");
 
     if (titleEl) titleEl.textContent = art.title;
-    if (mediumEl) mediumEl.textContent = art.technique;
-    if (sizeEl) sizeEl.textContent = art.size;
+    if (mediumEl) mediumEl.textContent = art.technique || art.medium;
+    if (sizeEl) sizeEl.textContent = art.size || art.dimensions;
     if (yearEl) yearEl.textContent = art.year;
 
     if (ctaWrapper) {
@@ -411,7 +394,7 @@ function updateHeroSection(art) {
         heroImg.alt = `Obra seleccionada: ${art.title}`;
         
         if (heroTitle) heroTitle.textContent = art.title;
-        if (heroSpecs) heroSpecs.textContent = `${art.technique} — ${art.size} (${art.year})`;
+        if (heroSpecs) heroSpecs.textContent = `${art.technique || art.medium} — ${art.size || art.dimensions} (${art.year})`;
 
         if (heroActionContainer) {
             heroActionContainer.innerHTML = art.isAvailable ? `
@@ -428,7 +411,6 @@ function updateHeroSection(art) {
 
 function setupInitialState(initialArt) {
     updateSidebarMetadata(initialArt);
-    
     const heroImg = document.getElementById("hero-img-display");
     if (heroImg) {
         heroImg.src = initialArt.image;
@@ -437,23 +419,13 @@ function setupInitialState(initialArt) {
     }
     
     if (document.getElementById("hero-title-display")) document.getElementById("hero-title-display").textContent = initialArt.title;
-    if (document.getElementById("hero-specs-display")) document.getElementById("hero-specs-display").textContent = `${initialArt.technique} — ${initialArt.size} (${initialArt.year})`;
-    
-    const heroActionContainer = document.getElementById("hero-action-container");
-    if (heroActionContainer) {
-        heroActionContainer.innerHTML = initialArt.isAvailable ? `
-            <a href="obras/${initialArt.code}.html" class="btn-editorial-action" style="text-decoration: none; display: inline-block; padding: 10px 20px; background: #0f1115; color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
-                Solicitar Ficha Técnica — ${initialArt.code}
-            </a>` : `
-            <span class="label-editorial-sold" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6f6f6f; font-weight: 600;">
-                Colección Privada
-            </span>`;
-    }
+    if (document.getElementById("hero-specs-display")) document.getElementById("hero-specs-display").textContent = `${initialArt.technique || initialArt.medium} — ${initialArt.size || initialArt.dimensions} (${initialArt.year})`;
 }
 
-/**
- * Hidratación optimizada para páginas de detalles individuales
- */
+// ==========================================================================
+// PÁGINA DE DETALLE (HIDRATACIÓN)
+// ==========================================================================
+
 async function hydrateDetailPage() {
     const originalContainer = document.getElementById("live-original-cta");
     const printsContainer = document.getElementById("live-prints-cta");
@@ -463,11 +435,11 @@ async function hydrateDetailPage() {
     if (!WORK_CODE) return;
 
     try {
-        if (!galleryDataset.series || galleryDataset.series.length === 0) {
+        if (flatArtworks.length === 0) {
             const response = await fetch(GOOGLE_SHEETS_CSV_URL);
             if (!response.ok) throw new Error("Error leyendo base de datos");
             const csvText = await response.text();
-            galleryDataset = parseCSVToGalleryDataset(csvText);
+            flatArtworks = parseCSVToFlatArray(csvText);
         }
 
         const currentWork = findArtworkByCode(WORK_CODE);
@@ -482,52 +454,14 @@ async function hydrateDetailPage() {
                     <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
                         <div style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted);">Disponible — ${currentWork.originalPrice}</div>
                         <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                            Pasarela de pago directo en línea para esta pieza en proceso de configuración. Si deseas adquirirla hoy, puedes contactarme directamente dando clic al botón de WhatsApp de abajo.
+                            Pasarela de pago directo en línea para esta pieza en proceso de configuración. Contacta vía WhatsApp para comprarla hoy.
                         </p>
                     </div>`;
             } else {
                 originalContainer.innerHTML = `
                     <div class="original-sold-container" style="border: 1px dashed var(--border-color); padding: 18px; background-color: rgba(255,255,255,0.02); text-align: center; margin-bottom: 8px;">
                         <div class="btn-original-sold" style="margin-bottom: 12px; font-weight: 600; color: #888;">Obra Original: Vendida</div>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                            Esta pieza única ya forma parte de una colección privada. Sin embargo, puedes adquirir una <strong>reproducción Giclée autorizada</strong> abajo o contactarme directamente para encargar una obra comisionada similar.
-                        </p>
                     </div>`;
-            }
-
-            if (printsContainer && currentWork.prints?.length > 0) {
-                const printButtons = currentWork.prints.map(print => {
-                    const buttonText = print.label || "Adquirir Reproducción";
-                    let finalUrl = print.url || "#";
-
-                    if (finalUrl !== "#") {
-                        const separator = finalUrl.includes("?") ? "&" : "?";
-                        finalUrl = `${finalUrl}${separator}client_reference_id=${currentWork.code}`;
-                    }
-
-                    let displayLabel = buttonText;
-                    let displayAction = "Adquirir →";
-                    if (buttonText.includes(" - ")) {
-                        const parts = buttonText.split(" - ");
-                        displayLabel = parts[0];
-                        displayAction = `${parts[1]} →`;
-                    }
-
-                    return `
-                        <a class="print-order-btn" href="${finalUrl}" target="_blank">
-                            <span>${displayLabel}</span>
-                            <strong>${displayAction}</strong>
-                        </a>`;
-                }).join("");
-
-                printsContainer.innerHTML = `
-                    <div class="prints-box" style="margin-top: 16px;">
-                        <span class="prints-title">Reproducciones Giclée (Prints)</span>
-                        <p class="prints-desc">Impresión fine art de calidad de museo bajo demanda, gestionada por Prodigi.</p>
-                        <div class="print-options-grid">${printButtons}</div>
-                    </div>`;
-            } else if (printsContainer) {
-                printsContainer.innerHTML = "";
             }
         }
     } catch (e) {
@@ -538,15 +472,8 @@ async function hydrateDetailPage() {
 }
 
 // ==========================================================================
-// MÓDULO LIGHTBOX / NAVEGADOR OBRAPOR OBRA (CARRUSEL FULLSCREEN)
+// MÓDULO LIGHTBOX
 // ==========================================================================
-
-let allWorksFlat = []; // Arreglo plano para navegar fácilmente
-let currentWorkIndex = 0;
-
-// Variables para gestos táctiles (Swipe en móvil)
-let touchStartX = 0;
-let touchEndX = 0;
 
 function initLightboxEngine() {
     const modal = document.getElementById("artwork-lightbox");
@@ -556,17 +483,14 @@ function initLightboxEngine() {
 
     if (!modal) return;
 
-    // Cerrar modal
-    closeBtn.addEventListener("click", closeLightbox);
+    if (closeBtn) closeBtn.addEventListener("click", closeLightbox);
     modal.addEventListener("click", (e) => {
         if (e.target === modal) closeLightbox();
     });
 
-    // Navegación con botones
-    prevBtn.addEventListener("click", showPrevArtwork);
-    nextBtn.addEventListener("click", showNextArtwork);
+    if (prevBtn) prevBtn.addEventListener("click", showPrevArtwork);
+    if (nextBtn) nextBtn.addEventListener("click", showNextArtwork);
 
-    // Navegación con teclado (Flechas y ESC)
     document.addEventListener("keydown", (e) => {
         if (!modal.classList.contains("active")) return;
         if (e.key === "ArrowLeft") showPrevArtwork();
@@ -574,7 +498,6 @@ function initLightboxEngine() {
         if (e.key === "Escape") closeLightbox();
     });
 
-    // Soporte para gestos táctiles (Móvil)
     modal.addEventListener("touchstart", (e) => {
         touchStartX = e.changedTouches[0].screenX;
     }, false);
@@ -585,49 +508,43 @@ function initLightboxEngine() {
     }, false);
 }
 
-function updateFlatWorksList() {
-    allWorksFlat = [];
-    if (galleryDataset.series) {
-        galleryDataset.series.forEach(s => {
-            if (s.works) allWorksFlat.push(...s.works);
-        });
-    }
-}
-
 function openLightboxByCode(code) {
-    updateFlatWorksList();
-    const index = allWorksFlat.findIndex(w => w.code === code);
+    const index = filteredArtworks.findIndex(w => w.code === code);
     if (index !== -1) {
         currentWorkIndex = index;
         renderLightboxActiveWork();
         const modal = document.getElementById("artwork-lightbox");
-        modal.classList.add("active");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden"; // Evita el scroll de fondo
+        if (modal) {
+            modal.classList.add("active");
+            modal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        }
     }
 }
 
 function closeLightbox() {
     const modal = document.getElementById("artwork-lightbox");
-    modal.classList.remove("active");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = ""; // Restaura el scroll
+    if (modal) {
+        modal.classList.remove("active");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+    }
 }
 
 function showPrevArtwork() {
-    if (allWorksFlat.length === 0) return;
-    currentWorkIndex = (currentWorkIndex - 1 + allWorksFlat.length) % allWorksFlat.length;
+    if (filteredArtworks.length === 0) return;
+    currentWorkIndex = (currentWorkIndex - 1 + filteredArtworks.length) % filteredArtworks.length;
     renderLightboxActiveWork();
 }
 
 function showNextArtwork() {
-    if (allWorksFlat.length === 0) return;
-    currentWorkIndex = (currentWorkIndex + 1) % allWorksFlat.length;
+    if (filteredArtworks.length === 0) return;
+    currentWorkIndex = (currentWorkIndex + 1) % filteredArtworks.length;
     renderLightboxActiveWork();
 }
 
 function renderLightboxActiveWork() {
-    const art = allWorksFlat[currentWorkIndex];
+    const art = filteredArtworks[currentWorkIndex];
     if (!art) return;
 
     const img = document.getElementById("lightbox-img");
@@ -635,17 +552,20 @@ function renderLightboxActiveWork() {
     const specs = document.getElementById("lightbox-specs");
     const cta = document.getElementById("lightbox-cta");
 
-    // Efecto de transición suave
+    if (!img) return;
+
     img.style.opacity = "0";
     img.style.transform = "scale(0.97)";
 
     setTimeout(() => {
         img.src = art.image;
         img.alt = art.title;
-        title.textContent = art.title;
-        specs.textContent = `${art.technique} — ${art.size} (${art.year})`;
-        cta.href = `obras/${art.code}.html`;
-        cta.textContent = art.isAvailable ? `Consultar Adquisición — ${art.originalPrice || ''}` : "Ver Ficha de Obra";
+        if (title) title.textContent = art.title;
+        if (specs) specs.textContent = `${art.technique || art.medium} — ${art.size || art.dimensions} (${art.year})`;
+        if (cta) {
+            cta.href = `obras/${art.code}.html`;
+            cta.textContent = art.isAvailable ? `Consultar Adquisición — ${art.originalPrice || ''}` : "Ver Ficha de Obra";
+        }
 
         img.style.opacity = "1";
         img.style.transform = "scale(1)";
@@ -653,16 +573,23 @@ function renderLightboxActiveWork() {
 }
 
 function handleSwipeGesture() {
-    const swipeThreshold = 50; // Mínimo de distancia en px para detectar el swipe
-    if (touchEndX < touchStartX - swipeThreshold) {
-        showNextArtwork(); // Swipe hacia la izquierda -> Siguiente
-    }
-    if (touchEndX > touchStartX + swipeThreshold) {
-        showPrevArtwork(); // Swipe hacia la derecha -> Anterior
-    }
+    const swipeThreshold = 50;
+    if (touchEndX < touchStartX - swipeThreshold) showNextArtwork();
+    if (touchEndX > touchStartX + swipeThreshold) showPrevArtwork();
 }
 
-// Inicializar cuando el DOM esté listo
-document.addEventListener("DOMContentLoaded", () => {
-    initLightboxEngine();
-});
+// ==========================================================================
+// BÚSQUEDAS AUXILIARES
+// ==========================================================================
+
+function getFirstAvailableArtwork() {
+    return flatArtworks.length > 0 ? flatArtworks[0] : null;
+}
+
+function findArtworkByCode(code) {
+    return flatArtworks.find(w => w.code === code) || null;
+}
+
+function findArtworkByTitle(title) {
+    return flatArtworks.find(w => w.title === title) || null;
+}
