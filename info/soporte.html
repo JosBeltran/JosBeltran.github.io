@@ -1,110 +1,179 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Soporte y Contacto | Josué Beltrán</title>
+  <title>Customer Support & Order Info | Josué Beltrán</title>
   <link rel="stylesheet" href="../styles.css" />
   <style>
-    /* Complementary local styles to ensure beautiful, readable typography on dark background */
-    .support-content h1 {
-      font-size: 2rem;
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      color: #ffffff;
-      border-bottom: 1px solid #333333;
-      padding-bottom: 12px;
+    /* Estilos claros complementarios alineados a la estética blanca/editorial */
+    body {
+      background-color: #ffffff;
+      color: #111111;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
     }
-    .support-content h2 {
-      font-size: 1.25rem;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      color: #e0e0e0;
-    }
-    .support-content p {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #cccccc;
-      margin-bottom: 1.5rem;
-    }
+
     .support-container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 40px 16px;
+      padding: 40px 20px;
     }
+
     .back-link {
       display: inline-block;
       margin-bottom: 2rem;
-      color: #f4f4f4;
+      color: #111111;
       text-decoration: none;
       font-size: 0.9rem;
-      opacity: 0.8;
+      font-weight: 500;
       transition: opacity 0.2s;
     }
     .back-link:hover {
-      opacity: 1;
+      opacity: 0.6;
     }
+
+    .support-content h1 {
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      color: #111111;
+      letter-spacing: -0.5px;
+    }
+
+    .support-content h2 {
+      font-size: 1.25rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: #111111;
+      border-bottom: 1px solid #eeeeee;
+      padding-bottom: 8px;
+    }
+
+    .support-content p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #444444;
+      margin-bottom: 1rem;
+    }
+
+    .lang-section {
+      margin-bottom: 2rem;
+    }
+
     .contact-card {
-      background: #1e1e1e;
-      border: 1px solid #333333;
-      border-radius: 4px;
+      background: #f9f9f9;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
       padding: 24px;
       margin-top: 1.5rem;
     }
+
     .contact-method {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
+    .contact-method:last-child {
+      margin-bottom: 0;
+    }
+
     .contact-method strong {
       display: block;
-      color: #ffffff;
-      font-size: 1.1rem;
+      color: #111111;
+      font-size: 1rem;
       margin-bottom: 0.25rem;
     }
+
     .contact-method a {
-      color: #6366f1;
-      text-decoration: none;
-      font-size: 1rem;
+      color: #000000;
+      font-weight: 600;
+      text-decoration: underline;
+      font-size: 0.95rem;
     }
     .contact-method a:hover {
-      text-decoration: underline;
+      color: #555555;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background-color: #f0f0f0;
+      color: #333;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
     }
   </style>
 </head>
-<body style="background-color: #161616; color: #f4f4f4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<body>
 
 <main class="artwork-page">
   <div class="support-container">
-    <a href="../index.html" class="back-link">← Volver al catálogo</a>
+    <a href="../index.html" class="back-link">← Return to Catalog / Volver al catálogo</a>
 
     <article class="support-content">
-      <h1>Soporte al Cliente y Contacto</h1>
-      <p>¿Tienes alguna duda con el proceso de adquisición, métodos de pago seguros de Stripe, o requieres información detallada sobre el envío nacional o internacional de alguna de las piezas del catálogo?</p>
-      
-      <p>Por favor contáctame directamente a través de cualquiera de las vías listadas a continuación. Trato de responder a todas las consultas de coleccionistas y entusiastas en menos de 24 horas.</p>
+      <div class="lang-section">
+        <h1>Customer Support & Order Information</h1>
+        <p>Welcome to my studio store. Whether you are acquiring an original piece or ordering a phone case, transparency and collector satisfaction are my highest priorities. All payments are securely processed via <strong>Stripe Encryption</strong>.</p>
+
+        <h2>Original Artworks (Pinturas Originales)</h2>
+        <span class="badge-tag">Priced in MXN (Pesos Mexicanos)</span>
+        <p>All original physical paintings are priced in Mexican Pesos (MXN). Each artwork is carefully hand-packed in crate/reinforced casing and insured for international or domestic shipping. Once dispatched via courier (FedEx, DHL, or UPS), you will receive a tracking number within 3 to 5 business days to follow your shipment in real time.</p>
+
+        <h2>Phone Cases (Fundas para Celular)</h2>
+        <span class="badge-tag">US Shipping Only / Envíos Solo a EE. UU.</span>
+        <p>Phone cases are fulfilled through our specialized print-on-demand partner <strong>Prodigi</strong>. Upon successful payment on Stripe, your order is automatically generated and submitted to production. You will receive an email confirmation with your estimated delivery date, followed by full tracking details once the order leaves the facility.</p>
+
+        <h2>Track Your Order</h2>
+        <p>If you already have a tracking number or order ID, you can check your shipment status directly on our <a href="./tracking.html" style="color:#111; text-decoration:underline;">Tracking Page</a>.</p>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;" />
+
+      <div class="lang-section">
+        <h1>Soporte al Cliente e Información de Compras</h1>
+        <p>Bienvenido a mi tienda de estudio. Ya sea que adquieras una obra original o una funda para celular, mi prioridad es brindarte total transparencia y confianza. Todos los pagos son procesados con la mayor seguridad en la plataforma <strong>Stripe</strong>.</p>
+
+        <h2>Obras de Arte Originales</h2>
+        <span class="badge-tag">Precios en Pesos Mexicanos (MXN)</span>
+        <p>Todas las pinturas originales están cotizadas en Pesos Mexicanos (MXN). Cada pieza original se embala cuidadosamente con protección reforzada y asegurada para envío nacional o internacional. Tras procesar tu pago, recibirás en un plazo de 3 a 5 días hábiles tu número de guía (FedEx, DHL o UPS) para rastrear el trayecto en tiempo real.</p>
+
+        <h2>Fundas para Celular (Phone Cases)</h2>
+        <span class="badge-tag">Disponible Exclusivamente para Estados Unidos</span>
+        <p>Por el momento, los pedidos de fundas solo se procesan y envían dentro de Estados Unidos. Una vez realizado tu pago, tu orden se genera automáticamente con nuestro socio de impresión <strong>Prodigi</strong>. Se notificará inmediatamente por correo la fecha estimada de entrega y se te brindará la guía en cuanto salga de producción.</p>
+
+        <h2>Seguimiento de Envíos</h2>
+        <p>Si ya cuentas con tu número de guía, puedes verificar el estado de tu pedido en nuestra <a href="./tracking.html" style="color:#111; text-decoration:underline;">Sección de Seguimiento a Envíos</a>.</p>
+      </div>
 
       <div class="contact-card">
+        <h2 style="margin-top: 0; border: none; padding: 0;">Direct Contact & Support / Contacto Directo</h2>
+        
         <div class="contact-method">
-          <strong>Enlace Directo por WhatsApp</strong>
-          <a href="https://wa.me/528123518298?text=Hola%20Josue%2C%20tengo%20una%20duda%20acerca%20de%20tus%20obras%20y%20el%20envio" target="_blank">
-            Enviar mensaje por WhatsApp (+52 81 2351 8298)
+          <strong>WhatsApp Direct Line:</strong>
+          <a href="https://wa.me/528123518298?text=Hello%20Josue%2C%20I%20have%20a%20question%20about%20your%20artworks" target="_blank">
+            +52 81 2351 8298 (Send Message)
           </a>
         </div>
 
         <div class="contact-method">
-          <strong>Correo Electrónico de Soporte</strong>
-          <a href="mailto:soporte@josuebeltranuresti.com">
-            soporte@josuebeltranuresti.com
+          <strong>Email Support:</strong>
+          <a href="mailto:josue.beltran.u@gmail.com">
+            josue.beltran.u@gmail.com
           </a>
         </div>
 
         <div class="contact-method">
-          <strong>Horario de Atención</strong>
-          <p style="margin: 0; font-size: 0.9rem; color: #aaaaaa;">Lunes a Sábado — 9:00 AM a 7:00 PM (GMT-6, Monterrey, México)</p>
+          <strong>Business Hours / Horario de Atención:</strong>
+          <p style="margin: 0; font-size: 0.85rem; color: #666666;">
+            Monday to Saturday — 9:00 AM to 7:00 PM (GMT-6, Monterrey, NL, Mexico)
+          </p>
         </div>
       </div>
 
-      <h2>Seguimiento de Envíos</h2>
-      <p>Si ya procesaste el pago de tu obra de arte y recibiste el enlace de cobro de Stripe, en un plazo máximo de 3 a 5 días hábiles recibirás en tu correo electrónico de compra el número de guía de paquetería (FedEx, DHL o UPS) con el cual podrás verificar el tránsito en tiempo real.</p>
     </article>
   </div>
 </main>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking | Rastrear Envío</title>
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-editorial: 'Italiana', serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --bg-color: #ffffff;
+            --card-bg: #f9f9f9;
+            --text-color: #111111;
+            --border-color: #e5e5e5;
+            --accent-color: #000000;
+            --status-bg: #eeeeee;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background: var(--bg-color); color: var(--text-color); padding: 40px 16px; line-height: 1.5; }
+        
+        .tracking-container { max-width: 680px; margin: 0 auto; }
+        
+        /* Header & Lang Toggle */
+        .tracking-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; }
+        .tracking-title { font-family: var(--font-editorial); font-size: 2rem; letter-spacing: 1px; text-transform: uppercase; }
+        .lang-btn { background: transparent; border: 1px solid var(--border-color); padding: 6px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; transition: all 0.2s; }
+        .lang-btn:hover { background: #f0f0f0; }
+
+        /* Search Form */
+        .search-box { display: flex; gap: 8px; margin-bottom: 32px; }
+        .search-input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--accent-color); }
+        .search-button { background: var(--accent-color); color: #ffffff; border: none; padding: 12px 24px; cursor: pointer; font-size: 0.95rem; font-weight: 500; transition: opacity 0.2s; }
+        .search-button:hover { opacity: 0.85; }
+
+        /* Dynamic Output Area */
+        #tracking-results { margin-top: 24px; }
+        
+        /* CSS inyectado dinámicamente para las tarjetas de resultados */
+        .track-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 4px; margin-bottom: 24px; }
+        .track-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px dashed var(--border-color); padding-bottom: 12px; }
+        .track-id-title { font-weight: 600; font-size: 1.1rem; }
+        .status-badge { background: var(--accent-color); color: #fff; padding: 4px 10px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 2px; }
+        
+        .track-data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .data-item { font-size: 0.9rem; }
+        .data-item strong { display: block; color: #666666; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        
+        .carrier-link { display: inline-block; background: #000; color: #fff; text-decoration: none; padding: 10px 18px; font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .carrier-link:hover { background: #333; }
+        
+        .error-msg { background: #fff0f0; color: #900000; padding: 16px; border: 1px solid #ffd0d0; font-size: 0.95rem; text-align: center; }
+        .loading-spinner { text-align: center; color: #666; padding: 20px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="tracking-container">
+        <header class="tracking-header">
+            <h1 class="tracking-title" id="page-title">Track Your Order</h1>
+            <button class="lang-btn" id="lang-toggle-btn" onclick="toggleLanguage()">ES</button>
+        </header>
+
+        <form class="search-box" onsubmit="handleSearch(event)">
+            <input type="text" id="order-id-input" class="search-input" placeholder="e.g. JBU-1042 or Stripe ID" required>
+            <button type="submit" class="search-button" id="search-btn">Track</button>
+        </form>
+
+        <div id="tracking-results"></div>
+    </div>
+
+    <script src="tracking.js"></script>
+</body>
+</html>
