@@ -6,9 +6,9 @@ const { google } = require("googleapis");
 const SITE_URL = "https://josuebeltranuresti.com";
 const WHATSAPP_NUMBER = "528123518298";
 
-// CONFIGURACIÓN MAESTRA DE GOOGLE SHEETS
-const SPREADSHEET_ID = "1uY0_p8BCl4Fs-MZMzWWYVdT33_d4BHEI-BVJtS3ednw"; 
-const RANGE = "Catalogo!A2:N"; 
+// MASTER GOOGLE SHEETS CONFIGURATION
+const SPREADSHEET_ID = "1uY0_p8BCl4Fs-MZMzWWYVdT33_d4BHEI-BVJtS3ednw";
+const RANGE = "Catalogo!A2:N";
 
 const outputDir = path.join(__dirname, "obras");
 const qrDir = path.join(__dirname, "assets", "qr");
@@ -16,8 +16,24 @@ const qrDir = path.join(__dirname, "assets", "qr");
 fs.mkdirSync(outputDir, { recursive: true });
 fs.mkdirSync(qrDir, { recursive: true });
 
+// Helper function to safely escape HTML entities
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Helper function to sanitize filenames
+function sanitizeFilename(filename) {
+    return filename.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 const auth = new google.auth.GoogleAuth({
-    keyFile: path.join(__dirname, "credentials.json"), 
+    keyFile: path.join(__dirname, "credentials.json"),
     scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
 });
 
@@ -30,300 +46,292 @@ async function getSheetsData() {
         });
         return response.data.values || [];
     } catch (error) {
-        console.error("Error obteniendo datos:", error);
+        console.error("Error reading Google Sheets:", error);
         return [];
     }
 }
 
-function parsePrints(printsString) {
-    if (!printsString) return [];
-    try { return JSON.parse(printsString); } catch (e) { return []; }
-}
-
-function transformRowsToSeriesStructure(rows) {
-    const seriesMap = new Map();
-    for (const row of rows) {
-        const [
-            seriesTitle, code, title, year, technique, size, image, description,
-            isAvailableStr, originalPrice, stripeUrl, printsJson, sketchUrl, notes
-        ] = row;
-
-        if (!code || !seriesTitle) continue;
-
-        const isAvailable = String(isAvailableStr).toUpperCase() === "TRUE";
-
-        const workObj = {
-            code: code.trim(),
-            title: title.trim(),
-            year: year ? year.trim() : "",
-            technique: technique ? technique.trim() : "",
-            size: size ? size.trim() : "",
-            image: image ? image.trim() : "",
-            description: description ? description.trim() : "",
-            availability: {
-                isAvailable,
-                price: originalPrice ? originalPrice.trim() : "",
-                stripeUrl: stripeUrl ? stripeUrl.trim() : ""
-            },
-            prints: parsePrints(printsJson),
-            documentation: (sketchUrl || notes) ? {
-                sketchUrl: sketchUrl ? sketchUrl.trim() : "",
-                notes: notes ? notes.trim() : ""
-            } : null
-        };
-
-        const currentSeriesTitle = seriesTitle.trim();
-        if (!seriesMap.has(currentSeriesTitle)) {
-            seriesMap.set(currentSeriesTitle, { seriesTitle: currentSeriesTitle, works: [] });
-        }
-        seriesMap.get(currentSeriesTitle).works.push(workObj);
-    }
-    return Array.from(seriesMap.values());
-}
-
 (async () => {
     const rows = await getSheetsData();
-    if (rows.length === 0) return;
 
-    const seriesData = transformRowsToSeriesStructure(rows);
-
-    // =======================================================
-    // 1. GENERACIÓN DE SUBPÁGINAS INDIVIDUALES (obras/*.html)
-    // =======================================================
-    for (const serie of seriesData) {
-        const isCase = serie.seriesTitle === "Case Devices";
-
-        for (const work of serie.works) {
-            const pageUrl = `${SITE_URL}/obras/${work.code}.html`;
-            const qrPath = path.join(qrDir, `${work.code}.png`);
-
-            await QRCode.toFile(qrPath, pageUrl, { width: 500, margin: 2 });
-
-            // Textos dinámicos según el tipo de producto
-            const backLinkText = isCase ? "← Volver a Case Devices" : "← Volver al catálogo";
-            const backLinkHref = isCase ? "../cases.html" : "../index.html";
-            const itemLabel = isCase ? "Funda" : "Obra";
-            const buyBtnText = isCase ? "Comprar Funda" : "Adquirir Original";
-            const soldBtnText = isCase ? "Agotado" : "Obra Vendida";
-
-            const whatsappText = encodeURIComponent(
-                isCase 
-                  ? `Hola, me interesa la funda ${work.code} - ${work.title} de Case Devices`
-                  : `Hola, me interesa la obra ${work.code} - ${work.title} de la serie ${serie.seriesTitle}`
-            );
-
-            let documentationHtml = "";
-            if (work.documentation && !isCase) {
-                const hasSketch = !!work.documentation.sketchUrl;
-                documentationHtml = `
-                <div class="documentation-panel" style="margin-top: 2rem; background: #f9f9f9; border: 1px solid #e0e0e0; padding: 24px;">
-                    <h3 style="color: #666666; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; margin-top: 0;">Proceso & Documentación</h3>
-                    ${hasSketch ? `<div style="background: #ffffff; padding: 12px; border: 1px solid #e0e0e0; margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <img src="../${work.documentation.sketchUrl}" alt="Boceto de ${work.title}" style="width: 100%; max-height: 300px; object-fit: contain;" />
-                    </div>` : ''}
-                    ${work.documentation.notes ? `<p style="font-style: italic; color: #555555; line-height: 1.5; font-size: 14px; margin: 0;">"${work.documentation.notes}"</p>` : ''}
-                </div>`;
-            }
-
-            // Bloque dinámico para botón de Stripe/Compra
-            let purchaseBtnHtml = "";
-            if (work.availability.isAvailable && work.availability.stripeUrl) {
-                purchaseBtnHtml = `<a class="btn-original-buy" target="_blank" href="${work.availability.stripeUrl}">${buyBtnText} (${work.availability.price})</a>`;
-            } else if (work.availability.isAvailable) {
-                purchaseBtnHtml = `<a class="btn-original-buy" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">Consultar Disponibilidad</a>`;
-            } else {
-                purchaseBtnHtml = `<div class="btn-original-sold">${soldBtnText}</div>`;
-            }
-let includesHtml = "";
-
-if (!isCase) {
-    includesHtml = `
-    <div class="includes-panel">
-        <h3>Lo que incluye</h3>
-
-        <ul class="includes-list">
-            <li>✓ Obra original única (1 de 1)</li>
-            <li>✓ Firmada por el artista</li>
-            <li>✓ Certificado de autenticidad</li>
-            <li>✓ Marco de presentación incluido (México)</li>
-            <li>✓ Lista para exhibirse inmediatamente</li>
-            <li>✓ Embalaje profesional</li>
-            <li>✓ Envío asegurado</li>
-            <li>✓ Número de rastreo</li>
-        </ul>
-    </div>
-    `;
-}
-            const html = `<!DOCTYPE html>
-<html lang="es" data-theme="white">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${work.code} | ${work.title}</title>
-  <meta name="description" content="${work.description.replace(/"/g, '&quot;')}" />
-  <link rel="stylesheet" href="../styles.css" />
-  <style>
-    body {
-      background-color: #ffffff; color: #111111;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      margin: 0; padding: 0;
-    }
-    .artwork-container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
-    .back-link { display: inline-flex; align-items: center; text-decoration: none; color: #666666; font-size: 0.9rem; margin-bottom: 32px; transition: all 0.2s; }
-    .back-link:hover { color: #111111; transform: translateX(-4px); }
-    .artwork-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; align-items: start; }
-    @media (max-width: 900px) { .artwork-layout { grid-template-columns: 1fr; gap: 40px; } }
-    .artwork-image-column { display: flex; flex-direction: column; gap: 20px; }
-    .artwork-image-wrap { background-color: #fcfcfc; border: 1px solid #e5e5e5; padding: 24px; display: flex; justify-content: center; align-items: center; }
-    .artwork-image { max-width: 100%; max-height: 70vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
-    .artwork-details { position: sticky; top: 40px; }
-    .artwork-code { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #666666; margin: 0 0 12px 0; }
-    h1 { font-size: 2.5rem; font-weight: 400; line-height: 1.2; margin: 0 0 24px 0; letter-spacing: -0.5px; }
-    .meta-grid { border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; padding: 16px 0; margin-bottom: 24px; }
-    .meta-item { display: flex; justify-content: space-between; font-size: 0.95rem; padding: 6px 0; }
-    .meta-item strong { color: #666666; font-weight: 400; }
-    .description { font-size: 1rem; line-height: 1.6; color: #333333; margin-bottom: 32px; }
-    .btn-original-buy { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: #111111; color: #ffffff; text-decoration: none; font-weight: 500; font-size: 15px; transition: background-color 0.2s; }
-    .btn-original-buy:hover { background-color: #333333; }
-    .btn-original-sold { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 16px; background-color: #f5f5f5; color: #999999; border: 1px solid #e5e5e5; font-size: 15px; cursor: not-allowed; }
-    .whatsapp-btn-secondary { display: block; width: 100%; text-align: center; box-sizing: border-box; padding: 14px; border: 1px solid #e5e5e5; background-color: transparent; color: #555555; text-decoration: none; font-size: 14px; margin-top: 12px; transition: all 0.2s; }
-    .whatsapp-btn-secondary:hover { background-color: #f9f9f9; color: #111111; border-color: #888888; }
-    .qr-box { text-align: center; margin-top: 32px; padding: 20px; border: 1px dashed #e5e5e5; }
-    .qr-img { width: 110px; height: 110px; display: block; margin: 0 auto 12px; }
-    .qr-text { color: #666666; font-size: 0.75rem; margin: 0; }
-  </style>
-</head>
-<body>
-<main class="artwork-container">
-  <a href="${backLinkHref}" class="back-link">${backLinkText}</a>
-  <section class="artwork-layout">
-    <div class="artwork-image-column">
-      <div class="artwork-image-wrap"><img src="../${work.image}" alt="${work.title}" class="artwork-image" /></div>
-      ${documentationHtml}
-    </div>
-    <aside class="artwork-details">
-      <p class="artwork-code">${work.code} — ${isCase ? 'Colección' : 'Serie'}: ${serie.seriesTitle}</p>
-      <h1>${work.title}</h1>
-      <div class="meta-grid">
-        <div class="meta-item"><strong>Año:</strong><span>${work.year}</span></div>
-        <div class="meta-item"><strong>${isCase ? 'Compatibilidad / Modelo' : 'Técnica'}:</strong><span>${work.technique}</span></div>
-        <div class="meta-item"><strong>${isCase ? 'Dimensiones' : 'Medida'}:</strong><span>${work.size}</span></div>
-      </div>
-      <p class="description">${work.description}</p>
-      <div class="purchase-section">
-        <div id="live-original-cta">
-            ${purchaseBtnHtml}
-        </div>
-        <a class="whatsapp-btn-secondary" target="_blank" href="https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}">Preguntar por WhatsApp</a>
-      </div>
-      ${includesHtml}
-      <div class="qr-box">
-        <img src="../assets/qr/${work.code}.png" alt="QR ${work.code}" class="qr-img" />
-        <p class="qr-text">Escanea para abrir en tu móvil</p>
-      </div>
-    </aside>
-  </section>
-</main>
-<script src="../app.js"></script>
-</body>
-</html>`;
-
-            fs.writeFileSync(path.join(outputDir, `${work.code}.html`), html, "utf8");
-        }
+    if (rows.length === 0) {
+        console.log("⚠️ No data found in Google Sheets.");
+        return;
     }
 
-    // =======================================================
-    // 2. GENERACIÓN ÚNICA DE LA PÁGINA DE FUNDAS (cases.html)
-    // =======================================================
-    const caseSeries = seriesData.filter(s => s.seriesTitle === "Case Devices");
-    fs.writeFileSync(path.join(__dirname, "cases.html"), buildCasesCatalogTemplate(caseSeries), "utf8");
+    // Process rows into JSON objects
+    const works = rows.map(row => {
+      const series = row[0] ? row[0].trim() : "";
 
-    console.log("¡Hecho! Se generaron las subpáginas personalizadas y la sección cases.html.");
-})();
+const code = row[1] ? row[1].trim() : "";
 
-function buildCasesCatalogTemplate(filteredSeries) {
-    const contentHtml = filteredSeries.map(serie => {
-        const worksGrid = serie.works.map(work => `
-            <div class="artwork-card" style="border: 1px solid #e5e5e5; padding: 16px; background: #ffffff; transition: transform 0.2s ease, border-color 0.2s ease; position: relative;">
-                <a href="obras/${work.code}.html" style="text-decoration: none; color: inherit; display: block;">
-                    <div style="background: #fbfbfb; padding: 16px; display: flex; justify-content: center; align-items: center; margin-bottom: 16px; border: 1px solid #f0f0f0; height: 260px; overflow: hidden;">
-                        <img src="${work.image}" alt="${work.title}" style="max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.05);" />
-                    </div>
-                    <div style="font-size: 0.75rem; color: #666666; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;">${work.code}</div>
-                    <h3 style="font-size: 1.25rem; font-weight: 400; line-height: 1.3; margin: 0 0 8px 0; color: #111111; letter-spacing: -0.3px;">${work.title}</h3>
-                    <p style="font-size: 0.85rem; color: #666666; margin: 0 0 16px 0; line-height: 1.4;">${work.technique}</p>
-                    <div style="border-top: 1px solid #e5e5e5; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.95rem; font-weight: 500; color: #111111;">${work.availability.price || "Consultar"}</span>
-                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #198038;">Disponible</span>
-                    </div>
-                </a>
-            </div>
-        `).join("");
+const title = row[2] ? row[2].trim() : "Untitled";
 
-        return `
-            <div class="catalog-header-block" style="margin-bottom: 32px;">
-                <span class="metadata-label">Colección Exclusiva</span>
-                <h3 class="catalog-section-title">Case Devices</h3>
-            </div>
-            <div class="editorial-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px; margin-bottom: 64px;">
-                ${worksGrid}
-            </div>
-        `;
-    }).join("");
+const year = row[3] ? row[3].trim() : new Date().getFullYear().toString();
 
-    return `<!DOCTYPE html>
-<html lang="es" data-theme="white">
+const technique = row[4] ? row[4].trim() : "Mixed Media";
+
+const dimensions = row[5] ? row[5].trim() : "";
+
+const mainImage = row[6] ? row[6].trim() : "";
+
+const description = row[7] ? row[7].trim() : "";
+
+const status = row[8] && row[8].toUpperCase() === "TRUE"
+    ? "AVAILABLE"
+    : "SOLD";
+
+const price = row[9] ? row[9].trim() : "";
+
+const stripeLink = row[10] ? row[10].trim() : "";
+
+const galleryImages =[];
+
+const sketchPath = row[12] ? row[12].trim() : "";
+
+const processNotes = row[13] ? row[13].trim() : "";
+
+const marketplaceTitle = row[14] ? row[14].trim() : "";
+
+        return {
+            code,
+            cleanCode: sanitizeFilename(code),
+            title,
+            technique,
+            dimensions,
+            year,
+            price,
+            status,
+            mainImage,
+            stripeLink,
+            description,
+            series,
+            galleryImages
+        };
+    }).filter(work => work.code !== "");
+
+    console.log(`🚀 Generating ${works.length} artwork detail pages...`);
+
+    for (const work of works) {
+        // Safe URLs and paths
+        const pageUrl = `${SITE_URL}/obras/${work.cleanCode}.html`;
+        const qrPath = path.join(qrDir, `${work.cleanCode}.png`);
+        await QRCode.toFile(qrPath, pageUrl, { width: 300, margin: 2 });
+
+        const isAvailable = work.status === "AVAILABLE" || work.status === "DISPONIBLE";
+        const statusBadge = isAvailable 
+            ? '<span class="status-badge available">● Available</span>' 
+            : '<span class="status-badge sold">○ Sold / Private Collection</span>';
+
+        const buyButtonHtml = isAvailable && work.stripeLink 
+            ? `<a href="${encodeURI(work.stripeLink)}" target="_blank" rel="noopener noreferrer" class="btn-primary-action">Acquire Artwork — ${escapeHtml(work.price)}</a>`
+            : `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=Hello,%20I%20am%20interested%20in%20the%20artwork%20${encodeURIComponent(work.title)}%20(${encodeURIComponent(work.code)})" target="_blank" rel="noopener noreferrer" class="btn-secondary-action">Inquire / Reserve</a>`;
+
+        // Generate Gallery Grid HTML
+        const allImages = [work.mainImage, ...work.galleryImages].filter(Boolean);
+        const galleryHtml = allImages.map((img, index) => {
+    const imagePath = img.startsWith("http")
+        ? img
+        : `../${img}`;
+
+    return `
+    <div class="artwork-image-wrapper">
+        <img src="${encodeURI(imagePath)}"
+             alt="${escapeHtml(work.title)} - View ${index + 1}"
+             class="artwork-detail-img"
+             loading="lazy" />
+    </div>`;
+}).join("");
+
+        // Build Master Page Template
+        const htmlContent = `<!DOCTYPE html>
+<html lang="en" data-theme="white">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>JBU — Case Devices Colección</title>
+    <title>${escapeHtml(work.title)} (${escapeHtml(work.year)}) — JBU Artwork Archive</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" href="assets/logo.png" />
-    <style>
-        .artwork-card:hover { transform: translateY(-4px); border-color: #111111 !important; }
-    </style>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="icon" type="image/png" href="../assets/logo.png" />
 </head>
-<body class="editorial-gallery-body">
-
+<body class="editorial-detail-body">
     <header class="gallery-header" role="banner">
-        <div class="header-container">
-            <a class="gallery-brand" href="index.html" aria-label="JBU - Volver al inicio">
-                <span class="brand-prefix">JBU</span>
-                <span class="brand-suffix">Galería & Archivo</span>
+        <div class="header-inner">
+            <a href="../index.html" class="brand-logo" aria-label="JBU Home">
+                <img src="../assets/logo.png" alt="JBU Logo" class="logo-clean" />
             </a>
-            <nav class="gallery-nav" aria-label="Navegación principal de la galería">
-                <ul class="nav-menu" role="menubar">
-                    <li role="none"><a class="nav-link" href="index.html#galeria" role="menuitem">Colecciones</a></li>
-                    <li role="none"><a class="nav-link" href="index.html#archivo" role="menuitem">Archivo</a></li>
-                    <li role="none"><a class="nav-link" href="cases.html" role="menuitem" style="font-weight: 500; color: #111111;">Case Devices</a></li>
-                    <li role="none"><a class="nav-link" href="index.html#sobre-artista" role="menuitem">Sobre el Artista</a></li>
-                    <li role="none"><a class="nav-link" href="info/soporte.html" role="menuitem">Contacto</a></li>
+            <nav class="main-nav" role="navigation">
+                <ul class="nav-list" role="menubar">
+                    <li role="none"><a class="nav-link" href="../index.html" role="menuitem">Gallery</a></li>
+                    <li role="none"><a class="nav-link" href="../cases.html" role="menuitem">Case Devices</a></li>
+                    <li role="none"><a class="nav-link" href="../info/soporte.html" role="menuitem">Contact</a></li>
                 </ul>
             </nav>
+            <div id="global-user-status" class="user-status-container"></div>
         </div>
     </header>
 
     <main class="cds--grid main-editorial-wrapper" style="padding-top: 2rem;">
         <div class="cds--row">
-            <section class="content-editorial-panel cds--col-lg-16 cds--col-md-8 cds--col-sm-4">
-                <div class="catalog-editorial-container">
-                    ${contentHtml || '<p style="color: #666666; text-align: center; margin-top: 40px;">Próximamente disponible.</p>'}
+            <section class="cds--col-lg-10 cds--col-md-5 cds--col-sm-4">
+                <div class="artwork-gallery-container">
+                    ${galleryHtml}
                 </div>
             </section>
+
+            <aside class="cds--col-lg-6 cds--col-md-3 cds--col-sm-4">
+                <div class="artwork-meta-panel sticky-panel">
+                    <div class="meta-header">
+                        <span class="series-tag">${escapeHtml(work.series)}</span>
+                        ${statusBadge}
+                    </div>
+
+                    <h1 class="artwork-title">${escapeHtml(work.title)}</h1>
+                    <p class="artwork-specs">${escapeHtml(work.technique)}, ${escapeHtml(work.dimensions)} (${escapeHtml(work.year)})</p>
+                    
+                    <div class="artwork-pricing">
+                        <span class="price-label">Price:</span>
+                        <span class="price-value">${escapeHtml(work.price)}</span>
+                    </div>
+
+                    <p class="artwork-description">${escapeHtml(work.description) || "Original artwork signed by the artist. Certificate of authenticity included."}</p>
+
+                    <div class="interaction-block">
+                        <div class="like-counter-wrapper">
+                            <span id="contador-vistas" class="like-badge">❤️ 0 likes</span>
+                            <span id="dossier-status-tag" class="like-status">Unsaved</span>
+                        </div>
+
+                        <button id="btn-ver-obra" class="btn-like-action">
+                            ❤️ Like Artwork
+                        </button>
+
+                        <div id="dossier-content" class="dossier-expanded-panel" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #555;">
+                            <p>✨ Added to your saved favorites!</p>
+                        </div>
+                    </div>
+
+                    <div class="purchase-actions" style="margin-top: 1.5rem;">
+                        ${buyButtonHtml}
+                    </div>
+
+                    <div class="qr-verification-block" style="margin-top: 2rem;">
+                        <img src="../assets/qr/${work.cleanCode}.png" alt="Verification QR Code" class="qr-code-img" style="width: 100px; height: 100px;" />
+                        <span class="qr-code-label">Code: ${escapeHtml(work.code)}</span>
+                    </div>
+                </div>
+            </aside>
         </div>
     </main>
 
     <footer class="gallery-footer" role="contentinfo">
         <div class="footer-inner">
-            <span class="footer-copyright">© 2026 JBU. Todos los derechos reservados.</span>
-            <div class="footer-utility-links">
-                <a href="info/terminos-de-servicio.html">Términos</a>
-                <a href="info/politica-de-privacidad.html">Privacidad</a>
-            </div>
+            <span class="footer-copyright">© 2026 JBU. All rights reserved.</span>
         </div>
     </footer>
 
+    <script type="module">
+        import { guardarVista, obtenerTotalVistas } from "../js/firestore.js";
+        import { auth } from "../js/firebase-config.js";
+        import { 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+        const globalUserStatus = document.getElementById("global-user-status");
+        const btnVerObra = document.getElementById("btn-ver-obra");
+        const contadorVistas = document.getElementById("contador-vistas");
+        const dossierContent = document.getElementById("dossier-content");
+        const statusTag = document.getElementById("dossier-status-tag");
+
+        const WORK_CODE = ${JSON.stringify(work.code)};
+        let liked = false;
+        const provider = new GoogleAuthProvider();
+
+        // 1. Fetch and display total likes count
+        async function cargarTotalVistas() {
+            if (!contadorVistas) return;
+            try {
+                const total = await obtenerTotalVistas(WORK_CODE);
+                contadorVistas.textContent = "❤️ " + total + " likes";
+            } catch (err) {
+                console.error("💥 Error querying likes count:", err);
+                contadorVistas.textContent = "❤️ 0 likes";
+            }
+        }
+
+        // Public execution on load
+        cargarTotalVistas();
+
+        // 2. Real-time User Auth Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user && globalUserStatus) {
+                const name = user.displayName || user.email.split('@')[0];
+                const photo = user.photoURL 
+                    ? '<img src="' + user.photoURL + '" alt="' + name + '" class="user-avatar-img" />' 
+                    : '<span class="user-status-dot"></span>';
+                
+                globalUserStatus.innerHTML = '<div class="user-badge">' + photo + '<span>Connected: <strong>' + name + '</strong></span></div>';
+            } else if (globalUserStatus) {
+                globalUserStatus.innerHTML = '<span style="color: #777;">👤 Guest (Not signed in)</span>';
+            }
+        });
+
+        // 3. Like Button Action
+        if (btnVerObra) {
+            btnVerObra.addEventListener("click", async () => {
+                let user = auth.currentUser;
+
+                // Toggle off if already liked
+                if (liked) {
+                    liked = false;
+                    btnVerObra.textContent = "❤️ Like Artwork";
+                    if (dossierContent) dossierContent.style.display = "none";
+                    if (statusTag) statusTag.textContent = "Unsaved";
+                    return;
+                }
+
+                // Require login if user is not authenticated
+                if (!user) {
+                    try {
+                        console.log("🔒 [Auth] Login required to like artwork...");
+                        const result = await signInWithPopup(auth, provider);
+                        user = result.user;
+                        console.log("✅ [Auth] Signed in as:", user.displayName);
+                    } catch (error) {
+                        console.error("💥 [Auth] Login cancelled or failed:", error);
+                        alert("Please sign in with your Google account to like and save this artwork.");
+                        return;
+                    }
+                }
+
+                // Mark as liked upon successful auth
+                liked = true;
+                btnVerObra.textContent = "💖 Liked";
+                if (dossierContent) dossierContent.style.display = "block";
+                if (statusTag) statusTag.textContent = "Liked";
+
+                // Record like in Firestore
+                try {
+                    const esNuevaVista = await guardarVista(user.uid, WORK_CODE);
+                    if (esNuevaVista) {
+                        console.log("✅ [Firestore] New like recorded for:", WORK_CODE);
+                        await cargarTotalVistas();
+                    } else {
+                        console.log("ℹ️ [Firestore] Existing like found. Count not duplicated.");
+                    }
+                } catch (err) {
+                    console.error("💥 [Firestore] Error saving like:", err);
+                }
+            });
+        }
+    </script>
 </body>
 </html>`;
-}
+console.log(outputDir);
+        fs.writeFileSync(path.join(outputDir, `${work.cleanCode}.html`), htmlContent, "utf8");
+    }
+
+    console.log("✅ Custom English detail pages with Likes feature created successfully.");
+})();
