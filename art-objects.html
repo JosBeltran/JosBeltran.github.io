@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JBU — Art Objects</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <style>
+        /* Header Minimalista Superior */
+        .gallery-header {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eaeaea;
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .brand-name-header {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #111;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .btn-login {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #111;
+            text-decoration: none;
+            padding: 0.4rem 0.9rem;
+            border: 1px solid #111;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-login:hover {
+            background: #111;
+            color: #fff;
+        }
+
+        .waffle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .waffle-btn:hover {
+            background: #f4f4f4;
+        }
+
+        .waffle-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 220px;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 0.5rem 0;
+            z-index: 101;
+        }
+
+        .waffle-dropdown.active {
+            display: block;
+        }
+
+        .waffle-menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .waffle-menu-item a {
+            display: block;
+            padding: 0.7rem 1.2rem;
+            color: #222;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .waffle-menu-item a:hover {
+            background: #f7f7f7;
+        }
+
+        /* Logo Central Grande */
+        .hero-brand-area {
+            text-align: center;
+            padding: 2.5rem 1rem 1rem 1rem;
+        }
+
+        .hero-main-logo {
+            max-height: 200px;
+            max-width: 280px;
+            width: auto;
+            display: inline-block;
+            object-fit: contain;
+        }
+
+        /* Specific styles for Art Objects View */
+        .objects-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .us-only-badge {
+            display: inline-block;
+            background-color: #f4f4f4;
+            color: #111;
+            border: 1px solid #ddd;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+        }
+
+        .objects-filter-block {
+            margin-bottom: 2.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .object-selector-label {
+            display: block;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .object-select {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .object-select:focus {
+            border-color: #111;
+        }
+
+        .objects-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 3rem 1.5rem 2rem 1.5rem;
+            box-sizing: border-box;
+            display: none; 
+        }
+
+        /* Link Wrapper for Main Image */
+        .main-object-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 380px;
+            height: 420px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .main-object-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.12));
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .main-object-link:hover .main-object-image {
+            transform: scale(1.03);
+        }
+
+        .object-info-panel {
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .object-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #111;
+            margin: 0.5rem 0 0.2rem 0;
+        }
+
+        .object-title-link {
+            color: #111;
+            text-decoration: none;
+        }
+
+        .object-title-link:hover {
+            text-decoration: underline;
+        }
+
+        .object-meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .shipping-note {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .object-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 1.2rem;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-buy-object {
+            display: inline-block;
+            padding: 0.75rem 1.8rem;
+            background: #111;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.82rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-buy-object:hover {
+            background: #333;
+        }
+
+        .btn-details-object {
+            display: inline-block;
+            padding: 0.75rem 1.8rem;
+            background: transparent;
+            color: #111;
+            border: 1px solid #111;
+            text-decoration: none;
+            font-size: 0.82rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-details-object:hover {
+            background: #111;
+            color: #fff;
+        }
+
+        /* Circular Carousel */
+        .circular-carousel-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+            scrollbar-width: thin;
+        }
+
+        .circular-carousel {
+            display: flex;
+            gap: 1.2rem;
+            padding: 0.5rem;
+            align-items: center;
+        }
+
+        .thumb-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            overflow: hidden;
+            cursor: pointer;
+            background: #fff;
+            flex-shrink: 0;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumb-circle:hover {
+            transform: translateY(-3px);
+            border-color: #888;
+        }
+
+        .thumb-circle.active {
+            border-color: #111;
+            border-width: 3px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: scale(1.08);
+        }
+
+        .thumb-circle img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        /* Static Intro Section */
+        .objects-intro-stage {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background: #fdfdfd;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 3rem;
+            box-sizing: border-box;
+        }
+
+        .intro-category-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .intro-category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .intro-category-image {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            object-fit: contain;
+            filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.08));
+            margin-bottom: 1.5rem;
+        }
+
+        .intro-category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 0.3rem;
+        }
+
+        .intro-category-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .objects-intro-stage {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="editorial-gallery-body">
+
+    <!-- HEADER MINIMALISTA IGUAL AL INDEX -->
+    <header class="gallery-header" role="banner">
+        <div class="header-container">
+            
+            <div class="header-left">
+                <a href="index.html" class="brand-name-header">Josue Beltran Uresti</a>
+            </div>
+
+            <div class="header-right">
+                <a href="#" id="btnAuth" class="btn-login">Sign In</a>
+
+                <button class="waffle-btn" id="waffleToggle" aria-label="Open menu" aria-expanded="false">
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="8" y="2" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="14" y="2" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="2" y="8" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="8" y="8" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="14" y="8" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="2" y="14" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="8" y="14" width="4" height="4" rx="1" fill="#111111"/>
+                        <rect x="14" y="14" width="4" height="4" rx="1" fill="#111111"/>
+                    </svg>
+                </button>
+
+                <!-- Dropdown Waffle Menu -->
+                <nav class="waffle-dropdown" id="waffleDropdown" aria-label="Main menu">
+                    <ul class="waffle-menu-list">
+                        <li class="waffle-menu-item"><a href="index.html">Original Art</a></li>
+                        <li class="waffle-menu-item"><a href="cases.html">Case Devices</a></li>
+                        <li class="waffle-menu-item"><a href="art-objects.html" style="font-weight: 700;">● Art Objects</a></li>
+                        <li class="waffle-menu-item"><a href="info/soporte.html">Support / Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="editorial-layout-wrapper">
+        
+        <!-- LOGO PROTAGONISTA MÁS GRANDE COMPARTIDO -->
+        <section class="hero-brand-area">
+            <img class="hero-main-logo" src="assets/logoXL.png" alt="Josue Beltran Uresti Studio Logo">
+        </section>
+
+        <section class="objects-container">
+            
+            <div class="catalog-header-block" style="text-align: center; margin-bottom: 2rem;">
+                <span class="us-only-badge">🇺🇸 Exclusive for US Market Only</span>
+                <h2 class="catalog-section-title" style="font-size: 2rem; margin-top: 0.2rem; margin-bottom: 0.4rem;">Art Objects & Editions</h2>
+                <p class="catalog-subtitle" style="color: #666; font-size: 0.9rem; margin: 0;">Explore dynamic art pieces for everyday living. Available as limited editions.</p>
+            </div>
+
+            <!-- Dropdown Filter for Object Type (Textile / Timepiece) -->
+            <div class="objects-filter-block">
+                <label for="objectTypeSelect" class="object-selector-label">Collection Type</label>
+                <select id="objectTypeSelect" class="object-select">
+                    <option value="">Select a category...</option>
+                    <option value="textile">Textiles & Cushions</option>
+                    <option value="timepiece">Timepieces</option>
+                </select>
+            </div>
+
+            <!-- Static Intro Stage -->
+            <div id="objectsIntroStage" class="objects-intro-stage">
+                
+                <!-- Textile Card -->
+                <div class="intro-category-card" onclick="selectCategoryFromIntro('textile')">
+                    <img src="assets/textile-cover.png" alt="Textile Collection Cover" class="intro-category-image" />
+                    <h3 class="intro-category-title">Textiles</h3>
+                    <p class="intro-category-subtitle">Premium Cushions & Fine Fabric Editions.</p>
+                    <button class="btn-details-object">View Collection</button>
+                </div>
+
+                <!-- Timepiece Card -->
+                <div class="intro-category-card" onclick="selectCategoryFromIntro('timepiece')">
+                    <img src="assets/timepiece-cover.png" alt="Timepiece Collection Cover" class="intro-category-image" />
+                    <h3 class="intro-category-title">Timepieces</h3>
+                    <p class="intro-category-subtitle">Functional Art Clocks & Limited Watch Releases.</p>
+                    <button class="btn-details-object">View Collection</button>
+                </div>
+
+            </div>
+
+            <!-- Main Stage for Selected Object -->
+            <div id="objectsStage" class="objects-stage">
+                
+                <a id="mainObjectLink" class="main-object-link" href="#" title="View Full Item Details">
+                    <img id="mainObjectImg" class="main-object-image" src="" alt="Loading object..." />
+                </a>
+
+                <div class="object-info-panel">
+                    <h3 id="objectTitle" class="object-title">
+                        <a id="objectTitleLink" class="object-title-link" href="#">—</a>
+                    </h3>
+                    <p id="objectMeta" class="object-meta">—</p>
+                    <p class="shipping-note">Free standard shipping available across all 50 US States.</p>
+                    <div id="objectPrice" class="object-price">—</div>
+                    <div id="objectCtaWrapper" class="action-buttons-group"></div>
+                </div>
+
+                <div class="circular-carousel-wrapper">
+                    <div id="circularCarousel" class="circular-carousel">
+                        <!-- Dynamic circular thumbnails -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="gallery-footer" role="contentinfo" style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid #eaeaea;">
+        <div class="footer-inner" style="display: flex; justify-content: space-between; align-items: center; max-width: 1320px; margin: 0 auto; padding: 0 1.5rem;">
+            <span class="footer-copyright" style="font-size: 0.85rem; color: #666;">© 2026 JBU. All rights reserved. US Orders Only.</span>
+            <div class="footer-utility-links" style="display: flex; gap: 1.5rem; font-size: 0.85rem;">
+                <a href="info/terminos-de-servicio.html" style="color: #444; text-decoration: none;">Terms of Service</a>
+                <a href="info/politica-de-privacidad.html" style="color: #444; text-decoration: none;">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const waffleBtn = document.getElementById('waffleToggle');
+            const waffleDropdown = document.getElementById('waffleDropdown');
+
+            waffleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = waffleBtn.getAttribute('aria-expanded') === 'true';
+                waffleBtn.setAttribute('aria-expanded', !isExpanded);
+                waffleDropdown.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!waffleDropdown.contains(e.target) && !waffleBtn.contains(e.target)) {
+                    waffleDropdown.classList.remove('active');
+                    waffleBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+    </script>
+    <script src="art-objects.js"></script>
+</body>
+</html>

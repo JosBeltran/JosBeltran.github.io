@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Objects — Special Studio Releases | Josué Beltrán</title>
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border-color: #e5e5e5;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 80px;
+        }
+
+        /* Hero Header */
+        header {
+            padding: 80px 20px 40px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 50px 0 30px;
+            color: var(--text-main);
+        }
+
+        /* ----------------------------------------------------------------- */
+        /* FEATURED SETS DISPLAY (2x2 Duo Collection Layout)                 */
+        /* ----------------------------------------------------------------- */
+        .featured-sets-container {
+            max-width: 1100px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+        }
+
+        .set-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .set-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Pair Images Grid (2 Columnes per Set) */
+        .set-images-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .set-images-duo img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background-color: #f4f4f4;
+        }
+
+        .set-info {
+            text-align: center;
+            width: 100%;
+        }
+
+        .set-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .set-heading {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .set-price-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .set-price {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .btn-set-action {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 24px;
+            background-color: var(--text-main);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-set-action:hover {
+            background-color: #333333;
+        }
+
+        /* Footer Shipping Note */
+        .shipping-disclaimer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 60px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 520px) {
+            .featured-sets-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Art Objects</h1>
+        <p>Functional art pieces and limited studio releases. Merging original expressionist compositions with daily living environments.</p>
+    </header>
+
+    <h2 class="section-title">Collector Duo Sets</h2>
+
+    <!-- CONTAINER 2x2: LOS 2 SETS DE COLECCIÓN CON LAS 4 ALMOHADAS -->
+    <section class="featured-sets-container">
+
+        <!-- SET 1: WARM PALETTE (ROJO + VERDE/ROJO) -->
+        <article class="set-card">
+            <div class="set-images-duo">
+                <img src="path-to-your-images/bear-red.jpg" alt="Spiral Bear Red Cushion">
+                <img src="path-to-your-images/bear-green.jpg" alt="Spiral Bear Green Cushion">
+            </div>
+            <div class="set-info">
+                <span class="set-tag">Curated Set — Edition 2/2</span>
+                <h3 class="set-heading">Spiral Bear Duo I — Warm Palette</h3>
+                <p style="font-size: 0.85rem; color: #666;">2x Premium Canvas Cushions (18"×18" & 16"×16")</p>
+                <div class="set-price-wrap">
+                    <span class="set-price">$110 USD</span>
+                </div>
+                <a href="obras/OBJ-SET-01.html" class="btn-set-action">View Collector Set</a>
+            </div>
+        </article>
+
+        <!-- SET 2: COOL PALETTE (AZUL + PÚRPURA) -->
+        <article class="set-card">
+            <div class="set-images-duo">
+                <img src="path-to-your-images/bear-blue.jpg" alt="Spiral Bear Blue Cushion">
+                <img src="path-to-your-images/bear-purple.jpg" alt="Spiral Bear Purple Cushion">
+            </div>
+            <div class="set-info">
+                <span class="set-tag">Curated Set — Edition 2/2</span>
+                <h3 class="set-heading">Spiral Bear Duo II — Cool Palette</h3>
+                <p style="font-size: 0.85rem; color: #666;">2x Premium Canvas Cushions (16"×16")</p>
+                <div class="set-price-wrap">
+                    <span class="set-price">$110 USD</span>
+                </div>
+                <a href="obras/OBJ-SET-02.html" class="btn-set-action">View Collector Set</a>
+            </div>
+        </article>
+
+    </section>
+
+    <div class="shipping-disclaimer">
+        * All Art Objects are custom-crafted per release. Available exclusively for US domestic shipping.
+    </div>
+
+</body>
+</html>

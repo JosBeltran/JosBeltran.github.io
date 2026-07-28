@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiral Bear Duo I (Warm Palette) — Art Objects | Josué Beltrán</title>
+    <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --border-color: #eaeaea;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            -webkit-font-smoothing: antialiased;
+            padding: 40px 20px;
+        }
+
+        .nav-back {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+        }
+
+        .nav-back a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .product-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        /* Gallery Side (Images) */
+        .product-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main-image-frame {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: #f4f4f4;
+            overflow: hidden;
+        }
+
+        .main-image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .duo-thumbnails {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .duo-thumbnails img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .duo-thumbnails img:hover, .duo-thumbnails img.active {
+            border-color: var(--text-main);
+        }
+
+        /* Product Info Side */
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tag-series {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        .product-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .product-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+        }
+
+        .specs-list {
+            list-style: none;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .specs-list li span {
+            color: var(--text-muted);
+        }
+
+        .actions-wrapper {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-buy {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--text-main);
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-buy:hover {
+            background-color: #333333;
+        }
+
+        .shipping-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .product-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-back">
+        <a href="../art-objects.html">← Back to Art Objects</a>
+    </nav>
+
+    <main class="product-container">
+        
+        <!-- LEFT: GALLERY -->
+        <section class="product-gallery">
+            <div class="main-image-frame">
+                <img id="currentDisplay" src="../path-to-images/bear-red.jpg" alt="Spiral Bear Red Cushion">
+            </div>
+            <div class="duo-thumbnails">
+                <img src="../path-to-images/bear-red.jpg" alt="Spiral Bear Red" class="active" onclick="switchImage(this.src)">
+                <img src="../path-to-images/bear-green.jpg" alt="Spiral Bear Green" onclick="switchImage(this.src)">
+            </div>
+        </section>
+
+        <!-- RIGHT: DETAILS & CTA -->
+        <section class="product-details">
+            <div>
+                <span class="tag-series">Art Objects / Studio Set</span>
+                <h1 class="product-title">Spiral Bear Duo I — Warm Palette</h1>
+            </div>
+
+            <div class="product-price">$110 USD</div>
+
+            <div class="product-description">
+                A curated 2-piece textile set featuring high-definition prints of original expressionist mixed-media paintings from the <i>Spiral Bear</i> series. Designed as functional art pieces to elevate living room and studio spaces.
+            </div>
+
+            <ul class="specs-list">
+                <li><span>Set Contents:</span> 2x Decorative Throw Cushions (Red & Green/Red variants)</li>
+                <li><span>Dimensions:</span> 18" × 18" (45×45 cm) & 16" × 16" (40×40 cm)</li>
+                <li><span>Material:</span> Premium heavy-weight woven canvas texture with concealed zipper</li>
+                <li><span>Edition:</span> Limited Studio Release — Code: OBJ-SET-01</li>
+            </ul>
+
+            <div class="actions-wrapper">
+                <!-- Reemplazar con tu enlace de Stripe Checkout -->
+                <a href="https://buy.stripe.com/tu-link-de-stripe-set-1" target="_blank" class="btn-buy">
+                    Buy Collector Set — $110 USD
+                </a>
+                <p class="shipping-note">* Custom-crafted upon order. Ships exclusively to the United States.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function switchImage(src) {
+            document.getElementById('currentDisplay').src = src;
+            const thumbs = document.querySelectorAll('.duo-thumbnails img');
+            thumbs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

@@ -59,39 +59,31 @@ async function getSheetsData() {
         return;
     }
 
-    // Process rows into JSON objects
+    // Process rows into structured objects
     const works = rows.map(row => {
-      const series = row[0] ? row[0].trim() : "";
+        const series = row[0] ? row[0].trim() : "Art Objects";
+        const code = row[1] ? row[1].trim() : "";
+        const title = row[2] ? row[2].trim() : "Untitled";
+        const year = row[3] ? row[3].trim() : new Date().getFullYear().toString();
+        const technique = row[4] ? row[4].trim() : "Mixed Media";
+        const dimensions = row[5] ? row[5].trim() : "";
+        
+        // Normalizar ruta de imagen (removiendo barras invertidas de Windows)
+        let mainImage = row[6] ? row[6].trim().replace(/\\/g, '/') : "";
+        
+        const description = row[7] ? row[7].trim() : "";
+        const status = row[8] && row[8].toUpperCase() === "TRUE" ? "AVAILABLE" : "SOLD";
+        const price = row[9] ? row[9].trim() : "";
+        const stripeLink = row[10] ? row[10].trim() : "";
+        
+        // Carga de bocetos / imágenes adicionales de proceso
+        let sketchPath = row[12] ? row[12].trim().replace(/\\/g, '/') : "";
+        const processNotes = row[13] ? row[13].trim() : "";
 
-const code = row[1] ? row[1].trim() : "";
-
-const title = row[2] ? row[2].trim() : "Untitled";
-
-const year = row[3] ? row[3].trim() : new Date().getFullYear().toString();
-
-const technique = row[4] ? row[4].trim() : "Mixed Media";
-
-const dimensions = row[5] ? row[5].trim() : "";
-
-const mainImage = row[6] ? row[6].trim() : "";
-
-const description = row[7] ? row[7].trim() : "";
-
-const status = row[8] && row[8].toUpperCase() === "TRUE"
-    ? "AVAILABLE"
-    : "SOLD";
-
-const price = row[9] ? row[9].trim() : "";
-
-const stripeLink = row[10] ? row[10].trim() : "";
-
-const galleryImages =[];
-
-const sketchPath = row[12] ? row[12].trim() : "";
-
-const processNotes = row[13] ? row[13].trim() : "";
-
-const marketplaceTitle = row[14] ? row[14].trim() : "";
+        const galleryImages = [];
+        if (sketchPath) {
+            galleryImages.push({ url: sketchPath, isSketch: true });
+        }
 
         return {
             code,
@@ -106,170 +98,195 @@ const marketplaceTitle = row[14] ? row[14].trim() : "";
             stripeLink,
             description,
             series,
-            galleryImages
+            galleryImages,
+            processNotes
         };
     }).filter(work => work.code !== "");
 
-    console.log(`🚀 Generating ${works.length} artwork detail pages...`);
+    console.log(`🚀 Generating ${works.length} detail pages for all categories...`);
 
     for (const work of works) {
-        // Safe URLs and paths
         const pageUrl = `${SITE_URL}/obras/${work.cleanCode}.html`;
         const qrPath = path.join(qrDir, `${work.cleanCode}.png`);
         await QRCode.toFile(qrPath, pageUrl, { width: 300, margin: 2 });
-const isCaseDevice = work.series === "Case Devices";
 
-        const buyButtonText = isCaseDevice
-    ? "Buy Premium Case"
-    : "Acquire Original Artwork";
+        // Normalizar la URL absoluta de la imagen para Open Graph Previews (WhatsApp, X, FB)
+        const absoluteImageUrl = work.mainImage.startsWith("http") 
+            ? work.mainImage 
+            : `${SITE_URL}/${work.mainImage.replace(/^\.\//, '')}`;
 
+        // Identificación dinámica del tipo de producto
+        const seriesNorm = work.series.toLowerCase();
+        const techNorm = work.technique.toLowerCase();
+
+        let productCategory = "artwork"; // default
+        if (seriesNorm.includes("case") || work.code.toLowerCase().includes("case")) {
+            productCategory = "case";
+        } else if (seriesNorm.includes("textile") || techNorm.includes("textile") || work.code.toLowerCase().includes("cush")) {
+            productCategory = "textile";
+        } else if (seriesNorm.includes("timepiece") || techNorm.includes("timepiece") || work.code.toLowerCase().includes("clck")) {
+            productCategory = "timepiece";
+        }
+
+        // UI & Navigation Configurations
+        let ui = {
+            pageTitle: "JBU Artwork Archive",
+            typeLabel: "Original Artwork",
+            navActive: "originals",
+            likeText: "❤️ Like Artwork",
+            savedMessage: "✨ Item added to your favorites!"
+        };
+
+        if (productCategory === "case") {
+            ui = {
+                pageTitle: "JBU Case Devices",
+                typeLabel: "Phone Case Edition",
+                navActive: "cases",
+                likeText: "❤️ Like Case",
+                savedMessage: "✨ Case saved to favorites!"
+            };
+        } else if (productCategory === "textile" || productCategory === "timepiece") {
+            ui = {
+                pageTitle: "JBU Art Objects",
+                typeLabel: productCategory === "textile" ? "Textile & Cushion Edition" : "Functional Timepiece",
+                navActive: "objects",
+                likeText: "❤️ Like Object",
+                savedMessage: "✨ Art object saved to favorites!"
+            };
+        }
 
         const isAvailable = work.status === "AVAILABLE" || work.status === "DISPONIBLE";
         const statusBadge = isAvailable 
             ? '<span class="status-badge available">● Available</span>' 
             : '<span class="status-badge sold">○ Sold / Private Collection</span>';
 
+        // Acción Principal: Inquire / Reserve vía WhatsApp o Direct Link
         const buyButtonHtml = isAvailable && work.stripeLink 
-            ? `<a href="${encodeURI(work.stripeLink)}" target="_blank" rel="noopener noreferrer" class="btn-primary-action">${buyButtonText} — ${escapeHtml(work.price)}</a>`
-            : `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=Hello,%20I%20am%20interested%20in%20the%20artwork%20${encodeURIComponent(work.title)}%20(${encodeURIComponent(work.code)})" target="_blank" rel="noopener noreferrer" class="btn-secondary-action">Inquire / Reserve</a>`;
+            ? `<a href="${encodeURI(work.stripeLink)}" target="_blank" rel="noopener noreferrer" class="btn-primary-action">Acquire — ${escapeHtml(work.price ? '$' + work.price + ' USD' : 'Inquire')}</a>`
+            : `<a href="https://wa.me/${WHATSAPP_NUMBER}?text=Hello,%20I%20am%20interested%20in%20the%20piece%20${encodeURIComponent(work.title)}%20(${encodeURIComponent(work.code)})" target="_blank" rel="noopener noreferrer" class="btn-secondary-action">Inquire / Reserve Piece</a>`;
 
-        // Generate Gallery Grid HTML
-        const allImages = [work.mainImage, ...work.galleryImages].filter(Boolean);
-        const galleryHtml = allImages.map((img, index) => {
-    const imagePath = img.startsWith("http")
-        ? img
-        : `../${img}`;
+        // Generar Galería con Control de Tamaño y Espacio para Bocetos
+        const mainImgPath = work.mainImage.startsWith("http") ? work.mainImage : `../${work.mainImage}`;
+        
+        let galleryHtml = `
+            <div class="artwork-image-wrapper main-image-container" style="text-align: center; margin-bottom: 1.5rem;">
+                <img src="${encodeURI(mainImgPath)}"
+                     alt="${escapeHtml(work.title)}"
+                     class="artwork-detail-img-main"
+                     style="max-height: 480px; width: auto; object-fit: contain; border-radius: 4px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.08));" />
+            </div>`;
 
-    return `
-    <div class="artwork-image-wrapper">
-        <img src="${encodeURI(imagePath)}"
-             alt="${escapeHtml(work.title)} - View ${index + 1}"
-             class="artwork-detail-img"
-             loading="lazy" />
-    </div>`;
-}).join("");
+        if (work.galleryImages.length > 0) {
+            galleryHtml += `<div class="additional-sketches-grid" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">`;
+            work.galleryImages.forEach((item, index) => {
+                const sketchImgPath = item.url.startsWith("http") ? item.url : `../${item.url}`;
+                galleryHtml += `
+                    <div class="sketch-wrapper" style="max-width: 200px; text-align: center;">
+                        <img src="${encodeURI(sketchImgPath)}" 
+                             alt="${escapeHtml(work.title)} - Sketch ${index + 1}" 
+                             style="max-height: 180px; width: 100%; object-fit: contain; border: 1px solid #eee; border-radius: 4px;" />
+                        <span style="display: block; font-size: 0.7rem; color: #888; margin-top: 4px;">Process Sketch</span>
+                    </div>`;
+            });
+            galleryHtml += `</div>`;
+        }
 
-
-
-const ui = isCaseDevice
-    ? {
-        pageTitle: "JBU Premium Cases",
-        priceLabel: "Price:",
-        descriptionFallback: "Premium protective case designed with exclusive artwork.",
-        likeText: "❤️ Like Case",
-        likesLabel: "❤️ 0 likes",
-        savedText: "Saved",
-        unsavedText: "Unsaved",
-        savedMessage: "✨ Case added to your favorites!",
-        buyButtonText: "Buy Case",
-        qrLabel: "Product Code:"
-    }
-    : {
-        pageTitle: "JBU Artwork Archive",
-        priceLabel: "Price:",
-        descriptionFallback: "Original artwork signed by the artist. Certificate of authenticity included.",
-        likeText: "❤️ Like Artwork",
-        likesLabel: "❤️ 0 likes",
-        savedText: "Saved",
-        unsavedText: "Unsaved",
-        savedMessage: "✨ Artwork added to your favorites!",
-        buyButtonText: "Acquire Artwork",
-        qrLabel: "Code:"
-    };
-
-    const navItems = isCaseDevice
-    ? `
-        <li><a class="nav-link" href="../cases.html">Case Devices</a></li>
-        <li><a class="nav-link" href="../index.html">Original Art</a></li>
-        <li><a class="nav-link" href="../info/soporte.html">Support</a></li>
-    `
-    : `
-        <li><a class="nav-link" href="../index.html">Originals</a></li>
-        <li><a class="nav-link" href="../cases.html">Case Devices</a></li>
-        <li><a class="nav-link" href="../info/soporte.html">Support</a></li>
-    `;
-        // Build Master Page Template
+        // Plantilla HTML de la Subpágina
         const htmlContent = `<!DOCTYPE html>
 <html lang="en" data-theme="white">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(work.title)} (${escapeHtml(work.year)}) — JBU Artwork Archive</title>
+    <title>${escapeHtml(work.title)} (${escapeHtml(work.year)}) — JBU</title>
+    
+    <!-- Open Graph Meta Tags para Excelentes Previews al Compartir -->
+    <meta property="og:title" content="${escapeHtml(work.title)} — JBU ${ui.typeLabel}" />
+    <meta property="og:description" content="${escapeHtml(work.description || work.technique + ' ' + work.dimensions)}" />
+    <meta property="og:image" content="${encodeURI(absoluteImageUrl)}" />
+    <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${escapeHtml(work.title)}" />
+    <meta name="twitter:image" content="${encodeURI(absoluteImageUrl)}" />
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
     <link rel="stylesheet" href="../styles.css" />
     <link rel="icon" type="image/png" href="../assets/logo.png" />
 </head>
 <body class="editorial-detail-body">
     <header class="gallery-header" role="banner">
-        <div class="header-inner">
+        <div class="header-inner" style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem;">
             <a href="../index.html" class="brand-logo" aria-label="JBU Home">
-                <img src="../assets/logo.png" alt="JBU Logo" class="logo-clean" />
+                <img src="../assets/logo.png" alt="JBU Logo" class="logo-clean" style="height: 35px;" />
             </a>
             <nav class="main-nav" role="navigation">
-                <ul class="nav-list" role="menubar">
-                    ${navItems}
+                <ul class="nav-list" role="menubar" style="display: flex; gap: 1.5rem; list-style: none; margin: 0;">
+                    <li><a class="nav-link" href="../index.html" style="${ui.navActive === 'originals' ? 'font-weight: bold;' : ''}">Originals</a></li>
+                    <li><a class="nav-link" href="../cases.html" style="${ui.navActive === 'cases' ? 'font-weight: bold;' : ''}">Case Devices</a></li>
+                    <li><a class="nav-link" href="../art-objects.html" style="${ui.navActive === 'objects' ? 'font-weight: bold;' : ''}">Art Objects</a></li>
+                    <li><a class="nav-link" href="../info/soporte.html">Contact</a></li>
                 </ul>
             </nav>
             <div id="global-user-status" class="user-status-container"></div>
         </div>
     </header>
 
-    <main class="cds--grid main-editorial-wrapper" style="padding-top: 2rem;">
-        <div class="cds--row">
-            <section class="cds--col-lg-10 cds--col-md-5 cds--col-sm-4">
+    <main class="cds--grid main-editorial-wrapper" style="padding-top: 2rem; max-width: 1200px; margin: 0 auto;">
+        <div class="cds--row" style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            
+            <!-- Contenedor Visual (Imagen Principal Regulada + Bocetos) -->
+            <section style="flex: 1 1 500px; max-width: 650px;">
                 <div class="artwork-gallery-container">
                     ${galleryHtml}
                 </div>
             </section>
 
-            <aside class="cds--col-lg-6 cds--col-md-3 cds--col-sm-4">
+            <!-- Panel de Información & Acciones -->
+            <aside style="flex: 1 1 350px;">
                 <div class="artwork-meta-panel sticky-panel">
-                    <div class="meta-header">
-                        <span class="series-tag">${escapeHtml(work.series)}</span>
+                    <div class="meta-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="series-tag" style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: #777;">${escapeHtml(work.series)}</span>
                         ${statusBadge}
                     </div>
 
-                    <h1 class="artwork-title">${escapeHtml(work.title)}</h1>
-                    <p class="artwork-specs">${escapeHtml(work.technique)}, ${escapeHtml(work.dimensions)} (${escapeHtml(work.year)})</p>
-                    
-                    <div class="artwork-pricing">
-                        <span class="price-label">Price:</span>
-                        <span class="price-value">${escapeHtml(work.price)}</span>
-                    </div>
+                    <h1 class="artwork-title" style="font-size: 2rem; margin: 0.3rem 0;">${escapeHtml(work.title)}</h1>
+                    <p class="artwork-specs" style="color: #666; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        ${escapeHtml(work.technique)}${work.dimensions ? ' — ' + escapeHtml(work.dimensions) : ''} (${escapeHtml(work.year)})
+                    </p>
 
-                    <p class="artwork-description">${escapeHtml(work.description) || ui.descriptionFallback}</p>
+                    ${work.description ? `<p class="artwork-description" style="line-height: 1.6; color: #444; margin-bottom: 1.5rem;">${escapeHtml(work.description)}</p>` : ''}
 
-                    <div class="interaction-block">
-                        <div class="like-counter-wrapper">
+                    <div class="interaction-block" style="margin-bottom: 1.5rem; background: #fafafa; padding: 1rem; border-radius: 6px; border: 1px solid #eee;">
+                        <div class="like-counter-wrapper" style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.8rem;">
                             <span id="contador-vistas" class="like-badge">❤️ 0 likes</span>
-                            <span id="dossier-status-tag" class="like-status">Unsaved</span>
+                            <span id="dossier-status-tag" class="like-status" style="color: #888;">Unsaved</span>
                         </div>
 
-                        <button id="btn-ver-obra" class="btn-like-action">
-                             ${ui.likeText}
+                        <button id="btn-ver-obra" class="btn-like-action" style="width: 100%; padding: 0.6rem; background: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                            ${ui.likeText}
                         </button>
 
-                        <div id="dossier-content" class="dossier-expanded-panel" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #555;">
+                        <div id="dossier-content" class="dossier-expanded-panel" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #2e7d32; text-align: center;">
                             <p>${ui.savedMessage}</p>
                         </div>
                     </div>
 
-                    <div class="purchase-actions" style="margin-top: 1.5rem;">
+                    <div class="purchase-actions">
                         ${buyButtonHtml}
                     </div>
 
-                    <div class="qr-verification-block" style="margin-top: 2rem;">
-                        <img src="../assets/qr/${work.cleanCode}.png" alt="Verification QR Code" class="qr-code-img" style="width: 100px; height: 100px;" />
-                        <span class="qr-code-label">Code: ${escapeHtml(work.code)}</span>
+                    <div class="qr-verification-block" style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
+                        <img src="../assets/qr/${work.cleanCode}.png" alt="Verification QR Code" class="qr-code-img" style="width: 75px; height: 75px;" />
+                        <span class="qr-code-label" style="font-size: 0.8rem; color: #888;">Catalog Code:<br><strong style="color: #333;">${escapeHtml(work.code)}</strong></span>
                     </div>
                 </div>
             </aside>
         </div>
     </main>
 
-    <footer class="gallery-footer" role="contentinfo">
+    <footer class="gallery-footer" role="contentinfo" style="margin-top: 4rem; padding: 2rem 0; border-top: 1px solid #eee; text-align: center;">
         <div class="footer-inner">
-            <span class="footer-copyright">© 2026 JBU. All rights reserved.</span>
+            <span class="footer-copyright" style="font-size: 0.85rem; color: #777;">© 2026 JBU. All rights reserved.</span>
         </div>
     </footer>
 
@@ -292,89 +309,71 @@ const ui = isCaseDevice
         let liked = false;
         const provider = new GoogleAuthProvider();
 
-        // 1. Fetch and display total likes count
         async function cargarTotalVistas() {
             if (!contadorVistas) return;
             try {
                 const total = await obtenerTotalVistas(WORK_CODE);
                 contadorVistas.textContent = "❤️ " + total + " likes";
             } catch (err) {
-                console.error("💥 Error querying likes count:", err);
+                console.error("Error querying likes count:", err);
                 contadorVistas.textContent = "❤️ 0 likes";
             }
         }
 
-        // Public execution on load
         cargarTotalVistas();
 
-        // 2. Real-time User Auth Listener
         onAuthStateChanged(auth, (user) => {
             if (user && globalUserStatus) {
                 const name = user.displayName || user.email.split('@')[0];
-                const photo = user.photoURL 
-                    ? '<img src="' + user.photoURL + '" alt="' + name + '" class="user-avatar-img" />' 
-                    : '<span class="user-status-dot"></span>';
-                
-                globalUserStatus.innerHTML = '<div class="user-badge">' + photo + '<span>Connected: <strong>' + name + '</strong></span></div>';
+                globalUserStatus.innerHTML = '<span style="font-size: 0.8rem;">Connected: <strong>' + name + '</strong></span>';
             } else if (globalUserStatus) {
-                globalUserStatus.innerHTML = '<span style="color: #777;">👤 Guest (Not signed in)</span>';
+                globalUserStatus.innerHTML = '<span style="font-size: 0.8rem; color: #888;">Guest</span>';
             }
         });
 
-        // 3. Like Button Action
         if (btnVerObra) {
             btnVerObra.addEventListener("click", async () => {
                 let user = auth.currentUser;
 
-                // Toggle off if already liked
                 if (liked) {
                     liked = false;
-                    btnVerObra.textContent = "❤️ Like Artwork";
+                    btnVerObra.textContent = "${ui.likeText}";
                     if (dossierContent) dossierContent.style.display = "none";
                     if (statusTag) statusTag.textContent = "Unsaved";
                     return;
                 }
 
-                // Require login if user is not authenticated
                 if (!user) {
                     try {
-                        console.log("🔒 [Auth] Login required to like artwork...");
                         const result = await signInWithPopup(auth, provider);
                         user = result.user;
-                        console.log("✅ [Auth] Signed in as:", user.displayName);
                     } catch (error) {
-                        console.error("💥 [Auth] Login cancelled or failed:", error);
-                        alert("Please sign in with your Google account to like and save this artwork.");
+                        alert("Please sign in with your account to save this item.");
                         return;
                     }
                 }
 
-                // Mark as liked upon successful auth
                 liked = true;
                 btnVerObra.textContent = "💖 Liked";
                 if (dossierContent) dossierContent.style.display = "block";
                 if (statusTag) statusTag.textContent = "Liked";
 
-                // Record like in Firestore
                 try {
                     const esNuevaVista = await guardarVista(user.uid, WORK_CODE);
                     if (esNuevaVista) {
-                        console.log("✅ [Firestore] New like recorded for:", WORK_CODE);
                         await cargarTotalVistas();
-                    } else {
-                        console.log("ℹ️ [Firestore] Existing like found. Count not duplicated.");
                     }
                 } catch (err) {
-                    console.error("💥 [Firestore] Error saving like:", err);
+                    console.error("Error saving like:", err);
                 }
             });
         }
     </script>
 </body>
 </html>`;
-console.log(outputDir);
+
         fs.writeFileSync(path.join(outputDir, `${work.cleanCode}.html`), htmlContent, "utf8");
     }
 
-    console.log("✅ Custom English detail pages with Likes feature created successfully.");
+    console.log("✅ Custom detail subpages generated successfully with OG meta previews.");
 })();
