@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Josué Beltrán Uresti | Portal</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: #0d0d0d;
+      color: #ffffff;
+    }
+
+    /* Contenedor Principal Split */
+    .split-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Estilos compartidos de las secciones */
+    .split-card {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: #ffffff;
+      overflow: hidden;
+      transition: flex 0.5s ease-in-out, filter 0.5s ease;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Filtro oscuro para contraste de texto */
+    .split-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      transition: background 0.4s ease;
+      z-index: 1;
+    }
+
+    /* EFECTO HOVER: Expande la sección sobre la que pasa el mouse */
+    .split-container:hover .split-card {
+      flex: 0.8; /* Reduce la sección no seleccionada */
+    }
+
+    .split-container .split-card:hover {
+      flex: 1.2; /* Expande la sección seleccionada */
+    }
+
+    .split-card:hover::before {
+      background: rgba(0, 0, 0, 0.35); /* Aumenta claridad al pasar hover */
+    }
+
+    /* Fondo Sección ARTE (Usa una foto de tus pinturas) */
+    .art-section {
+      background-image: url('https://via.placeholder.com/1000x1200?text=Obra+de+Arte'); 
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Fondo Sección TECH (Usa un fondo técnico/minimalista o abstracto) */
+    .tech-section {
+      background-image: url('https://via.placeholder.com/1000x1200?text=Tech+Architect');
+    }
+
+    /* Contenido de cada tarjeta */
+    .card-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      transform: translateY(0);
+      transition: transform 0.4s ease;
+    }
+
+    .split-card:hover .card-content {
+      transform: translateY(-8px);
+    }
+
+    /* Iconos o Logotipos */
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    .split-card:hover .card-icon {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    .card-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.95rem;
+      font-weight: 300;
+      letter-spacing: 1px;
+      color: #cccccc;
+      max-width: 300px;
+    }
+
+    /* Branding Superior Central */
+    .brand-overlay {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .brand-overlay h1 {
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    /* Responsivo para Móviles (Split Vertical) */
+    @media (max-width: 768px) {
+      body, html {
+        overflow: auto;
+      }
+      .split-container {
+        flex-direction: column;
+        height: 100vh;
+      }
+      .split-container:hover .split-card,
+      .split-container .split-card:hover {
+        flex: 1;
+      }
+      .art-section {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .card-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay para tu nombre central -->
+  <div class="brand-overlay">
+    <h1>Josué Beltrán Uresti</h1>
+  </div>
+
+  <div class="split-container">
+    
+    <!-- OPCIÓN 1: ARTE -->
+    <a href="art-gallery.html" class="split-card art-section">
+      <div class="card-content">
+        <!-- Puedes colocar aquí un SVG de un pincel, paleta o tu logo de Art Vault -->
+        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        <h2 class="card-title">ART VAULT</h2>
+        <p class="card-subtitle">Galería de arte original, series geométricas y archivo de obra.</p>
+      </div>
+    </a>
+
+    <!-- OPCIÓN 2: TECH & ARCHITECTURE -->
+    <a href="tech-blog.html" class="split-card tech-section">
+      <div class="card-content">
+        <!-- Puedes colocar aquí un SVG de código, arquitectura o un nodo -->
+        <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+        </svg>
+        <h2 class="card-title">TECH & ARCHITECTURE</h2>
+        <p class="card-subtitle">Publicaciones, arquitectura de software, CRM y soluciones enterprise.</p>
+      </div>
+    </a>
+
+  </div>
+
+</body>
+</html>
