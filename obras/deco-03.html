@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="white">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interior Signal (2026) — JBU Artwork Archive</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@carbon/styles@1/css/styles.min.css">
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="icon" type="image/png" href="../assets/logo.png" />
+</head>
+<body class="editorial-detail-body">
+    <header class="gallery-header" role="banner">
+        <div class="header-inner">
+            <a href="../index.html" class="brand-logo" aria-label="JBU Home">
+                <img src="../assets/logo.png" alt="JBU Logo" class="logo-clean" />
+            </a>
+            <nav class="main-nav" role="navigation">
+                <ul class="nav-list" role="menubar">
+                    
+        <li><a class="nav-link" href="../index.html">Originals</a></li>
+        <li><a class="nav-link" href="../cases.html">Case Devices</a></li>
+        <li><a class="nav-link" href="../info/soporte.html">Support</a></li>
+    
+                </ul>
+            </nav>
+            <div id="global-user-status" class="user-status-container"></div>
+        </div>
+    </header>
+
+    <main class="cds--grid main-editorial-wrapper" style="padding-top: 2rem;">
+        <div class="cds--row">
+            <section class="cds--col-lg-10 cds--col-md-5 cds--col-sm-4">
+                <div class="artwork-gallery-container">
+                    
+    <div class="artwork-image-wrapper">
+        <img src="../assets/artworks/DECO/12.png"
+             alt="Interior Signal - View 1"
+             class="artwork-detail-img"
+             loading="lazy" />
+    </div>
+                </div>
+            </section>
+
+            <aside class="cds--col-lg-6 cds--col-md-3 cds--col-sm-4">
+                <div class="artwork-meta-panel sticky-panel">
+                    <div class="meta-header">
+                        <span class="series-tag">DECO</span>
+                        <span class="status-badge sold">○ Sold / Private Collection</span>
+                    </div>
+
+                    <h1 class="artwork-title">Interior Signal</h1>
+                    <p class="artwork-specs">Acrílico sobre papel, 15 x 19 in (2026)</p>
+                    
+                    <div class="artwork-pricing">
+                        <span class="price-label">Price:</span>
+                        <span class="price-value">0</span>
+                    </div>
+
+                    <p class="artwork-description">A piece with clear abstract language and immediate decorative appeal.</p>
+
+                    <div class="interaction-block">
+                        <div class="like-counter-wrapper">
+                            <span id="contador-vistas" class="like-badge">❤️ 0 likes</span>
+                            <span id="dossier-status-tag" class="like-status">Unsaved</span>
+                        </div>
+
+                        <button id="btn-ver-obra" class="btn-like-action">
+                             ❤️ Like Artwork
+                        </button>
+
+                        <div id="dossier-content" class="dossier-expanded-panel" style="display: none; margin-top: 10px; font-size: 0.85rem; color: #555;">
+                            <p>✨ Artwork added to your favorites!</p>
+                        </div>
+                    </div>
+
+                    <div class="purchase-actions" style="margin-top: 1.5rem;">
+                        <a href="https://wa.me/528123518298?text=Hello,%20I%20am%20interested%20in%20the%20artwork%20Interior%20Signal%20(deco-03)" target="_blank" rel="noopener noreferrer" class="btn-secondary-action">Inquire / Reserve</a>
+                    </div>
+
+                    <div class="qr-verification-block" style="margin-top: 2rem;">
+                        <img src="../assets/qr/deco-03.png" alt="Verification QR Code" class="qr-code-img" style="width: 100px; height: 100px;" />
+                        <span class="qr-code-label">Code: deco-03</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="gallery-footer" role="contentinfo">
+        <div class="footer-inner">
+            <span class="footer-copyright">© 2026 JBU. All rights reserved.</span>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { guardarVista, obtenerTotalVistas } from "../js/firestore.js";
+        import { auth } from "../js/firebase-config.js";
+        import { 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+        const globalUserStatus = document.getElementById("global-user-status");
+        const btnVerObra = document.getElementById("btn-ver-obra");
+        const contadorVistas = document.getElementById("contador-vistas");
+        const dossierContent = document.getElementById("dossier-content");
+        const statusTag = document.getElementById("dossier-status-tag");
+
+        const WORK_CODE = "deco-03";
+        let liked = false;
+        const provider = new GoogleAuthProvider();
+
+        // 1. Fetch and display total likes count
+        async function cargarTotalVistas() {
+            if (!contadorVistas) return;
+            try {
+                const total = await obtenerTotalVistas(WORK_CODE);
+                contadorVistas.textContent = "❤️ " + total + " likes";
+            } catch (err) {
+                console.error("💥 Error querying likes count:", err);
+                contadorVistas.textContent = "❤️ 0 likes";
+            }
+        }
+
+        // Public execution on load
+        cargarTotalVistas();
+
+        // 2. Real-time User Auth Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user && globalUserStatus) {
+                const name = user.displayName || user.email.split('@')[0];
+                const photo = user.photoURL 
+                    ? '<img src="' + user.photoURL + '" alt="' + name + '" class="user-avatar-img" />' 
+                    : '<span class="user-status-dot"></span>';
+                
+                globalUserStatus.innerHTML = '<div class="user-badge">' + photo + '<span>Connected: <strong>' + name + '</strong></span></div>';
+            } else if (globalUserStatus) {
+                globalUserStatus.innerHTML = '<span style="color: #777;">👤 Guest (Not signed in)</span>';
+            }
+        });
+
+        // 3. Like Button Action
+        if (btnVerObra) {
+            btnVerObra.addEventListener("click", async () => {
+                let user = auth.currentUser;
+
+                // Toggle off if already liked
+                if (liked) {
+                    liked = false;
+                    btnVerObra.textContent = "❤️ Like Artwork";
+                    if (dossierContent) dossierContent.style.display = "none";
+                    if (statusTag) statusTag.textContent = "Unsaved";
+                    return;
+                }
+
+                // Require login if user is not authenticated
+                if (!user) {
+                    try {
+                        console.log("🔒 [Auth] Login required to like artwork...");
+                        const result = await signInWithPopup(auth, provider);
+                        user = result.user;
+                        console.log("✅ [Auth] Signed in as:", user.displayName);
+                    } catch (error) {
+                        console.error("💥 [Auth] Login cancelled or failed:", error);
+                        alert("Please sign in with your Google account to like and save this artwork.");
+                        return;
+                    }
+                }
+
+                // Mark as liked upon successful auth
+                liked = true;
+                btnVerObra.textContent = "💖 Liked";
+                if (dossierContent) dossierContent.style.display = "block";
+                if (statusTag) statusTag.textContent = "Liked";
+
+                // Record like in Firestore
+                try {
+                    const esNuevaVista = await guardarVista(user.uid, WORK_CODE);
+                    if (esNuevaVista) {
+                        console.log("✅ [Firestore] New like recorded for:", WORK_CODE);
+                        await cargarTotalVistas();
+                    } else {
+                        console.log("ℹ️ [Firestore] Existing like found. Count not duplicated.");
+                    }
+                } catch (err) {
+                    console.error("💥 [Firestore] Error saving like:", err);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
