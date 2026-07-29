@@ -1,12 +1,11 @@
 const { google } = require('googleapis');
 // Reemplaza con tu Secret Key real (sk_test_... o sk_live_...)
-const stripe = require('stripe')('ttest'); 
+const stripe = require('stripe')('test--'); 
 const path = require('path');
 
 // Configuración de Google Sheets
 const SPREADSHEET_ID = '1uY0_p8BCl4Fs-MZMzWWYVdT33_d4BHEI-BVJtS3ednw';
 const NOMBRE_HOJA = 'Catalogo';
-// Leemos de la columna A hasta la Q para evaluar la K (link) y escribir Q (ID)
 const RANGE_LECTURA = `${NOMBRE_HOJA}!A2:Q500`;
 
 async function obtenerAutenticacionGoogle() {
@@ -36,39 +35,34 @@ async function procesarCatalogoYSheets() {
 
     console.log(`🚀 Procesando ${filas.length} registros desde Google Sheets...\n`);
 
-    // Iteramos fila por fila
     for (let index = 0; index < filas.length; index++) {
       const fila = filas[index];
-      const numeroFila = index + 2; // +2 porque el rango empieza en A2 (índice 0 = Fila 2)
+      const numeroFila = index + 2; // Índice 0 = Fila 2 en Sheets
 
-      // Mapeo de columnas (Índice base 0):
-      // Col B = [1], Col C = [2], Col J = [9], Col K = [10], Col O = [14], Col P = [15]
       const codeB = fila[1] ? fila[1].toString().trim() : '';
       const titleC = fila[2] ? fila[2].toString().trim() : '';
       const priceJ = fila[9] ? parseFloat(fila[9]) : 0;
       const stripeUrlK = fila[10] ? fila[10].toString().trim() : '';
       const descO = fila[14] ? fila[14].toString().trim() : '';
-      const currencyP = fila[15] ? fila[15].toString().trim() : 'usd';
+      
+      // FORZADO A USD para todos los casos sin link de Stripe
+      const currency = 'usd';
 
-      // Filtrar: Ejecutar solo si la columna K está VACÍA, tiene precio y código de producto
+      // Evaluar si la columna K está VACÍA, tiene código y precio > 0
       if (stripeUrlK === '' && codeB !== '' && priceJ > 0) {
         
-        // A. Nombre concatenado (B + C)
         const productName = `${codeB} ${titleC}`.trim();
         const description = descO || `Original artwork ${codeB}`;
-        const currency = currencyP.toLowerCase();
-        
-        // Stripe requiere el monto en centavos (ej. 1000.00 -> 100000)
         const amountCentavos = Math.round(priceJ * 100);
 
-        console.log(`⏳ Procesando fila ${numeroFila}: "${productName}" - $${priceJ} ${currency.toUpperCase()}`);
+        console.log(`⏳ Procesando fila ${numeroFila}: "${productName}" - $${priceJ} USD`);
 
-        // B. Crear Producto en Stripe
+        // 1. Crear Producto y Precio Default en USD
         const product = await stripe.products.create({
           name: productName,
           description: description,
           metadata: {
-            product_code: codeB // Guarda la clave para que la reconozca tu Webhook
+            product_code: codeB
           },
           default_price_data: {
             currency: currency,
@@ -76,7 +70,7 @@ async function procesarCatalogoYSheets() {
           },
         });
 
-        // C. Crear Enlace de Pago (Payment Link) en Stripe
+        // 2. Crear Enlace de Pago (Payment Link)
         const paymentLink = await stripe.paymentLinks.create({
           line_items: [
             {
@@ -85,14 +79,14 @@ async function procesarCatalogoYSheets() {
             },
           ],
           shipping_address_collection: {
-            allowed_countries: ['MX', 'US', 'CA'], // Solicita dirección de envío
+            allowed_countries: ['MX', 'US', 'CA'],
           },
           metadata: {
-            product_code: codeB // Pasa la clave en el Payment Link
+            product_code: codeB
           }
         });
 
-        // D. Actualizar ID del Producto en Columna Q
+        // 3. Actualizar ID del Producto en Columna Q
         await sheets.spreadsheets.values.update({
           spreadsheetId: SPREADSHEET_ID,
           range: `${NOMBRE_HOJA}!Q${numeroFila}`,
@@ -102,7 +96,7 @@ async function procesarCatalogoYSheets() {
           },
         });
 
-        // E. Actualizar URL del Link de Pago en Columna K
+        // 4. Actualizar URL del Link de Pago en Columna K
         await sheets.spreadsheets.values.update({
           spreadsheetId: SPREADSHEET_ID,
           range: `${NOMBRE_HOJA}!K${numeroFila}`,
